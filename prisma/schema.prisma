@@ -1,0 +1,263 @@
+// Prisma schema — NutriKanban
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum KanbanStatus {
+  NOVOS
+  EM_AVALIACAO
+  PLANO_ENTREGUE
+  ACOMPANHAMENTO
+}
+
+enum MainGoal {
+  EMAGRECIMENTO
+  ESTETICA
+  DESEMPENHO_ESPORTIVO
+  REEDUCACAO_ALIMENTAR
+  ENCAMINHADO_MEDICO
+}
+
+enum ConsultationFormStatus {
+  PENDING
+  SENT
+  COMPLETED
+}
+
+model Client {
+  id         String       @id @default(cuid())
+  name       String
+  email      String?
+  phone      String?
+  age        Int?
+  height     Float? // cm
+  goal       String? // objetivo do cliente (ex: emagrecimento, hipertrofia)
+  document   String? // identidade ou CPF
+  profession String?
+  notes      String?
+  status     KanbanStatus @default(NOVOS)
+  order      Int          @default(0) // posição dentro da coluna do kanban
+  avatarSeed String?      @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  measurements      Measurement[]
+  dietLogs          DietLog[]
+  mealPlans         MealPlan[]
+  supplements       ClientSupplement[]
+  consultationForms ConsultationForm[]
+}
+
+model Measurement {
+  id       String   @id @default(cuid())
+  clientId String
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  date     DateTime @default(now())
+  weight   Float // kg
+  bodyFat  Float? // %
+  waist    Float? // cm
+  hip      Float? // cm
+
+  @@index([clientId])
+}
+
+model DietLog {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  weekStart DateTime // início da semana referente ao registro
+  adherence Int // % de adesão à dieta (0-100)
+  protein   Float? // g médios/dia
+  carbs     Float? // g médios/dia
+  fat       Float? // g médios/dia
+
+  @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Banco de alimentos
+// ---------------------------------------------------------------------------
+
+model Food {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  category    String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
+  defaultUnit String   @default("g") // g, ml, unidade, fatia, colher de sopa...
+  kcal100     Float // kcal por 100g (ou por 100ml)
+  protein100  Float
+  carbs100    Float
+  fat100      Float
+  fiber100    Float?
+  createdAt   DateTime @default(now())
+
+  mealOptionItems   MealOptionItem[]
+  recipeIngredients RecipeIngredient[]
+}
+
+// ---------------------------------------------------------------------------
+// Receitas (biblioteca compartilhada)
+// ---------------------------------------------------------------------------
+
+model Recipe {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  ingredients  String // lista separada por linha (texto livre, sempre exibido)
+  instructions String?
+  calories     Int? // kcal (opcional — nem toda receita importada tem macro conhecido)
+  protein      Float? // g
+  carbs        Float? // g
+  fat          Float? // g
+  imageUrl     String?
+  tags         String? // separadas por vírgula (ex: "café da manhã,low carb")
+  createdAt    DateTime @default(now())
+
+  ingredientItems RecipeIngredient[]
+  mealOptionItems MealOptionItem[]
+}
+
+model RecipeIngredient {
+  id          String  @id @default(cuid())
+  recipeId    String
+  recipe      Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  foodId      String?
+  food        Food?   @relation(fields: [foodId], references: [id])
+  description String? // usado quando não há Food estruturado (ex: "sal a gosto")
+  quantity    Float?
+  unit        String?
+  order       Int     @default(0)
+
+  @@index([recipeId])
+  @@index([foodId])
+}
+
+// ---------------------------------------------------------------------------
+// Plano alimentar do paciente
+// ---------------------------------------------------------------------------
+
+model MealPlan {
+  id                String   @id @default(cuid())
+  clientId          String
+  client            Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title             String   @default("Plano Alimentar")
+  objective         String?
+  generalGuidelines String? // itens separados por \n
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  meals Meal[]
+
+  @@index([clientId])
+}
+
+model Meal {
+  id         String   @id @default(cuid())
+  mealPlanId String
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  name       String // "Desjejum", "Almoço", "Jantar"...
+  order      Int      @default(0)
+
+  options MealOption[]
+
+  @@index([mealPlanId])
+}
+
+model MealOption {
+  id       String @id @default(cuid())
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  label    String @default("Opção 1")
+  order    Int    @default(0)
+  freeText String // texto original / autoritativo da opção
+
+  items MealOptionItem[]
+
+  @@index([mealId])
+}
+
+model MealOptionItem {
+  id           String     @id @default(cuid())
+  mealOptionId String
+  mealOption   MealOption @relation(fields: [mealOptionId], references: [id], onDelete: Cascade)
+  foodId       String?
+  food         Food?      @relation(fields: [foodId], references: [id])
+  recipeId     String?
+  recipe       Recipe?    @relation(fields: [recipeId], references: [id])
+  description  String? // fallback texto quando não há food/recipe estruturado
+  quantity     Float?
+  unit         String?
+  order        Int        @default(0)
+
+  @@index([mealOptionId])
+  @@index([foodId])
+  @@index([recipeId])
+}
+
+// ---------------------------------------------------------------------------
+// Suplementação
+// ---------------------------------------------------------------------------
+
+model Supplement {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  notes String?
+
+  clientSupplements ClientSupplement[]
+}
+
+model ClientSupplement {
+  id           String      @id @default(cuid())
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  supplementId String?
+  supplement   Supplement? @relation(fields: [supplementId], references: [id])
+  name         String // nome de exibição (denormalizado)
+  instructions String // dosagem/instrução completa
+  order        Int         @default(0)
+  createdAt    DateTime    @default(now())
+
+  @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Formulário pré-consulta
+// ---------------------------------------------------------------------------
+
+model ConsultationForm {
+  id          String                 @id @default(cuid())
+  clientId    String
+  client      Client                 @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  token       String                 @unique @default(cuid())
+  status      ConsultationFormStatus @default(PENDING)
+  sentAt      DateTime?
+  completedAt DateTime?
+
+  // respostas preenchidas pelo paciente
+  fullName                  String?
+  document                  String?
+  profession                String?
+  height                    Float?
+  birthDate                 DateTime?
+  mainGoal                  MainGoal?
+  hasNutritionalFollowUp    Boolean?
+  pathology                 String?
+  doesPhysicalActivity      Boolean?
+  physicalActivityFrequency String?
+  medications               String?
+  sleepQuality              String?
+  gutHealth                 String?
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+}
