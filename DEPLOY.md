@@ -2,10 +2,12 @@
 
 ## 1. Banco de dados (Supabase Postgres)
 
-No painel do Supabase → **Project Settings → Database → Connection string**, copie:
+No painel do Supabase → botão **Connect** (topo do dashboard) → aba **Connection string**, copie:
 
 - **Transaction pooler** (porta `6543`) → variável `DATABASE_URL` (usada pelo app em runtime)
-- **Direct connection** (porta `5432`) → variável `DIRECT_URL` (usada pelo Prisma CLI para `db push`/migrations)
+- **Session pooler** (porta `5432`) → variável `DIRECT_URL` (usada pelo Prisma CLI para `db push`/migrations)
+
+> Usamos o **Session pooler** em vez da "Direct connection" porque a conexão direta do Supabase é IPv6-only por padrão — em redes/ambientes só-IPv4 (comum em casa e em alguns runtimes) ela não conecta. O Session pooler resolve isso (é a alternativa oficial recomendada pelo próprio Supabase pra IPv4).
 
 Cole as duas no `.env` local, depois rode:
 
@@ -20,8 +22,8 @@ Configure em Vercel → Project Settings → Environment Variables:
 
 | Variável | Valor |
 |---|---|
-| `DATABASE_URL` | connection string pooled do Supabase (porta 6543) |
-| `DIRECT_URL` | connection string direta do Supabase (porta 5432) |
+| `DATABASE_URL` | Transaction pooler do Supabase (porta 6543) |
+| `DIRECT_URL` | Session pooler do Supabase (porta 5432) |
 | `SUPABASE_URL` | URL do projeto Supabase |
 | `SUPABASE_SECRET_KEY` | chave secreta do Supabase (Storage — fotos de receitas) |
 | `RESEND_API_KEY` | API key do Resend (opcional — sem ela, envio de formulário fica em modo de teste/log) |
