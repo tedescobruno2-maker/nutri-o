@@ -8,12 +8,18 @@
  *
  * Rodar com: npx tsx prisma/import-to-postgres.ts
  */
+import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import fs from "fs";
 import path from "path";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+// Usa DIRECT_URL (session pooler) em vez do transaction pooler: mais estável
+// para esta carga em lote com muitas queries sequenciais.
+const adapter = new PrismaPg({
+  connectionString: process.env.DIRECT_URL ?? process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 const prisma = new PrismaClient({ adapter });
 
 // Converte strings ISO de data (produzidas pelo JSON.stringify) de volta para Date.
