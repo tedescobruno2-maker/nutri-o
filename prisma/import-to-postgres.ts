@@ -17,11 +17,12 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 // Converte strings ISO de data (produzidas pelo JSON.stringify) de volta para Date.
-function withDates<T extends Record<string, unknown>>(rows: T[], dateFields: string[]): T[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function withDates(rows: any[], dateFields: string[]): any[] {
   return rows.map((row) => {
     const copy = { ...row };
     for (const field of dateFields) {
-      if (copy[field]) copy[field] = new Date(copy[field] as string) as never;
+      if (copy[field]) copy[field] = new Date(copy[field]);
     }
     return copy;
   });
