@@ -11,6 +11,8 @@ import { AddSupplementForm } from "@/components/supplements/AddSupplementForm";
 import { SupplementRow } from "@/components/supplements/SupplementRow";
 import { ConsultationFormSection } from "@/components/consultation/ConsultationFormSection";
 import { EditClientButton } from "@/components/clients/EditClientButton";
+import { ImportScaleButton } from "@/components/clients/ImportScaleButton";
+import { BodyCompositionSection } from "@/components/clients/BodyCompositionSection";
 import { KANBAN_LABELS, initials, formatDateFull, type KanbanStatusValue } from "@/lib/utils";
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,8 +44,9 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             </p>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span className="badge badge-primary">{KANBAN_LABELS[client.status as KanbanStatusValue]}</span>
+          <ImportScaleButton clientId={client.id} clientName={client.name} />
           <EditClientButton client={client} />
         </div>
       </div>
@@ -80,6 +83,12 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
           <AddMeasurementForm clientId={client.id} />
         </div>
       </section>
+
+      {latest && (latest.bmi != null || latest.muscleMassPercent != null || latest.bmr != null) && (
+        <section className="section">
+          <BodyCompositionSection measurement={latest} />
+        </section>
+      )}
 
       <section className="section chart-grid-2">
         <div className="card card-pad">

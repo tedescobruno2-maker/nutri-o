@@ -66,6 +66,22 @@ model Measurement {
   waist    Float? // cm
   hip      Float? // cm
 
+  // Bioimpedância (relatório de balança — ex: Bioeasy Pro)
+  fatMassKg         Float? // massa gorda em kg
+  subcutaneousFatKg Float? // massa de gordura subcutânea
+  fatFreeMassKg     Float? // massa livre de gordura
+  muscleMassPercent Float? // % massa muscular
+  bodyWaterPercent  Float? // % água corporal
+  bodyWaterKg       Float? // água corporal em kg
+  bmi               Float? // IMC
+  sarcopeniaIndex   Float?
+  boneMassKg        Float?
+  bmr               Int? // taxa metabólica basal (kcal)
+  visceralFat       Int? // gordura visceral (nível)
+  bioScore          Float? // pontuação geral do relatório
+  segmental         Json? // massa muscular/gordura por segmento (tronco, braços, pernas)
+  source            String? // ex: "Balança Bioeasy Pro 1" — indica origem não-manual da medição
+
   @@index([clientId])
 }
 
