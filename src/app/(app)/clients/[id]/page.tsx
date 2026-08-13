@@ -11,7 +11,7 @@ import { AddSupplementForm } from "@/components/supplements/AddSupplementForm";
 import { SupplementRow } from "@/components/supplements/SupplementRow";
 import { ConsultationFormSection } from "@/components/consultation/ConsultationFormSection";
 import { EditClientButton } from "@/components/clients/EditClientButton";
-import { KANBAN_LABELS, initials, type KanbanStatusValue } from "@/lib/utils";
+import { KANBAN_LABELS, initials, formatDateFull, type KanbanStatusValue } from "@/lib/utils";
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -129,7 +129,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
         <ConsultationFormSection clientId={client.id} hasEmail={!!client.email} form={client.consultationForms[0] ?? null} />
       </section>
 
-      {(client.email || client.phone || client.notes || client.document || client.profession) && (
+      {(client.email || client.phone || client.notes || client.document || client.profession || client.lastConsultation) && (
         <section className="section">
           <div className="card card-pad">
             <h3 style={{ marginBottom: 12 }}>Informações de contato</h3>
@@ -138,6 +138,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
               {client.phone && <span>📱 {client.phone}</span>}
               {client.document && <span>🪪 {client.document}</span>}
               {client.profession && <span>💼 {client.profession}</span>}
+              {client.lastConsultation && <span>🗓️ Última consulta: {formatDateFull(client.lastConsultation)}</span>}
               {client.notes && <span>📝 {client.notes}</span>}
             </div>
           </div>

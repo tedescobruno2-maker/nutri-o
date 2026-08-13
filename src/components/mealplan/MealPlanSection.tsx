@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { NewMealPlanButton } from "./NewMealPlanButton";
 import { MealCard } from "./MealCard";
 import { AddMealForm } from "./AddMealForm";
@@ -27,7 +28,17 @@ export function MealPlanSection({
     <div className="card card-pad" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div className="chart-card-header">
         <h3>Plano Alimentar</h3>
-        <NewMealPlanButton clientId={clientId} hasPlan={!!mealPlan} />
+        <div style={{ display: "flex", gap: 8 }}>
+          {mealPlan && (
+            <Link href={`/planos/${mealPlan.id}/exportar`} className="btn btn-ghost btn-sm">
+              🖨️ Exportar PDF
+            </Link>
+          )}
+          <Link href={`/planos?clientId=${clientId}`} className="btn btn-ghost btn-sm">
+            🍽️ Montar com receitas
+          </Link>
+          <NewMealPlanButton clientId={clientId} hasPlan={!!mealPlan} />
+        </div>
       </div>
 
       {!mealPlan ? (

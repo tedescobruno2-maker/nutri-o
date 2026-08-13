@@ -82,6 +82,39 @@ export async function getFoods(search?: string) {
   });
 }
 
+export async function getClientsBasic() {
+  return prisma.client.findMany({
+    select: { id: true, name: true, goal: true, status: true },
+    orderBy: { name: "asc" },
+  });
+}
+
+export async function getMealPlanForExport(mealPlanId: string) {
+  return prisma.mealPlan.findUnique({
+    where: { id: mealPlanId },
+    include: {
+      client: true,
+      meals: {
+        orderBy: { order: "asc" },
+        include: {
+          options: {
+            orderBy: { order: "asc" },
+            include: {
+              items: {
+                orderBy: { order: "asc" },
+                include: {
+                  food: true,
+                  recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function getConsultationFormByToken(token: string) {
   return prisma.consultationForm.findUnique({
     where: { token },

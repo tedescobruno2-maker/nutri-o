@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/clients", label: "Clientes", icon: "👥" },
   { href: "/recipes", label: "Receitas", icon: "🍽️" },
   { href: "/alimentos", label: "Alimentos", icon: "🥕" },
+  { href: "/planos", label: "Planos", icon: "📝" },
 ];
 
 export function Sidebar() {

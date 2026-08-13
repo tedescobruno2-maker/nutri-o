@@ -54,6 +54,8 @@ next-env.d.ts
 /PACIENTES
 /Anamnese
 /LISTA DE PACIENTES
+/Dados da balança
+/Sistema nutricionista Luana.docx
 
 # ferramentas locais de agente (não fazem parte do app)
 /.agents

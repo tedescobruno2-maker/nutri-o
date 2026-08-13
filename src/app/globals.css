@@ -1112,6 +1112,216 @@ select.input:focus {
   padding: 40px 20px;
 }
 
+/* -------------------------------- Plan builder -------------------------------- */
+
+.plan-builder {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .plan-builder {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.plan-recipe-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-recipe-media-wrap {
+  height: 100px;
+}
+
+.plan-recipe-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+}
+
+.plan-recipe-media-placeholder {
+  background: linear-gradient(135deg, var(--accent-primary-soft), color-mix(in oklch, var(--accent-warm) 25%, var(--accent-primary-soft)));
+}
+
+.plan-slot-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.plan-slot-chip:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary-strong);
+}
+
+.plan-slot-chip-active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+.plan-summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+}
+
+/* -------------------------------- Plan document (export/print) -------------------------------- */
+
+.plan-document {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  max-width: 860px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.plan-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.plan-doc-date {
+  font-size: 0.78rem;
+}
+
+.plan-doc-client {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.plan-doc-client-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.plan-doc-objective {
+  background: var(--accent-primary-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+
+.plan-doc-meal {
+  margin-bottom: 26px;
+  break-inside: avoid;
+}
+
+.plan-doc-meal h3 {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+.plan-doc-recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-doc-recipe-card {
+  display: flex;
+  gap: 12px;
+  break-inside: avoid;
+}
+
+.plan-doc-recipe-media {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.plan-doc-recipe-media-placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  background: var(--accent-primary-soft);
+}
+
+.plan-doc-recipe-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.plan-doc-recipe-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.plan-doc-ingredients {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+@media print {
+  .no-print,
+  .sidebar,
+  .topbar {
+    display: none !important;
+  }
+  .app-shell {
+    display: block !important;
+  }
+  .app-content {
+    padding: 0 !important;
+  }
+  .plan-document {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+  }
+  body {
+    background: white !important;
+  }
+  body::before {
+    display: none !important;
+  }
+}
+
 /* -------------------------------- Empty states -------------------------------- */
 
 .empty-state {

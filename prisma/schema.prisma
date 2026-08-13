@@ -32,21 +32,22 @@ enum ConsultationFormStatus {
 }
 
 model Client {
-  id         String       @id @default(cuid())
-  name       String
-  email      String?
-  phone      String?
-  age        Int?
-  height     Float? // cm
-  goal       String? // objetivo do cliente (ex: emagrecimento, hipertrofia)
-  document   String? // identidade ou CPF
-  profession String?
-  notes      String?
-  status     KanbanStatus @default(NOVOS)
-  order      Int          @default(0) // posição dentro da coluna do kanban
-  avatarSeed String?      @default(cuid())
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id               String       @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  age              Int?
+  height           Float? // cm
+  goal             String? // objetivo do cliente (ex: emagrecimento, hipertrofia)
+  document         String? // identidade ou CPF
+  profession       String?
+  notes            String?
+  lastConsultation DateTime? // data da última consulta (importado da lista de pacientes)
+  status           KanbanStatus @default(NOVOS)
+  order            Int          @default(0) // posição dentro da coluna do kanban
+  avatarSeed       String?      @default(cuid())
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   measurements      Measurement[]
   dietLogs          DietLog[]

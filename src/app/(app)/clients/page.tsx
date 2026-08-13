@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getClients } from "@/lib/dal";
-import { KANBAN_LABELS, initials, type KanbanStatusValue } from "@/lib/utils";
+import { KANBAN_LABELS, initials, formatDateFull, type KanbanStatusValue } from "@/lib/utils";
 import { NewClientButton } from "@/components/kanban/NewClientButton";
 
 const STATUS_BADGE: Record<KanbanStatusValue, string> = {
@@ -10,32 +10,42 @@ const STATUS_BADGE: Record<KanbanStatusValue, string> = {
   ACOMPANHAMENTO: "badge-primary",
 };
 
-export default async function ClientsPage() {
-  const clients = await getClients();
+export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
+  const allClients = await getClients();
+  const clients = q
+    ? allClients.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()))
+    : allClients;
 
   return (
     <div className="animate-in">
       <div className="page-header">
         <div>
           <h1>Banco de Clientes</h1>
-          <p className="text-muted">{clients.length} cliente(s) cadastrado(s).</p>
+          <p className="text-muted">
+            {allClients.length} cliente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
+          </p>
         </div>
         <NewClientButton />
       </div>
+
+      <form method="GET" style={{ marginBottom: 20, maxWidth: 360 }}>
+        <input className="input" type="search" name="q" placeholder="Buscar por nome..." defaultValue={q ?? ""} />
+      </form>
 
       <div className="card">
         {clients.length === 0 ? (
           <div className="empty-state">
             <span style={{ fontSize: "2rem" }}>🗂️</span>
-            <p>Nenhum cliente cadastrado ainda.</p>
+            <p>Nenhum cliente encontrado.</p>
           </div>
         ) : (
           <table className="data-table">
             <thead>
               <tr>
                 <th>Cliente</th>
-                <th>Objetivo</th>
                 <th>Status</th>
+                <th>Última consulta</th>
                 <th>Último peso</th>
                 <th>Contato</th>
                 <th></th>
@@ -50,19 +60,21 @@ export default async function ClientsPage() {
                       <div>
                         <div style={{ fontWeight: 700 }}>{client.name}</div>
                         <div className="text-tertiary" style={{ fontSize: "0.76rem" }}>
-                          {client.age ? `${client.age} anos` : "Idade não informada"}
+                          {client.goal || (client.age ? `${client.age} anos` : "—")}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="text-muted">{client.goal || "—"}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGE[client.status as KanbanStatusValue]}`}>
                       {KANBAN_LABELS[client.status as KanbanStatusValue]}
                     </span>
                   </td>
+                  <td className="text-muted">
+                    {client.lastConsultation ? formatDateFull(client.lastConsultation) : "—"}
+                  </td>
                   <td>{client.measurements[0] ? `${client.measurements[0].weight} kg` : "—"}</td>
-                  <td className="text-muted">{client.email || client.phone || "—"}</td>
+                  <td className="text-muted">{client.email || client.phone || client.document || "—"}</td>
                   <td>
                     <Link href={`/clients/${client.id}`} className="btn btn-ghost btn-sm">
                       Ver perfil →
