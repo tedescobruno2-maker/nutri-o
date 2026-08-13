@@ -52,6 +52,8 @@ next-env.d.ts
 
 # dados sensíveis de pacientes — nunca versionar (PII/saúde)
 /PACIENTES
+/Anamnese
+/LISTA DE PACIENTES
 
 # ferramentas locais de agente (não fazem parte do app)
 /.agents

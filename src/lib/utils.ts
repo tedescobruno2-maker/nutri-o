@@ -78,3 +78,26 @@ export const CONSULTATION_FORM_STATUS_LABELS: Record<string, string> = {
   SENT: "Aguardando resposta",
   COMPLETED: "Respondido",
 };
+
+const RECIPE_EMOJI_RULES: Array<[RegExp, string]> = [
+  [/salmão|peixe|atum|ômega|tilápia|linguado/i, "🐟"],
+  [/frango|peito de frango/i, "🍗"],
+  [/ovo|omelete|clara/i, "🥚"],
+  [/smoothie|suco|shake|vitamina/i, "🥤"],
+  [/panqueca|aveia|banana/i, "🥞"],
+  [/salada|grão-de-bico|legum/i, "🥗"],
+  [/quinoa|bowl/i, "🍲"],
+  [/hambúrguer|hamburguer|carne/i, "🍔"],
+  [/sopa|caldo/i, "🍜"],
+  [/lasanha|berinjela|abobrinha/i, "🍆"],
+  [/granola|semente/i, "🌾"],
+  [/molho/i, "🫙"],
+];
+
+export function pickRecipeEmoji(name: string, tags?: string | null) {
+  const haystack = `${name} ${tags ?? ""}`;
+  for (const [pattern, emoji] of RECIPE_EMOJI_RULES) {
+    if (pattern.test(haystack)) return emoji;
+  }
+  return "🍽️";
+}

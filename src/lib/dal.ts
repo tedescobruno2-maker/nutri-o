@@ -66,6 +66,13 @@ export async function getRecipesWithIngredients() {
   });
 }
 
+export async function getRecipeById(id: string) {
+  return prisma.recipe.findUnique({
+    where: { id },
+    include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } },
+  });
+}
+
 export async function getFoods(search?: string) {
   return prisma.food.findMany({
     where: search

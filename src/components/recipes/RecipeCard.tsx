@@ -1,27 +1,6 @@
+import Link from "next/link";
 import type { Recipe } from "@/generated/prisma/client";
-
-const EMOJI_RULES: Array<[RegExp, string]> = [
-  [/salmão|peixe|atum|ômega|tilápia|linguado/i, "🐟"],
-  [/frango|peito de frango/i, "🍗"],
-  [/ovo|omelete|clara/i, "🥚"],
-  [/smoothie|suco|shake|vitamina/i, "🥤"],
-  [/panqueca|aveia|banana/i, "🥞"],
-  [/salada|grão-de-bico|legum/i, "🥗"],
-  [/quinoa|bowl/i, "🍲"],
-  [/hambúrguer|hamburguer|carne/i, "🍔"],
-  [/sopa|caldo/i, "🍜"],
-  [/lasanha|berinjela|abobrinha/i, "🍆"],
-  [/granola|semente/i, "🌾"],
-  [/molho/i, "🫙"],
-];
-
-function pickEmoji(recipe: Pick<Recipe, "name" | "tags">) {
-  const haystack = `${recipe.name} ${recipe.tags ?? ""}`;
-  for (const [pattern, emoji] of EMOJI_RULES) {
-    if (pattern.test(haystack)) return emoji;
-  }
-  return "🍽️";
-}
+import { pickRecipeEmoji } from "@/lib/utils";
 
 export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const hasMacros = recipe.protein != null && recipe.carbs != null && recipe.fat != null;
@@ -32,20 +11,23 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const tags = recipe.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
 
   return (
-    <div className="card card-hover animate-in" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
-      {recipe.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={recipe.imageUrl} alt={recipe.name} className="recipe-media" style={{ objectFit: "cover", fontSize: 0 }} />
-      ) : (
-        <div
-          className="recipe-media"
-          style={{
-            background: "linear-gradient(135deg, var(--accent-primary-soft), color-mix(in oklch, var(--accent-warm) 25%, var(--accent-primary-soft)))",
-          }}
-        >
-          {pickEmoji(recipe)}
-        </div>
-      )}
+    <Link href={`/recipes/${recipe.id}`} className="recipe-card card card-hover animate-in">
+      <div className="recipe-media-wrap">
+        {recipe.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={recipe.imageUrl} alt={recipe.name} className="recipe-media" />
+        ) : (
+          <div
+            className="recipe-media recipe-media-placeholder"
+            style={{
+              background: "linear-gradient(135deg, var(--accent-primary-soft), color-mix(in oklch, var(--accent-warm) 25%, var(--accent-primary-soft)))",
+            }}
+          >
+            {pickRecipeEmoji(recipe.name, recipe.tags)}
+          </div>
+        )}
+        {recipe.calories != null && <span className="recipe-kcal-chip">{recipe.calories} kcal</span>}
+      </div>
 
       <div className="card-pad" style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
         <div>
@@ -55,22 +37,11 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         {tags.length > 0 && (
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {tags.map((tag) => (
+            {tags.slice(0, 3).map((tag) => (
               <span key={tag} className="badge badge-neutral">
                 {tag}
               </span>
             ))}
-          </div>
-        )}
-
-        {recipe.calories != null && (
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-            <span className="stat-value" style={{ fontSize: "1.3rem" }}>
-              {recipe.calories}
-            </span>
-            <span className="text-tertiary" style={{ fontSize: "0.78rem" }}>
-              kcal
-            </span>
           </div>
         )}
 
@@ -94,7 +65,9 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             </div>
           </>
         )}
+
+        <span className="recipe-card-cta">Ver receita completa →</span>
       </div>
-    </div>
+    </Link>
   );
 }
