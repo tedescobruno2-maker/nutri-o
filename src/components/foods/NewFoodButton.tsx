@@ -38,6 +38,10 @@ export function NewFoodButton() {
                 <label htmlFor="f-name">Nome</label>
                 <input className="input" id="f-name" name="name" required placeholder="Ex: Peito de frango" />
               </div>
+              <div className="field">
+                <label htmlFor="f-photo">Foto (opcional)</label>
+                <input className="input" id="f-photo" name="photo" type="file" accept="image/*" />
+              </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div className="field">
                   <label htmlFor="f-category">Categoria</label>

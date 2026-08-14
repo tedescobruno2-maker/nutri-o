@@ -1296,6 +1296,32 @@ select.input:focus {
   line-height: 1.4;
 }
 
+.plan-doc-exam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 4px;
+  list-style: disc;
+  margin-left: 18px;
+}
+
+.plan-doc-exam-list li {
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.plan-doc-footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 2px solid var(--accent-primary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
 @media print {
   .no-print,
   .sidebar,

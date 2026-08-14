@@ -148,6 +148,7 @@ model Food {
   name        String   @unique
   category    String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
   defaultUnit String   @default("g") // g, ml, unidade, fatia, colher de sopa...
+  imageUrl    String? // foto ilustrativa do alimento (Pixabay, ou upload manual)
   kcal100     Float // kcal por 100g (ou por 100ml)
   protein100  Float
   carbs100    Float

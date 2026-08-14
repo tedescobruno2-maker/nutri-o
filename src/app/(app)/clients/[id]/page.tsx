@@ -292,7 +292,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
       {/* Exames solicitados */}
       <section className="section">
-        <ExamsSection clientId={client.id} exams={client.exams} />
+        <ExamsSection clientId={client.id} exams={client.exams} hasEmail={!!client.email} />
       </section>
 
       {(client.email || client.phone || client.notes || client.document || client.profession || lastConsultation) && (

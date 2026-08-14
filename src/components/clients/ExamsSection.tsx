@@ -1,8 +1,11 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { addExam, deleteExam, markExamResult } from "@/actions/exams";
+import Link from "next/link";
+import { deleteExam, markExamResult } from "@/actions/exams";
 import { formatDateFull } from "@/lib/utils";
+import { RequestExamsModal } from "./RequestExamsModal";
+import { SendExamsButton } from "./SendExamsButton";
 
 type ExamItem = {
   id: string;
@@ -13,57 +16,6 @@ type ExamItem = {
   notes: string | null;
   fileUrl: string | null;
 };
-
-function AddExamForm({ clientId }: { clientId: string }) {
-  const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  function handleSubmit(formData: FormData) {
-    startTransition(async () => {
-      await addExam(formData);
-      formRef.current?.reset();
-      setOpen(false);
-    });
-  }
-
-  if (!open) {
-    return (
-      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setOpen(true)}>
-        + Solicitar exame
-      </button>
-    );
-  }
-
-  return (
-    <form
-      ref={formRef}
-      action={handleSubmit}
-      className="animate-in"
-      style={{ display: "grid", gridTemplateColumns: "2fr 1fr 2fr auto auto", gap: 10, alignItems: "end", margin: "12px 0" }}
-    >
-      <input type="hidden" name="clientId" value={clientId} />
-      <div className="field">
-        <label htmlFor="ex-name">Exame</label>
-        <input className="input" id="ex-name" name="name" required placeholder="Ex: Hemograma completo" />
-      </div>
-      <div className="field">
-        <label htmlFor="ex-date">Data solicitação</label>
-        <input className="input" id="ex-date" name="requestedDate" type="date" required />
-      </div>
-      <div className="field">
-        <label htmlFor="ex-notes">Observações</label>
-        <input className="input" id="ex-notes" name="notes" placeholder="Opcional" />
-      </div>
-      <button type="submit" className="btn btn-primary btn-sm" disabled={isPending}>
-        {isPending ? "Salvando..." : "Salvar"}
-      </button>
-      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setOpen(false)}>
-        Cancelar
-      </button>
-    </form>
-  );
-}
 
 function ExamRow({ exam, clientId }: { exam: ExamItem; clientId: string }) {
   const [openResult, setOpenResult] = useState(false);
@@ -145,22 +97,32 @@ function ExamRow({ exam, clientId }: { exam: ExamItem; clientId: string }) {
   );
 }
 
-export function ExamsSection({ clientId, exams }: { clientId: string; exams: ExamItem[] }) {
+export function ExamsSection({ clientId, exams, hasEmail }: { clientId: string; exams: ExamItem[]; hasEmail: boolean }) {
   return (
     <div className="card card-pad">
       <div className="chart-card-header">
         <h3>Exames solicitados</h3>
-        <AddExamForm clientId={clientId} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <RequestExamsModal clientId={clientId} />
+          <Link href={`/clients/${clientId}/exames/exportar`} className="btn btn-ghost btn-sm">
+            🖨️ Exportar PDF
+          </Link>
+        </div>
       </div>
 
       {exams.length === 0 ? (
         <p className="text-tertiary" style={{ fontSize: "0.85rem", marginTop: 8 }}>Nenhum exame solicitado ainda.</p>
       ) : (
-        <div style={{ marginTop: 10 }}>
-          {exams.map((exam) => (
-            <ExamRow key={exam.id} exam={exam} clientId={clientId} />
-          ))}
-        </div>
+        <>
+          <div style={{ marginTop: 10 }}>
+            {exams.map((exam) => (
+              <ExamRow key={exam.id} exam={exam} clientId={clientId} />
+            ))}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <SendExamsButton clientId={clientId} hasEmail={hasEmail} />
+          </div>
+        </>
       )}
     </div>
   );

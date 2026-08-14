@@ -42,7 +42,34 @@ export default async function FoodsPage({ searchParams }: { searchParams: Promis
             <tbody>
               {foods.map((food) => (
                 <tr key={food.id}>
-                  <td style={{ fontWeight: 700 }}>{food.name}</td>
+                  <td style={{ fontWeight: 700 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {food.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={food.imageUrl}
+                          alt={food.name}
+                          style={{ width: 40, height: 40, borderRadius: "var(--radius-sm)", objectFit: "cover", flexShrink: 0 }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "var(--radius-sm)",
+                            background: "var(--accent-primary-soft)",
+                            display: "grid",
+                            placeItems: "center",
+                            fontSize: "1.1rem",
+                            flexShrink: 0,
+                          }}
+                        >
+                          🥕
+                        </div>
+                      )}
+                      {food.name}
+                    </div>
+                  </td>
                   <td className="text-muted">{food.category || "—"}</td>
                   <td>{food.kcal100}</td>
                   <td>{food.protein100}g</td>

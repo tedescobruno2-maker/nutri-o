@@ -133,6 +133,13 @@ export async function getMealPlanForExport(mealPlanId: string) {
   });
 }
 
+export async function getClientForExamsExport(id: string) {
+  return prisma.client.findUnique({
+    where: { id },
+    include: { exams: { orderBy: { requestedDate: "desc" } } },
+  });
+}
+
 export async function getConsultationFormByToken(token: string) {
   return prisma.consultationForm.findUnique({
     where: { token },

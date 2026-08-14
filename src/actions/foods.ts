@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { saveUploadedImage } from "@/actions/upload";
 
 const createFoodSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -27,10 +28,13 @@ export async function createFood(formData: FormData) {
     fiber100: formData.get("fiber100") || undefined,
   });
 
+  const photoFile = formData.get("photo") as File | null;
+  const imageUrl = await saveUploadedImage(photoFile, "foods");
+
   await prisma.food.upsert({
     where: { name: parsed.name },
-    update: parsed,
-    create: parsed,
+    update: { ...parsed, ...(imageUrl ? { imageUrl } : {}) },
+    create: { ...parsed, imageUrl: imageUrl ?? undefined },
   });
 
   revalidatePath("/alimentos");
