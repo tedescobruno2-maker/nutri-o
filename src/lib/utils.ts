@@ -21,6 +21,16 @@ export function formatDateFull(date: Date | string) {
   return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
 }
 
+/** Calcula a idade a partir da data de nascimento, na data informada (padrão: hoje). */
+export function calculateAge(birthDate: Date | string, atDate: Date | string = new Date()): number {
+  const birth = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
+  const at = typeof atDate === "string" ? new Date(atDate) : atDate;
+  let age = at.getFullYear() - birth.getFullYear();
+  const monthDiff = at.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && at.getDate() < birth.getDate())) age--;
+  return age;
+}
+
 export const KANBAN_STATUSES = [
   "NOVOS",
   "EM_AVALIACAO",

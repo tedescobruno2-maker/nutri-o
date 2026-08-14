@@ -2,18 +2,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMealPlanForExport } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
-import { formatDateFull } from "@/lib/utils";
+import { formatDateFull, calculateAge } from "@/lib/utils";
 
 export default async function ExportPlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const plan = await getMealPlanForExport(id);
   if (!plan) notFound();
+  const clientAge = plan.client.birthDate ? calculateAge(plan.client.birthDate) : plan.client.age;
 
   return (
     <div className="animate-in">
       <div className="page-header no-print">
         <Link href={`/clients/${plan.clientId}`} className="btn btn-ghost btn-sm">
-          ← Voltar para o cliente
+          ← Voltar para o paciente
         </Link>
         <PrintButton />
       </div>
@@ -34,7 +35,7 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
             <h2>{plan.client.name}</h2>
           </div>
           <div className="plan-doc-client-meta">
-            {plan.client.age && <span>{plan.client.age} anos</span>}
+            {clientAge != null && <span>{clientAge} anos</span>}
             {plan.client.height && <span>{plan.client.height} cm</span>}
             {plan.client.goal && <span>{plan.client.goal}</span>}
           </div>

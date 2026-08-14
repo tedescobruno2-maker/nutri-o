@@ -19,7 +19,7 @@ export function NewClientButton() {
   return (
     <>
       <button type="button" className="btn btn-primary" onClick={() => setOpen(true)}>
-        + Novo cliente
+        + Novo paciente
       </button>
 
       {open && (
@@ -41,7 +41,7 @@ export function NewClientButton() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="page-header" style={{ marginBottom: 16 }}>
-              <h2>Novo cliente</h2>
+              <h2>Novo paciente</h2>
               <button type="button" className="btn btn-ghost btn-icon" onClick={() => setOpen(false)}>
                 ✕
               </button>
@@ -54,8 +54,8 @@ export function NewClientButton() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div className="field">
-                  <label htmlFor="age">Idade</label>
-                  <input className="input" id="age" name="age" type="number" min={0} placeholder="Ex: 28" />
+                  <label htmlFor="birthDate">Data de nascimento</label>
+                  <input className="input" id="birthDate" name="birthDate" type="date" />
                 </div>
                 <div className="field">
                   <label htmlFor="height">Altura (cm)</label>
@@ -64,7 +64,7 @@ export function NewClientButton() {
               </div>
               <div className="field">
                 <label htmlFor="email">E-mail</label>
-                <input className="input" id="email" name="email" type="email" placeholder="cliente@email.com" />
+                <input className="input" id="email" name="email" type="email" placeholder="paciente@email.com" />
               </div>
               <div className="field">
                 <label htmlFor="phone">Telefone</label>
@@ -76,11 +76,11 @@ export function NewClientButton() {
               </div>
               <div className="field">
                 <label htmlFor="notes">Observações</label>
-                <textarea className="input" id="notes" name="notes" rows={3} placeholder="Notas iniciais sobre o cliente" />
+                <textarea className="input" id="notes" name="notes" rows={3} placeholder="Notas iniciais sobre o paciente" />
               </div>
 
               <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 6 }}>
-                {isPending ? "Salvando..." : "Adicionar cliente"}
+                {isPending ? "Salvando..." : "Adicionar paciente"}
               </button>
             </form>
           </div>

@@ -31,29 +31,70 @@ enum ConsultationFormStatus {
   COMPLETED
 }
 
+enum ExamStatus {
+  SOLICITADO
+  RESULTADO_RECEBIDO
+}
+
 model Client {
-  id               String       @id @default(cuid())
-  name             String
-  email            String?
-  phone            String?
-  age              Int?
-  height           Float? // cm
-  goal             String? // objetivo do cliente (ex: emagrecimento, hipertrofia)
-  document         String? // identidade ou CPF
-  profession       String?
-  notes            String?
-  lastConsultation DateTime? // data da última consulta (importado da lista de pacientes)
-  status           KanbanStatus @default(NOVOS)
-  order            Int          @default(0) // posição dentro da coluna do kanban
-  avatarSeed       String?      @default(cuid())
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id         String       @id @default(cuid())
+  name       String
+  email      String?
+  phone      String?
+  age        Int? // idade informada manualmente (fallback quando não há data de nascimento)
+  birthDate  DateTime? // data de nascimento — usada para calcular idade automaticamente
+  height     Float? // cm
+  goal       String? // objetivo do cliente (ex: emagrecimento, hipertrofia)
+  document   String? // identidade ou CPF
+  profession String?
+  notes      String?
+  status     KanbanStatus @default(NOVOS)
+  order      Int          @default(0) // posição dentro da coluna do kanban
+  avatarSeed String?      @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
   measurements      Measurement[]
   dietLogs          DietLog[]
   mealPlans         MealPlan[]
   supplements       ClientSupplement[]
   consultationForms ConsultationForm[]
+  consultations     Consultation[]
+  exams             Exam[]
+}
+
+// ---------------------------------------------------------------------------
+// Histórico de consultas
+// ---------------------------------------------------------------------------
+
+model Consultation {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Exames solicitados
+// ---------------------------------------------------------------------------
+
+model Exam {
+  id            String     @id @default(cuid())
+  clientId      String
+  client        Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name          String
+  requestedDate DateTime
+  resultDate    DateTime?
+  status        ExamStatus @default(SOLICITADO)
+  notes         String?
+  fileUrl       String? // resultado anexado (PDF/imagem)
+  createdAt     DateTime   @default(now())
+
+  @@index([clientId])
 }
 
 model Measurement {
@@ -231,15 +272,17 @@ model Supplement {
 }
 
 model ClientSupplement {
-  id           String      @id @default(cuid())
-  clientId     String
-  client       Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  supplementId String?
-  supplement   Supplement? @relation(fields: [supplementId], references: [id])
-  name         String // nome de exibição (denormalizado)
-  instructions String // dosagem/instrução completa
-  order        Int         @default(0)
-  createdAt    DateTime    @default(now())
+  id             String      @id @default(cuid())
+  clientId       String
+  client         Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  supplementId   String?
+  supplement     Supplement? @relation(fields: [supplementId], references: [id])
+  name           String // nome de exibição (denormalizado)
+  instructions   String // dosagem/instrução completa
+  active         Boolean     @default(true)
+  discontinuedAt DateTime?
+  order          Int         @default(0)
+  createdAt      DateTime    @default(now())
 
   @@index([clientId])
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getClients } from "@/lib/dal";
-import { KANBAN_LABELS, initials, formatDateFull, type KanbanStatusValue } from "@/lib/utils";
+import { KANBAN_LABELS, initials, formatDateFull, calculateAge, type KanbanStatusValue } from "@/lib/utils";
 import { NewClientButton } from "@/components/kanban/NewClientButton";
 
 const STATUS_BADGE: Record<KanbanStatusValue, string> = {
@@ -21,9 +21,9 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
     <div className="animate-in">
       <div className="page-header">
         <div>
-          <h1>Banco de Clientes</h1>
+          <h1>Banco de Pacientes</h1>
           <p className="text-muted">
-            {allClients.length} cliente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
+            {allClients.length} paciente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
           </p>
         </div>
         <NewClientButton />
@@ -37,13 +37,14 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
         {clients.length === 0 ? (
           <div className="empty-state">
             <span style={{ fontSize: "2rem" }}>🗂️</span>
-            <p>Nenhum cliente encontrado.</p>
+            <p>Nenhum paciente encontrado.</p>
           </div>
         ) : (
           <table className="data-table">
             <thead>
               <tr>
-                <th>Cliente</th>
+                <th>Paciente</th>
+                <th>Idade</th>
                 <th>Status</th>
                 <th>Última consulta</th>
                 <th>Último peso</th>
@@ -52,36 +53,39 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
               </tr>
             </thead>
             <tbody>
-              {clients.map((client) => (
-                <tr key={client.id}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div className="avatar">{initials(client.name)}</div>
-                      <div>
-                        <div style={{ fontWeight: 700 }}>{client.name}</div>
-                        <div className="text-tertiary" style={{ fontSize: "0.76rem" }}>
-                          {client.goal || (client.age ? `${client.age} anos` : "—")}
+              {clients.map((client) => {
+                const age = client.birthDate ? calculateAge(client.birthDate) : client.age;
+                const lastConsultation = client.consultations[0]?.date;
+                return (
+                  <tr key={client.id}>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div className="avatar">{initials(client.name)}</div>
+                        <div>
+                          <div style={{ fontWeight: 700 }}>{client.name}</div>
+                          <div className="text-tertiary" style={{ fontSize: "0.76rem" }}>
+                            {client.goal || "—"}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`badge ${STATUS_BADGE[client.status as KanbanStatusValue]}`}>
-                      {KANBAN_LABELS[client.status as KanbanStatusValue]}
-                    </span>
-                  </td>
-                  <td className="text-muted">
-                    {client.lastConsultation ? formatDateFull(client.lastConsultation) : "—"}
-                  </td>
-                  <td>{client.measurements[0] ? `${client.measurements[0].weight} kg` : "—"}</td>
-                  <td className="text-muted">{client.email || client.phone || client.document || "—"}</td>
-                  <td>
-                    <Link href={`/clients/${client.id}`} className="btn btn-ghost btn-sm">
-                      Ver perfil →
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="text-muted">{age != null ? `${age} anos` : "—"}</td>
+                    <td>
+                      <span className={`badge ${STATUS_BADGE[client.status as KanbanStatusValue]}`}>
+                        {KANBAN_LABELS[client.status as KanbanStatusValue]}
+                      </span>
+                    </td>
+                    <td className="text-muted">{lastConsultation ? formatDateFull(lastConsultation) : "—"}</td>
+                    <td>{client.measurements[0] ? `${client.measurements[0].weight} kg` : "—"}</td>
+                    <td className="text-muted">{client.email || client.phone || "—"}</td>
+                    <td>
+                      <Link href={`/clients/${client.id}`} className="btn btn-ghost btn-sm">
+                        Ver perfil →
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

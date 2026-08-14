@@ -17,42 +17,60 @@ export async function getKanbanBoard() {
 
 export async function getClients() {
   return prisma.client.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { name: "asc" },
     include: {
       _count: { select: { measurements: true } },
       measurements: { orderBy: { date: "desc" }, take: 1 },
+      consultations: { orderBy: { date: "desc" }, take: 1 },
     },
   });
 }
 
 export async function getClientProfile(id: string) {
-  return prisma.client.findUnique({
-    where: { id },
-    include: {
-      measurements: { orderBy: { date: "asc" } },
-      dietLogs: { orderBy: { weekStart: "asc" } },
-      supplements: { orderBy: { order: "asc" } },
-      consultationForms: { orderBy: { createdAt: "desc" }, take: 1 },
-      mealPlans: {
-        where: { active: true },
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        include: {
-          meals: {
-            orderBy: { order: "asc" },
-            include: {
-              options: {
-                orderBy: { order: "asc" },
-                include: {
-                  items: { orderBy: { order: "asc" }, include: { food: true, recipe: true } },
+  const [client, mealPlanHistory] = await Promise.all([
+    prisma.client.findUnique({
+      where: { id },
+      include: {
+        measurements: { orderBy: { date: "asc" } },
+        dietLogs: { orderBy: { weekStart: "asc" } },
+        supplements: { orderBy: [{ active: "desc" }, { order: "asc" }] },
+        consultationForms: { orderBy: { createdAt: "desc" }, take: 1 },
+        consultations: { orderBy: { date: "desc" } },
+        exams: { orderBy: { requestedDate: "desc" } },
+        mealPlans: {
+          where: { active: true },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          include: {
+            meals: {
+              orderBy: { order: "asc" },
+              include: {
+                options: {
+                  orderBy: { order: "asc" },
+                  include: {
+                    items: { orderBy: { order: "asc" }, include: { food: true, recipe: true } },
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.mealPlan.findMany({
+      where: { clientId: id, active: false },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        objective: true,
+        createdAt: true,
+        _count: { select: { meals: true } },
+      },
+    }),
+  ]);
+
+  return client ? { ...client, mealPlanHistory } : null;
 }
 
 export async function getRecipes() {

@@ -119,7 +119,7 @@ export function KanbanBoard({ initialBoard }: { initialBoard: BoardState }) {
       <div className="page-header">
         <div>
           <h1>Quadro Kanban</h1>
-          <p className="text-muted">Arraste os cards para atualizar a etapa de cada cliente.</p>
+          <p className="text-muted">Arraste os cards para atualizar a etapa de cada paciente.</p>
         </div>
         <NewClientButton />
       </div>

@@ -11,10 +11,10 @@ export default async function DashboardPage() {
       <div className="page-header">
         <div>
           <h1>Bem-vinda de volta 👋</h1>
-          <p className="text-muted">Aqui está um resumo dos seus clientes e planos hoje.</p>
+          <p className="text-muted">Aqui está um resumo dos seus pacientes e planos hoje.</p>
         </div>
         <Link href="/kanban" className="btn btn-primary">
-          + Novo cliente
+          + Novo paciente
         </Link>
       </div>
 
@@ -22,7 +22,7 @@ export default async function DashboardPage() {
         <div className="card glass stat-tile animate-in">
           <div className="stat-icon badge-primary">👥</div>
           <div className="stat-value">{stats.totalClients}</div>
-          <div className="stat-label">Clientes ativos</div>
+          <div className="stat-label">Pacientes ativos</div>
         </div>
         <div className="card glass stat-tile animate-in">
           <div className="stat-icon badge-info">📈</div>
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Cliente</th>
+                  <th>Paciente</th>
                   <th>Peso</th>
                   <th>% Gordura</th>
                   <th>Data</th>

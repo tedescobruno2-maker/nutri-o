@@ -25,7 +25,7 @@ export function SendFormButton({ clientId, hasEmail }: { clientId: string; hasEm
       <button type="button" className="btn btn-primary btn-sm" onClick={handleClick} disabled={isPending || !hasEmail}>
         {isPending ? "Enviando..." : "Enviar formulário por e-mail"}
       </button>
-      {!hasEmail && <p className="text-tertiary" style={{ fontSize: "0.76rem", marginTop: 6 }}>Cadastre um e-mail para o cliente primeiro.</p>}
+      {!hasEmail && <p className="text-tertiary" style={{ fontSize: "0.76rem", marginTop: 6 }}>Cadastre um e-mail para o paciente primeiro.</p>}
       {feedback && (
         <p className="text-muted animate-in" style={{ fontSize: "0.8rem", marginTop: 8 }}>
           {feedback}

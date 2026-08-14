@@ -4,12 +4,17 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { supabaseAdmin, STORAGE_BUCKET } from "@/lib/supabase";
 
-const ALLOWED_TYPES: Record<string, string> = {
+const IMAGE_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/jpg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
   "image/gif": "gif",
+};
+
+const DOCUMENT_TYPES: Record<string, string> = {
+  ...IMAGE_TYPES,
+  "application/pdf": "pdf",
 };
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
@@ -25,18 +30,23 @@ async function ensureBucket() {
 }
 
 /**
- * Salva uma imagem enviada via <input type="file">.
+ * Salva um arquivo enviado via <input type="file">.
  * Em produção (com SUPABASE_URL/SUPABASE_SECRET_KEY configurados), envia para o
  * Supabase Storage e retorna a URL pública — necessário porque o filesystem do
  * Vercel é efêmero/somente leitura. Em desenvolvimento local sem essas variáveis,
  * grava em public/uploads/<folder>/ como fallback.
  */
-export async function saveUploadedImage(file: File | null, folder: string): Promise<string | null> {
+async function saveUploadedFile(
+  file: File | null,
+  folder: string,
+  allowedTypes: Record<string, string>,
+  errorLabel: string
+): Promise<string | null> {
   if (!file || file.size === 0) return null;
 
-  const ext = ALLOWED_TYPES[file.type];
-  if (!ext) throw new Error("Formato de imagem não suportado. Use JPG, PNG, WEBP ou GIF.");
-  if (file.size > MAX_BYTES) throw new Error("Imagem muito grande (máx. 5MB).");
+  const ext = allowedTypes[file.type];
+  if (!ext) throw new Error(`Formato de ${errorLabel} não suportado.`);
+  if (file.size > MAX_BYTES) throw new Error(`Arquivo muito grande (máx. 5MB).`);
 
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -47,7 +57,7 @@ export async function saveUploadedImage(file: File | null, folder: string): Prom
     const { error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .upload(objectPath, buffer, { contentType: file.type, upsert: false });
-    if (error) throw new Error(`Falha ao enviar imagem: ${error.message}`);
+    if (error) throw new Error(`Falha ao enviar arquivo: ${error.message}`);
 
     const { data } = supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(objectPath);
     return data.publicUrl;
@@ -58,4 +68,12 @@ export async function saveUploadedImage(file: File | null, folder: string): Prom
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, filename), buffer);
   return `/uploads/${folder}/${filename}`;
+}
+
+export async function saveUploadedImage(file: File | null, folder: string): Promise<string | null> {
+  return saveUploadedFile(file, folder, IMAGE_TYPES, "imagem (use JPG, PNG, WEBP ou GIF)");
+}
+
+export async function saveUploadedDocument(file: File | null, folder: string): Promise<string | null> {
+  return saveUploadedFile(file, folder, DOCUMENT_TYPES, "arquivo (use PDF, JPG, PNG ou WEBP)");
 }

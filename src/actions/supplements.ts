@@ -43,3 +43,19 @@ export async function deleteClientSupplement(id: string, clientId: string) {
   await prisma.clientSupplement.delete({ where: { id } });
   revalidatePath(`/clients/${clientId}`);
 }
+
+export async function discontinueSupplement(id: string, clientId: string) {
+  await prisma.clientSupplement.update({
+    where: { id },
+    data: { active: false, discontinuedAt: new Date() },
+  });
+  revalidatePath(`/clients/${clientId}`);
+}
+
+export async function reactivateSupplement(id: string, clientId: string) {
+  await prisma.clientSupplement.update({
+    where: { id },
+    data: { active: true, discontinuedAt: null },
+  });
+  revalidatePath(`/clients/${clientId}`);
+}

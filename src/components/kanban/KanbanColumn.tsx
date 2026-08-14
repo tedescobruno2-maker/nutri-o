@@ -23,7 +23,7 @@ export function KanbanColumn({ status, clients }: { status: KanbanStatusValue; c
         <div className="kanban-column-list">
           {clients.length === 0 && (
             <div className="empty-state" style={{ padding: "24px 8px" }}>
-              <span>Nenhum cliente aqui</span>
+              <span>Nenhum paciente aqui</span>
             </div>
           )}
           {clients.map((client) => (

@@ -26,7 +26,7 @@ export async function createMealPlanFromRecipes(input: PlanBuilderInput) {
   const recipeById = new Map(recipes.map((r) => [r.id, r]));
 
   const client = await prisma.client.findUnique({ where: { id: clientId } });
-  if (!client) throw new Error("Cliente não encontrado");
+  if (!client) throw new Error("Paciente não encontrado");
 
   await prisma.mealPlan.updateMany({ where: { clientId, active: true }, data: { active: false } });
 

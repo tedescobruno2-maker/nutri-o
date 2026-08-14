@@ -5,7 +5,7 @@ import { Topbar } from "@/components/layout/Topbar";
 
 export const metadata: Metadata = {
   title: "NutriKanban",
-  description: "Sistema de acompanhamento nutricional para clientes",
+  description: "Sistema de acompanhamento nutricional para pacientes",
 };
 
 const THEME_INIT_SCRIPT = `

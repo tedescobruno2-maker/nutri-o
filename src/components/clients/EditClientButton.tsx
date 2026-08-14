@@ -29,7 +29,7 @@ export function EditClientButton({ client }: { client: Client }) {
         >
           <div className="card glass card-pad animate-in" style={{ width: "min(480px, 100%)", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
             <div className="page-header" style={{ marginBottom: 16 }}>
-              <h2>Editar cliente</h2>
+              <h2>Editar paciente</h2>
               <button type="button" className="btn btn-ghost btn-icon" onClick={() => setOpen(false)}>✕</button>
             </div>
 
@@ -41,17 +41,29 @@ export function EditClientButton({ client }: { client: Client }) {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div className="field">
-                  <label htmlFor="e-age">Idade</label>
-                  <input className="input" id="e-age" name="age" type="number" min={0} defaultValue={client.age ?? ""} />
+                  <label htmlFor="e-birthDate">Data de nascimento</label>
+                  <input
+                    className="input"
+                    id="e-birthDate"
+                    name="birthDate"
+                    type="date"
+                    defaultValue={client.birthDate ? new Date(client.birthDate).toISOString().slice(0, 10) : ""}
+                  />
                 </div>
                 <div className="field">
                   <label htmlFor="e-height">Altura (cm)</label>
                   <input className="input" id="e-height" name="height" type="number" min={0} defaultValue={client.height ?? ""} />
                 </div>
               </div>
+              {!client.birthDate && (
+                <div className="field">
+                  <label htmlFor="e-age">Idade (se não souber a data de nascimento)</label>
+                  <input className="input" id="e-age" name="age" type="number" min={0} defaultValue={client.age ?? ""} />
+                </div>
+              )}
               <div className="field">
                 <label htmlFor="e-email">E-mail</label>
-                <input className="input" id="e-email" name="email" type="email" defaultValue={client.email ?? ""} placeholder="cliente@email.com" />
+                <input className="input" id="e-email" name="email" type="email" defaultValue={client.email ?? ""} placeholder="paciente@email.com" />
               </div>
               <div className="field">
                 <label htmlFor="e-phone">Telefone</label>

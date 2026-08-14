@@ -10,9 +10,9 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export async function sendConsultationForm(clientId: string) {
   const client = await prisma.client.findUnique({ where: { id: clientId } });
-  if (!client) throw new Error("Cliente não encontrado");
+  if (!client) throw new Error("Paciente não encontrado");
   if (!client.email) {
-    return { ok: false, mode: "sent" as const, error: "Cliente não tem e-mail cadastrado." };
+    return { ok: false, mode: "sent" as const, error: "Paciente não tem e-mail cadastrado." };
   }
 
   let form = await prisma.consultationForm.findFirst({
@@ -134,6 +134,10 @@ export async function submitConsultationForm(formData: FormData) {
   await prisma.client.updateMany({
     where: { id: form.clientId, profession: null },
     data: { profession: parsed.profession },
+  });
+  await prisma.client.updateMany({
+    where: { id: form.clientId, birthDate: null },
+    data: { birthDate: parsed.birthDate },
   });
 
   revalidatePath(`/clients/${form.clientId}`);
