@@ -31,6 +31,23 @@ export function calculateAge(birthDate: Date | string, atDate: Date | string = n
   return age;
 }
 
+/** Calcula o IMC (kg/m²) a partir do peso (kg) e altura (cm). */
+export function calculateBMI(weightKg: number, heightCm: number): number {
+  const heightM = heightCm / 100;
+  return Math.round((weightKg / (heightM * heightM)) * 10) / 10;
+}
+
+/** Monta um link wa.me com mensagem pré-preenchida a partir de um telefone brasileiro em qualquer formato. */
+export function buildWhatsAppLink(phone: string, message: string): string {
+  let digits = phone.replace(/\D/g, "");
+  // Remove zero à esquerda do DDD (ex: "027..." → "27...") e adiciona o código do Brasil se ausente.
+  digits = digits.replace(/^0+/, "");
+  if (!digits.startsWith("55") || digits.length <= 11) {
+    digits = `55${digits}`;
+  }
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
 export const KANBAN_STATUSES = [
   "NOVOS",
   "EM_AVALIACAO",

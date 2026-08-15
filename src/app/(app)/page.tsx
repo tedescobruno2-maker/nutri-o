@@ -1,6 +1,19 @@
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/dal";
-import { KANBAN_LABELS, KANBAN_ICONS, KANBAN_STATUSES, initials, formatDate } from "@/lib/utils";
+import { KANBAN_LABELS, KANBAN_ICONS, KANBAN_STATUSES, initials, formatDate, calculateAge, calculateBMI, type KanbanStatusValue } from "@/lib/utils";
+import { ReturnReminderRow } from "@/components/dashboard/ReturnReminderRow";
+
+// A contagem de dias desde a última consulta (retornos de consulta) precisa ser
+// calculada a cada acesso — sem isso a página fica em cache estático e o alerta
+// de retorno trava na data do último deploy.
+export const dynamic = "force-dynamic";
+
+const STATUS_BADGE: Record<KanbanStatusValue, string> = {
+  NOVOS: "badge-info",
+  EM_AVALIACAO: "badge-warm",
+  PLANO_ENTREGUE: "badge-primary",
+  ACOMPANHAMENTO: "badge-primary",
+};
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
@@ -61,6 +74,22 @@ export default async function DashboardPage() {
 
       <section className="section">
         <div className="page-header">
+          <h2>🔔 Retornos de consulta</h2>
+          <p className="text-muted" style={{ fontSize: "0.82rem" }}>
+            Pacientes que se aproximam ou já passaram do ciclo de ~30 dias desde a última consulta.
+          </p>
+        </div>
+        <div className="card card-pad">
+          {stats.followUpDue.length === 0 ? (
+            <p className="text-tertiary" style={{ fontSize: "0.85rem" }}>Nenhum retorno pendente no momento.</p>
+          ) : (
+            stats.followUpDue.map((client) => <ReturnReminderRow key={client.id} client={client} />)
+          )}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="page-header">
           <h2>Últimas medições registradas</h2>
         </div>
         <div className="card">
@@ -70,31 +99,51 @@ export default async function DashboardPage() {
               <p>Nenhuma medição registrada ainda.</p>
             </div>
           ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Paciente</th>
-                  <th>Peso</th>
-                  <th>% Gordura</th>
-                  <th>Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.latestMeasurements.map((m) => (
-                  <tr key={m.id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div className="avatar">{initials(m.client.name)}</div>
-                        <Link href={`/clients/${m.clientId}`}>{m.client.name}</Link>
-                      </div>
-                    </td>
-                    <td>{m.weight} kg</td>
-                    <td>{m.bodyFat ? `${m.bodyFat}%` : "—"}</td>
-                    <td className="text-muted">{formatDate(m.date)}</td>
+            <div style={{ overflowX: "auto" }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Idade</th>
+                    <th>Altura</th>
+                    <th>Status</th>
+                    <th>Objetivo</th>
+                    <th>Peso</th>
+                    <th>IMC</th>
+                    <th>% Gordura</th>
+                    <th>Data</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stats.latestMeasurements.map((m) => {
+                    const age = m.client.birthDate ? calculateAge(m.client.birthDate) : m.client.age;
+                    const bmi = m.bmi ?? (m.client.height ? calculateBMI(m.weight, m.client.height) : null);
+                    return (
+                      <tr key={m.id}>
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <div className="avatar">{initials(m.client.name)}</div>
+                            <Link href={`/clients/${m.clientId}`}>{m.client.name}</Link>
+                          </div>
+                        </td>
+                        <td className="text-muted">{age != null ? `${age} anos` : "—"}</td>
+                        <td className="text-muted">{m.client.height ? `${m.client.height} cm` : "—"}</td>
+                        <td>
+                          <span className={`badge ${STATUS_BADGE[m.client.status as KanbanStatusValue]}`}>
+                            {KANBAN_LABELS[m.client.status as KanbanStatusValue]}
+                          </span>
+                        </td>
+                        <td className="text-muted">{m.client.goal || "—"}</td>
+                        <td>{m.weight} kg</td>
+                        <td>{bmi ?? "—"}</td>
+                        <td>{m.bodyFat ? `${m.bodyFat}%` : "—"}</td>
+                        <td className="text-muted">{formatDate(m.date)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </section>

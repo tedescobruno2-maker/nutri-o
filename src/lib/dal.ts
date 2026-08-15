@@ -147,8 +147,38 @@ export async function getConsultationFormByToken(token: string) {
   });
 }
 
+// Janela (em dias desde a última consulta) considerada para o alerta de retorno —
+// o ciclo padrão de acompanhamento nutricional é de ~30 dias.
+const RETURN_REMINDER_MIN_DAYS = 25;
+const RETURN_REMINDER_MAX_DAYS = 60;
+
+export async function getFollowUpDue() {
+  const clients = await prisma.client.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      consultations: { orderBy: { date: "desc" }, take: 1, select: { date: true } },
+    },
+  });
+
+  const today = new Date();
+  const dueList = clients
+    .filter((c) => c.consultations[0])
+    .map((c) => {
+      const lastConsultation = c.consultations[0]!.date;
+      const daysSince = Math.floor((today.getTime() - lastConsultation.getTime()) / 86_400_000);
+      return { id: c.id, name: c.name, email: c.email, phone: c.phone, lastConsultation, daysSince };
+    })
+    .filter((c) => c.daysSince >= RETURN_REMINDER_MIN_DAYS && c.daysSince <= RETURN_REMINDER_MAX_DAYS)
+    .sort((a, b) => b.daysSince - a.daysSince);
+
+  return dueList;
+}
+
 export async function getDashboardStats() {
-  const [totalClients, board, recipesCount, latestMeasurements] = await Promise.all([
+  const [totalClients, board, recipesCount, latestMeasurements, followUpDue] = await Promise.all([
     prisma.client.count(),
     getKanbanBoard(),
     prisma.recipe.count(),
@@ -157,6 +187,7 @@ export async function getDashboardStats() {
       take: 5,
       include: { client: true },
     }),
+    getFollowUpDue(),
   ]);
 
   const avgAdherence = await prisma.dietLog.aggregate({ _avg: { adherence: true } });
@@ -166,6 +197,7 @@ export async function getDashboardStats() {
     board,
     recipesCount,
     latestMeasurements,
+    followUpDue,
     avgAdherence: Math.round(avgAdherence._avg.adherence ?? 0),
   };
 }
