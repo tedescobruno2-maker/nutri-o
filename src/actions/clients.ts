@@ -21,7 +21,7 @@ export async function moveClient(input: z.infer<typeof moveClientSchema>) {
     ),
   ]);
 
-  revalidatePath("/kanban");
+  revalidatePath("/clients");
   revalidatePath("/");
 }
 
@@ -57,7 +57,6 @@ export async function createClient(formData: FormData) {
     },
   });
 
-  revalidatePath("/kanban");
   revalidatePath("/clients");
   revalidatePath("/");
 }
@@ -100,12 +99,10 @@ export async function updateClient(formData: FormData) {
 
   revalidatePath(`/clients/${clientId}`);
   revalidatePath("/clients");
-  revalidatePath("/kanban");
 }
 
 export async function deleteClient(clientId: string) {
   await prisma.client.delete({ where: { id: clientId } });
-  revalidatePath("/kanban");
   revalidatePath("/clients");
   revalidatePath("/");
 }

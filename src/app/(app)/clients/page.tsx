@@ -1,95 +1,100 @@
-import Link from "next/link";
-import { getClients } from "@/lib/dal";
-import { KANBAN_LABELS, initials, formatDateFull, calculateAge, type KanbanStatusValue } from "@/lib/utils";
+import { getClients, getKanbanBoard, getAppointmentsForMonth, getUpcomingAppointments, getClientsBasic } from "@/lib/dal";
 import { NewClientButton } from "@/components/kanban/NewClientButton";
+import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+import { ViewSwitcher } from "@/components/patients/ViewSwitcher";
+import { TableView } from "@/components/patients/TableView";
+import { CardsView } from "@/components/patients/CardsView";
+import { CalendarView } from "@/components/patients/CalendarView";
+import { KANBAN_STATUSES, type KanbanStatusValue } from "@/lib/utils";
+import type { Client } from "@/generated/prisma/client";
 
-const STATUS_BADGE: Record<KanbanStatusValue, string> = {
-  NOVOS: "badge-info",
-  EM_AVALIACAO: "badge-warm",
-  PLANO_ENTREGUE: "badge-primary",
-  ACOMPANHAMENTO: "badge-primary",
-};
+type ViewValue = "tabela" | "cards" | "kanban" | "calendario";
 
-export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
-  const allClients = await getClients();
-  const clients = q
-    ? allClients.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()))
-    : allClients;
+export default async function ClientsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; view?: string; year?: string; month?: string }>;
+}) {
+  const { q, view: rawView, year: rawYear, month: rawMonth } = await searchParams;
+  const view: ViewValue = (["tabela", "cards", "kanban", "calendario"] as const).includes(rawView as ViewValue)
+    ? (rawView as ViewValue)
+    : "tabela";
+
+  const now = new Date();
+  const year = rawYear ? parseInt(rawYear, 10) : now.getFullYear();
+  const month = rawMonth ? parseInt(rawMonth, 10) : now.getMonth();
 
   return (
     <div className="animate-in">
       <div className="page-header">
         <div>
           <h1>Banco de Pacientes</h1>
-          <p className="text-muted">
-            {allClients.length} paciente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
-          </p>
+          <p className="text-muted">Gerencie seus pacientes em tabela, cards, kanban ou calendário.</p>
         </div>
         <NewClientButton />
       </div>
 
-      <form method="GET" style={{ marginBottom: 20, maxWidth: 360 }}>
-        <input className="input" type="search" name="q" placeholder="Buscar por nome..." defaultValue={q ?? ""} />
-      </form>
+      <ViewSwitcher current={view} q={q} />
 
-      <div className="card">
-        {clients.length === 0 ? (
-          <div className="empty-state">
-            <span style={{ fontSize: "2rem" }}>🗂️</span>
-            <p>Nenhum paciente encontrado.</p>
-          </div>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Paciente</th>
-                <th>Idade</th>
-                <th>Status</th>
-                <th>Última consulta</th>
-                <th>Último peso</th>
-                <th>Contato</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((client) => {
-                const age = client.birthDate ? calculateAge(client.birthDate) : client.age;
-                const lastConsultation = client.consultations[0]?.date;
-                return (
-                  <tr key={client.id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div className="avatar">{initials(client.name)}</div>
-                        <div>
-                          <div style={{ fontWeight: 700 }}>{client.name}</div>
-                          <div className="text-tertiary" style={{ fontSize: "0.76rem" }}>
-                            {client.goal || "—"}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-muted">{age != null ? `${age} anos` : "—"}</td>
-                    <td>
-                      <span className={`badge ${STATUS_BADGE[client.status as KanbanStatusValue]}`}>
-                        {KANBAN_LABELS[client.status as KanbanStatusValue]}
-                      </span>
-                    </td>
-                    <td className="text-muted">{lastConsultation ? formatDateFull(lastConsultation) : "—"}</td>
-                    <td>{client.measurements[0] ? `${client.measurements[0].weight} kg` : "—"}</td>
-                    <td className="text-muted">{client.email || client.phone || "—"}</td>
-                    <td>
-                      <Link href={`/clients/${client.id}`} className="btn btn-ghost btn-sm">
-                        Ver perfil →
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {view === "tabela" && <TableViewContainer q={q} view={view} />}
+      {view === "cards" && <CardsViewContainer q={q} view={view} />}
+      {view === "kanban" && <KanbanViewContainer />}
+      {view === "calendario" && <CalendarViewContainer year={year} month={month} />}
     </div>
+  );
+}
+
+async function TableViewContainer({ q, view }: { q?: string; view: ViewValue }) {
+  const allClients = await getClients();
+  const clients = q ? allClients.filter((c) => c.name.toLowerCase().includes(q.toLowerCase())) : allClients;
+  return (
+    <>
+      <SearchForm q={q} view={view} />
+      <p className="text-muted" style={{ marginBottom: 12 }}>
+        {allClients.length} paciente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
+      </p>
+      <TableView clients={clients} />
+    </>
+  );
+}
+
+async function CardsViewContainer({ q, view }: { q?: string; view: ViewValue }) {
+  const allClients = await getClients();
+  const clients = q ? allClients.filter((c) => c.name.toLowerCase().includes(q.toLowerCase())) : allClients;
+  return (
+    <>
+      <SearchForm q={q} view={view} />
+      <p className="text-muted" style={{ marginBottom: 12 }}>
+        {allClients.length} paciente(s) cadastrado(s){q ? ` · ${clients.length} encontrado(s)` : ""}.
+      </p>
+      <CardsView clients={clients} />
+    </>
+  );
+}
+
+async function KanbanViewContainer() {
+  const boardMap = await getKanbanBoard();
+  const board = Object.fromEntries(KANBAN_STATUSES.map((s) => [s, boardMap.get(s) ?? []])) as Record<
+    KanbanStatusValue,
+    Client[]
+  >;
+  return <KanbanBoard initialBoard={board} />;
+}
+
+async function CalendarViewContainer({ year, month }: { year: number; month: number }) {
+  const [appointments, upcoming, clients] = await Promise.all([
+    getAppointmentsForMonth(year, month),
+    getUpcomingAppointments(15),
+    getClientsBasic(),
+  ]);
+  return <CalendarView year={year} month={month} appointments={appointments} upcoming={upcoming} clients={clients} />;
+}
+
+function SearchForm({ q, view }: { q?: string; view: ViewValue }) {
+  return (
+    <form method="GET" style={{ marginBottom: 20, maxWidth: 360, display: "flex", gap: 8 }}>
+      <input type="hidden" name="view" value={view} />
+      <input className="input" type="search" name="q" placeholder="Buscar por nome..." defaultValue={q ?? ""} />
+    </form>
   );
 }

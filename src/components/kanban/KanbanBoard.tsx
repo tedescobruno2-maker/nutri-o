@@ -16,7 +16,6 @@ import {
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanCard } from "./KanbanCard";
-import { NewClientButton } from "./NewClientButton";
 import { moveClient } from "@/actions/clients";
 import { KANBAN_STATUSES, type KanbanStatusValue } from "@/lib/utils";
 import type { Client } from "@/generated/prisma/client";
@@ -116,13 +115,9 @@ export function KanbanBoard({ initialBoard }: { initialBoard: BoardState }) {
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1>Quadro Kanban</h1>
-          <p className="text-muted">Arraste os cards para atualizar a etapa de cada paciente.</p>
-        </div>
-        <NewClientButton />
-      </div>
+      <p className="text-muted" style={{ marginBottom: 16 }}>
+        Arraste os cards para atualizar a etapa de cada paciente.
+      </p>
 
       <DndContext
         sensors={sensors}

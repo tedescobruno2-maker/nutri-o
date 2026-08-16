@@ -1,14 +1,7 @@
-import { getKanbanBoard } from "@/lib/dal";
-import { KanbanBoard } from "@/components/kanban/KanbanBoard";
-import { KANBAN_STATUSES, type KanbanStatusValue } from "@/lib/utils";
-import type { Client } from "@/generated/prisma/client";
+import { redirect } from "next/navigation";
 
-export default async function KanbanPage() {
-  const boardMap = await getKanbanBoard();
-  const board = Object.fromEntries(KANBAN_STATUSES.map((s) => [s, boardMap.get(s) ?? []])) as Record<
-    KanbanStatusValue,
-    Client[]
-  >;
-
-  return <KanbanBoard initialBoard={board} />;
+// O quadro Kanban foi unificado dentro de /clients (view=kanban), junto com as
+// visualizações de Tabela, Cards e Calendário. Esta rota antiga redireciona para lá.
+export default function KanbanRedirectPage() {
+  redirect("/clients?view=kanban");
 }

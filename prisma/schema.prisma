@@ -36,6 +36,24 @@ enum ExamStatus {
   RESULTADO_RECEBIDO
 }
 
+enum ExamResultFlag {
+  NORMAL
+  ATENCAO // fora da faixa de referência (alto ou baixo) — sinalizado para o operador revisar
+  INDETERMINADO // faixa de referência complexa/qualitativa demais para determinar automaticamente
+}
+
+enum AppointmentType {
+  CONSULTA
+  RETORNO
+}
+
+enum AppointmentStatus {
+  AGENDADO
+  CONFIRMADO
+  REALIZADO
+  CANCELADO
+}
+
 model Client {
   id         String       @id @default(cuid())
   name       String
@@ -61,6 +79,8 @@ model Client {
   consultationForms ConsultationForm[]
   consultations     Consultation[]
   exams             Exam[]
+  examResults       ExamResult[]
+  appointments      Appointment[]
 }
 
 // ---------------------------------------------------------------------------
@@ -95,6 +115,50 @@ model Exam {
   createdAt     DateTime   @default(now())
 
   @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Resultados de exames laboratoriais (importados via PDF + IA) — histórico
+// acumulativo por parâmetro, com sinalização em relação ao valor de referência.
+// ---------------------------------------------------------------------------
+
+model ExamResult {
+  id            String         @id @default(cuid())
+  clientId      String
+  client        Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  parameterName String // ex: "Ferritina Sérica", "Glicemia de Jejum"
+  value         Float
+  unit          String? // ex: "ng/mL", "mg/dL"
+  collectedAt   DateTime // data da coleta desse resultado
+  referenceMin  Float? // limite inferior do V.R., quando um único intervalo numérico se aplica
+  referenceMax  Float? // limite superior do V.R.
+  referenceText String? // texto original do V.R. impresso no exame (sempre preservado)
+  flag          ExamResultFlag @default(INDETERMINADO)
+  sourceFileUrl String? // PDF de onde este resultado foi extraído
+  importBatchId String? // agrupa resultados vindos da mesma importação de PDF
+  createdAt     DateTime       @default(now())
+
+  @@unique([clientId, parameterName, collectedAt])
+  @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Agendamento de consultas e retornos futuros
+// ---------------------------------------------------------------------------
+
+model Appointment {
+  id          String            @id @default(cuid())
+  clientId    String
+  client      Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  scheduledAt DateTime
+  type        AppointmentType   @default(CONSULTA)
+  status      AppointmentStatus @default(AGENDADO)
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([clientId])
+  @@index([scheduledAt])
 }
 
 model Measurement {

@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           <h1>Bem-vinda de volta 👋</h1>
           <p className="text-muted">Aqui está um resumo dos seus pacientes e planos hoje.</p>
         </div>
-        <Link href="/kanban" className="btn btn-primary">
+        <Link href="/clients" className="btn btn-primary">
           + Novo paciente
         </Link>
       </div>
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
       <section className="section">
         <div className="page-header">
           <h2>Funil do Kanban</h2>
-          <Link href="/kanban" className="btn btn-ghost btn-sm">
+          <Link href="/clients?view=kanban" className="btn btn-ghost btn-sm">
             Ver quadro completo →
           </Link>
         </div>

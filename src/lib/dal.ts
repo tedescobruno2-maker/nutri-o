@@ -107,6 +107,27 @@ export async function getClientsBasic() {
   });
 }
 
+/** Agendamentos de um mês (year: ano cheio, month: 0-11), para a view de calendário. */
+export async function getAppointmentsForMonth(year: number, month: number) {
+  const start = new Date(year, month, 1);
+  const end = new Date(year, month + 1, 1);
+  return prisma.appointment.findMany({
+    where: { scheduledAt: { gte: start, lt: end } },
+    orderBy: { scheduledAt: "asc" },
+    include: { client: { select: { id: true, name: true } } },
+  });
+}
+
+/** Próximos agendamentos (a partir de agora), para a agenda lateral. */
+export async function getUpcomingAppointments(limit = 10) {
+  return prisma.appointment.findMany({
+    where: { scheduledAt: { gte: new Date() }, status: { in: ["AGENDADO", "CONFIRMADO"] } },
+    orderBy: { scheduledAt: "asc" },
+    take: limit,
+    include: { client: { select: { id: true, name: true } } },
+  });
+}
+
 export async function getMealPlanForExport(mealPlanId: string) {
   return prisma.mealPlan.findUnique({
     where: { id: mealPlanId },
@@ -138,6 +159,36 @@ export async function getClientForExamsExport(id: string) {
     where: { id },
     include: { exams: { orderBy: { requestedDate: "desc" } } },
   });
+}
+
+export async function getExamResultsGrouped(clientId: string) {
+  const [client, results] = await Promise.all([
+    prisma.client.findUnique({ where: { id: clientId }, select: { id: true, name: true } }),
+    prisma.examResult.findMany({ where: { clientId }, orderBy: { collectedAt: "asc" } }),
+  ]);
+  if (!client) return null;
+
+  const byParameter = new Map<string, typeof results>();
+  for (const r of results) {
+    const list = byParameter.get(r.parameterName) ?? [];
+    list.push(r);
+    byParameter.set(r.parameterName, list);
+  }
+
+  const parameters = [...byParameter.entries()]
+    .map(([parameterName, points]) => ({
+      parameterName,
+      unit: points.at(-1)!.unit,
+      referenceText: points.at(-1)!.referenceText,
+      referenceMin: points.at(-1)!.referenceMin,
+      referenceMax: points.at(-1)!.referenceMax,
+      latest: points.at(-1)!,
+      flag: points.at(-1)!.flag,
+      points,
+    }))
+    .sort((a, b) => a.parameterName.localeCompare(b.parameterName, "pt-BR"));
+
+  return { client, parameters };
 }
 
 export async function getConsultationFormByToken(token: string) {

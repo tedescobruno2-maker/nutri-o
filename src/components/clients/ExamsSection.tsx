@@ -6,6 +6,7 @@ import { deleteExam, markExamResult } from "@/actions/exams";
 import { formatDateFull } from "@/lib/utils";
 import { RequestExamsModal } from "./RequestExamsModal";
 import { SendExamsButton } from "./SendExamsButton";
+import { ImportExamResultsButton } from "./ImportExamResultsButton";
 
 type ExamItem = {
   id: string;
@@ -104,6 +105,10 @@ export function ExamsSection({ clientId, exams, hasEmail }: { clientId: string; 
         <h3>Exames solicitados</h3>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <RequestExamsModal clientId={clientId} />
+          <ImportExamResultsButton clientId={clientId} />
+          <Link href={`/clients/${clientId}/exames`} className="btn btn-ghost btn-sm">
+            📈 Histórico de resultados
+          </Link>
           <Link href={`/clients/${clientId}/exames/exportar`} className="btn btn-ghost btn-sm">
             🖨️ Exportar PDF
           </Link>

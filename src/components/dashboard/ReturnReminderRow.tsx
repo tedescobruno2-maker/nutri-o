@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { sendReturnReminderEmail } from "@/actions/reminders";
 import { buildWhatsAppLink, formatDateFull, initials } from "@/lib/utils";
+import { AddAppointmentModal } from "@/components/patients/AddAppointmentModal";
 
 export function ReturnReminderRow({
   client,
@@ -67,6 +68,12 @@ export function ReturnReminderRow({
         <button type="button" className="btn btn-ghost btn-sm" onClick={handleSendEmail} disabled={isPending || !client.email}>
           {isPending ? "Enviando..." : "✉️ E-mail"}
         </button>
+        <AddAppointmentModal
+          clients={[{ id: client.id, name: client.name }]}
+          defaultClientId={client.id}
+          defaultType="RETORNO"
+          trigger="📅 Agendar retorno"
+        />
         {client.phone ? (
           <a
             href={buildWhatsAppLink(client.phone, whatsAppMessage)}
