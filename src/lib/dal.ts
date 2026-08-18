@@ -252,3 +252,16 @@ export async function getDashboardStats() {
     avgAdherence: Math.round(avgAdherence._avg.adherence ?? 0),
   };
 }
+
+/** Dados da nutricionista usados no cabeçalho/rodapé dos PDFs — sempre retorna algo (cria o padrão se ainda não existir). */
+export async function getProfessionalSettings() {
+  return prisma.professionalSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: { id: "default" },
+  });
+}
+
+export async function getGuidanceTexts() {
+  return prisma.guidanceText.findMany({ orderBy: [{ type: "asc" }, { title: "asc" }] });
+}

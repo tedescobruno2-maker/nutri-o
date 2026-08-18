@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { logout } from "@/actions/auth";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: "🏠" },
   { href: "/clients", label: "Pacientes", icon: "👥" },
-  { href: "/recipes", label: "Receitas", icon: "🍽️" },
   { href: "/alimentos", label: "Alimentos", icon: "🥕" },
-  { href: "/planos", label: "Planos", icon: "📝" },
+  { href: "/recipes", label: "Receitas", icon: "🍽️" },
+  { href: "/planos", label: "Plano Alimentar", icon: "📝" },
+  { href: "/textos", label: "Biblioteca de Textos", icon: "📚" },
+  { href: "/configuracoes", label: "Configurações", icon: "⚙️" },
 ];
 
 export function Sidebar() {
@@ -20,7 +23,7 @@ export function Sidebar() {
       <div className="brand">
         <div className="brand-mark">🥗</div>
         <div>
-          <div className="brand-title">NutriKanban</div>
+          <div className="brand-title">Nutri Luana Gois</div>
           <div className="brand-sub">Acompanhamento nutricional</div>
         </div>
       </div>
@@ -44,10 +47,12 @@ export function Sidebar() {
 
       <div className="sidebar-footer nav-group">
         <span className="nav-label">Sistema</span>
-        <div className="nav-link" style={{ cursor: "default" }}>
-          <span className="nav-icon">🌱</span>
-          <span>v1.0 · local</span>
-        </div>
+        <form action={logout}>
+          <button type="submit" className="nav-link" style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
+            <span className="nav-icon">🚪</span>
+            <span>Sair</span>
+          </button>
+        </form>
       </div>
     </aside>
   );

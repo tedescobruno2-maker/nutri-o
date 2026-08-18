@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getMealPlanForExport } from "@/lib/dal";
+import { getMealPlanForExport, getProfessionalSettings } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
 import { formatDateFull, calculateAge } from "@/lib/utils";
 
 export default async function ExportPlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const plan = await getMealPlanForExport(id);
+  const [plan, settings] = await Promise.all([getMealPlanForExport(id), getProfessionalSettings()]);
   if (!plan) notFound();
   const clientAge = plan.client.birthDate ? calculateAge(plan.client.birthDate) : plan.client.age;
 
@@ -22,9 +22,14 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
       <div className="plan-document">
         <header className="plan-doc-header">
           <div>
-            <div className="eyebrow">NutriKanban</div>
+            {settings.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={settings.logoUrl} alt={settings.nutritionistName} style={{ height: 32, marginBottom: 6, objectFit: "contain" }} />
+            ) : (
+              <div className="eyebrow">Nutri Luana Gois</div>
+            )}
             <h1>{plan.title}</h1>
-            <p className="text-muted">Luana Gois — Nutricionista · CRN 09100683</p>
+            <p className="text-muted">{settings.nutritionistName} — Nutricionista · CRN {settings.crn}</p>
           </div>
           <div className="plan-doc-date text-tertiary">Gerado em {formatDateFull(new Date())}</div>
         </header>
@@ -91,6 +96,13 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
             </ul>
           </section>
         )}
+
+        <footer className="plan-doc-footer">
+          {settings.phone && <span>📞 {settings.phone}</span>}
+          {settings.email && <span>✉️ {settings.email}</span>}
+          {settings.address && <span>📍 {settings.address}</span>}
+          {settings.footerText && <span>{settings.footerText}</span>}
+        </footer>
       </div>
     </div>
   );

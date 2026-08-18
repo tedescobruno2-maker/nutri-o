@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 
 export const metadata: Metadata = {
-  title: "NutriKanban",
+  title: "Nutri Luana Gois",
   description: "Sistema de acompanhamento nutricional para pacientes",
 };
 

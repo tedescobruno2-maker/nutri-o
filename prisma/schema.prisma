@@ -1,4 +1,4 @@
-// Prisma schema — NutriKanban
+// Prisma schema — Nutri Luana Gois
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -383,4 +383,44 @@ model ConsultationForm {
   createdAt DateTime @default(now())
 
   @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Configurações — dados da nutricionista usados no rodapé/cabeçalho dos PDFs
+// (linha única — sempre acessada/atualizada pelo id fixo "default")
+// ---------------------------------------------------------------------------
+
+model ProfessionalSettings {
+  id                String   @id @default("default")
+  nutritionistName  String   @default("Luana Gois")
+  crn               String   @default("09100683")
+  logoUrl           String?
+  address           String?
+  phone             String?
+  email             String?
+  instagram         String?
+  footerText        String?
+  updatedAt         DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Biblioteca de Textos — frases e orientações reutilizáveis nos planos
+// ---------------------------------------------------------------------------
+
+enum GuidanceTextType {
+  ORIENTACAO_GERAL
+  HIDRATACAO
+  SUPLEMENTACAO
+  PRE_TREINO
+  TAREFA_INICIAL
+}
+
+model GuidanceText {
+  id        String           @id @default(cuid())
+  title     String // rótulo curto para localizar
+  content   String // texto completo, aceita quebras de linha
+  type      GuidanceTextType @default(ORIENTACAO_GERAL)
+  tags      String? // ex: "corrida curta,musculação"
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getClientForExamsExport } from "@/lib/dal";
+import { getClientForExamsExport, getProfessionalSettings } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
 import { formatDateFull } from "@/lib/utils";
 
 export default async function ExportExamsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const client = await getClientForExamsExport(id);
+  const [client, settings] = await Promise.all([getClientForExamsExport(id), getProfessionalSettings()]);
   if (!client) notFound();
 
   const requested = client.exams.filter((e) => e.status === "SOLICITADO");
@@ -24,9 +24,9 @@ export default async function ExportExamsPage({ params }: { params: Promise<{ id
       <div className="plan-document">
         <header className="plan-doc-header">
           <div>
-            <div className="eyebrow">NutriKanban</div>
+            <div className="eyebrow">Nutri Luana Gois</div>
             <h1>Solicitação de Exames</h1>
-            <p className="text-muted">Luana Gois — Nutricionista · CRN 09100683</p>
+            <p className="text-muted">{settings.nutritionistName} — Nutricionista · CRN {settings.crn}</p>
           </div>
           <div className="plan-doc-date text-tertiary">Gerado em {formatDateFull(new Date())}</div>
         </header>
@@ -69,9 +69,10 @@ export default async function ExportExamsPage({ params }: { params: Promise<{ id
         )}
 
         <footer className="plan-doc-footer">
-          <span>📞 27 9 98210896</span>
-          <span>✉️ luanagois2@hotmail.com</span>
-          <span>📍 Av. José Maria Vivacqua Santos, 280, Jardim Camburi - Vitória - ES, Sala 1003</span>
+          {settings.phone && <span>📞 {settings.phone}</span>}
+          {settings.email && <span>✉️ {settings.email}</span>}
+          {settings.address && <span>📍 {settings.address}</span>}
+          {settings.footerText && <span>{settings.footerText}</span>}
         </footer>
       </div>
     </div>

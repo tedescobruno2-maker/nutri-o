@@ -4,7 +4,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <div>
-        <div className="eyebrow">NutriKanban</div>
+        <div className="eyebrow">Nutri Luana Gois</div>
         <div className="text-muted" style={{ fontSize: "0.85rem" }}>
           Gestão de pacientes e planos nutricionais
         </div>

@@ -1,3 +1,7 @@
+# Nutri Luana Gois
+
+Sistema de gestão nutricional (pacientes, alimentos, receitas e planos alimentares) para a nutricionista Luana Gois.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

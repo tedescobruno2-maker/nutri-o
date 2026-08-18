@@ -2,7 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 
 const apiKey = process.env.RESEND_API_KEY?.trim();
-const from = process.env.EMAIL_FROM || "NutriKanban <onboarding@resend.dev>";
+const from = process.env.EMAIL_FROM || "Nutri Luana Gois <onboarding@resend.dev>";
 
 const resend = apiKey ? new Resend(apiKey) : null;
 

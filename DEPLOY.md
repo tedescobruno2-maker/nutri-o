@@ -1,4 +1,4 @@
-# Deploy — NutriKanban
+# Deploy — Nutri Luana Gois
 
 ## 1. Banco de dados (Supabase Postgres)
 
@@ -27,7 +27,7 @@ Configure em Vercel → Project Settings → Environment Variables:
 | `SUPABASE_URL` | URL do projeto Supabase |
 | `SUPABASE_SECRET_KEY` | chave secreta do Supabase (Storage — fotos de receitas/alimentos/exames) |
 | `RESEND_API_KEY` | API key do Resend (opcional — sem ela, envio de formulário fica em modo de teste/log) |
-| `EMAIL_FROM` | remetente do e-mail, ex: `NutriKanban <onboarding@resend.dev>` |
+| `EMAIL_FROM` | remetente do e-mail, ex: `Nutri Luana Gois <onboarding@resend.dev>` |
 | `NEXT_PUBLIC_APP_URL` | URL pública do site em produção, ex: `https://seu-projeto.vercel.app` |
 | `GEMINI_API_KEY` | API key do Google Gemini — usada para importar dados da balança e resultados de exames em PDF via IA. Sem ela, esses botões de importação mostram "GEMINI_API_KEY não configurada no servidor". |
 
