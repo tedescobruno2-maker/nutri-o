@@ -98,6 +98,59 @@ export type ScaleReportData = {
 };
 
 // ---------------------------------------------------------------------------
+// Sugestão de dados nutricionais + termo de busca de foto para um alimento novo
+// ---------------------------------------------------------------------------
+
+const FOOD_CATEGORIES = [
+  "Proteína",
+  "Carboidrato",
+  "Fruta",
+  "Laticínio",
+  "Gordura",
+  "Legume/Verdura",
+  "Leguminosa",
+  "Suplemento/Proteína",
+  "Condimento",
+  "Tempero",
+  "Outro",
+];
+
+export const FOOD_SUGGEST_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    category: { type: Type.STRING, enum: FOOD_CATEGORIES },
+    kcal100: { type: Type.NUMBER },
+    protein100: { type: Type.NUMBER },
+    carbs100: { type: Type.NUMBER },
+    fat100: { type: Type.NUMBER },
+    fiber100: { type: Type.NUMBER, nullable: true },
+    imageSearchQuery: { type: Type.STRING, description: "termo curto em português para buscar uma foto do alimento" },
+  },
+  required: ["category", "kcal100", "protein100", "carbs100", "fat100", "imageSearchQuery"],
+};
+
+export const FOOD_SUGGEST_PROMPT = (name: string) => `Estime os valores nutricionais médios (por 100g ou 100ml, o que for mais apropriado) do
+alimento/preparação a seguir, usando como referência tabelas nutricionais padrão (TACO, USDA) e conhecimento culinário geral:
+
+"${name}"
+
+Se a descrição combinar múltiplos ingredientes ou porções (ex: "3 ovos", "2 fatias de pão integral"), calcule a média por 100g do prato/preparação resultante,
+não a soma da porção inteira. Escolha a categoria mais adequada dentre as opções fornecidas. Sugira também "imageSearchQuery": um termo curto e simples em
+português, ideal para encontrar uma foto real e apetitosa do alimento em um banco de imagens (ex: "peito de frango grelhado", "salada de folhas verdes").
+Retorne apenas números plausíveis — nunca zero para todos os campos a menos que o item realmente não tenha valor calórico (ex: água, temperos em pequena
+quantidade).`;
+
+export type FoodSuggestData = {
+  category: string;
+  kcal100: number;
+  protein100: number;
+  carbs100: number;
+  fat100: number;
+  fiber100?: number | null;
+  imageSearchQuery: string;
+};
+
+// ---------------------------------------------------------------------------
 // Extração de resultados de exames laboratoriais (relatório em PDF)
 // ---------------------------------------------------------------------------
 

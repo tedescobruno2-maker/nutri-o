@@ -29,7 +29,9 @@ Configure em Vercel → Project Settings → Environment Variables:
 | `RESEND_API_KEY` | API key do Resend (opcional — sem ela, envio de formulário fica em modo de teste/log) |
 | `EMAIL_FROM` | remetente do e-mail, ex: `Nutri Luana Gois <onboarding@resend.dev>` |
 | `NEXT_PUBLIC_APP_URL` | URL pública do site em produção, ex: `https://seu-projeto.vercel.app` |
-| `GEMINI_API_KEY` | API key do Google Gemini — usada para importar dados da balança e resultados de exames em PDF via IA. Sem ela, esses botões de importação mostram "GEMINI_API_KEY não configurada no servidor". |
+| `GEMINI_API_KEY` | API key do Google Gemini — usada para importar dados da balança e resultados de exames em PDF via IA, e para sugerir dados nutricionais ao cadastrar um alimento novo. Sem ela, esses botões mostram "GEMINI_API_KEY não configurada no servidor". |
+| `PIXABAY_API_KEY` | API key gratuita do Pixabay (opcional — cadastre-se em pixabay.com/api/docs) — usada apenas pelo botão "Preencher com IA" no cadastro de alimentos, para buscar automaticamente uma foto. Sem ela, a IA ainda sugere os valores nutricionais normalmente, só não busca a foto. |
+| `APP_PASSWORD` | senha de acesso ao sistema (opcional) — sem ela, o sistema fica sem proteção por senha. |
 
 > **Importante:** o `.env` local nunca é commitado (está no `.gitignore`) — as variáveis precisam ser cadastradas manualmente em Vercel → Project Settings → Environment Variables (copie os mesmos valores do `.env` local). Depois de adicionar/alterar uma variável, é preciso fazer um novo deploy (ou "Redeploy" no painel da Vercel) para ela entrar em vigor.
 

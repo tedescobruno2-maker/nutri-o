@@ -29,7 +29,10 @@ export async function createFood(formData: FormData) {
   });
 
   const photoFile = formData.get("photo") as File | null;
-  const imageUrl = await saveUploadedImage(photoFile, "foods");
+  const uploadedImageUrl = await saveUploadedImage(photoFile, "foods");
+  const aiImageUrl = (formData.get("aiImageUrl") as string | null) || undefined;
+  // Prioriza um arquivo enviado manualmente; cai para a foto sugerida pela IA quando não há upload.
+  const imageUrl = uploadedImageUrl || aiImageUrl || null;
 
   await prisma.food.upsert({
     where: { name: parsed.name },
