@@ -25,10 +25,13 @@ Configure em Vercel → Project Settings → Environment Variables:
 | `DATABASE_URL` | Transaction pooler do Supabase (porta 6543) |
 | `DIRECT_URL` | Session pooler do Supabase (porta 5432) |
 | `SUPABASE_URL` | URL do projeto Supabase |
-| `SUPABASE_SECRET_KEY` | chave secreta do Supabase (Storage — fotos de receitas) |
+| `SUPABASE_SECRET_KEY` | chave secreta do Supabase (Storage — fotos de receitas/alimentos/exames) |
 | `RESEND_API_KEY` | API key do Resend (opcional — sem ela, envio de formulário fica em modo de teste/log) |
 | `EMAIL_FROM` | remetente do e-mail, ex: `NutriKanban <onboarding@resend.dev>` |
 | `NEXT_PUBLIC_APP_URL` | URL pública do site em produção, ex: `https://seu-projeto.vercel.app` |
+| `GEMINI_API_KEY` | API key do Google Gemini — usada para importar dados da balança e resultados de exames em PDF via IA. Sem ela, esses botões de importação mostram "GEMINI_API_KEY não configurada no servidor". |
+
+> **Importante:** o `.env` local nunca é commitado (está no `.gitignore`) — as variáveis precisam ser cadastradas manualmente em Vercel → Project Settings → Environment Variables (copie os mesmos valores do `.env` local). Depois de adicionar/alterar uma variável, é preciso fazer um novo deploy (ou "Redeploy" no painel da Vercel) para ela entrar em vigor.
 
 ## 3. Deploy
 
