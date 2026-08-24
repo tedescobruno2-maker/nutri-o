@@ -63,7 +63,9 @@ next-env.d.ts
 /TEXTO PARA MELHORIA NO SISTEMA NUTRI LUANA.docx
 /RECEITAS
 /LOGO
-/_PLANO-MESTRE/seed
+# _PLANO-MESTRE contém nome real de paciente em pelo menos 2 trechos (ver relatório da Fase 0) —
+# fica de fora até ser revisado/redigido, já que o repositório do GitHub é público.
+/_PLANO-MESTRE
 
 # ferramentas locais de agente (não fazem parte do app)
 /.agents
