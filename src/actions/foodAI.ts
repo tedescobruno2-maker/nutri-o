@@ -1,7 +1,7 @@
 "use server";
 
 import { gemini, FOOD_SUGGEST_SCHEMA, FOOD_SUGGEST_PROMPT, type FoodSuggestData } from "@/lib/gemini";
-import { supabaseAdmin, STORAGE_BUCKET } from "@/lib/supabase";
+import { supabaseAdmin, PUBLIC_BUCKET } from "@/lib/supabase";
 
 export type SuggestFoodResult =
   | { ok: true; data: FoodSuggestData & { imageUrl: string | null } }
@@ -11,8 +11,8 @@ let bucketEnsured = false;
 async function ensureBucket() {
   if (bucketEnsured || !supabaseAdmin) return;
   const { data } = await supabaseAdmin.storage.listBuckets();
-  if (!data?.some((b) => b.name === STORAGE_BUCKET)) {
-    await supabaseAdmin.storage.createBucket(STORAGE_BUCKET, { public: true });
+  if (!data?.some((b) => b.name === PUBLIC_BUCKET)) {
+    await supabaseAdmin.storage.createBucket(PUBLIC_BUCKET, { public: true });
   }
   bucketEnsured = true;
 }
@@ -38,11 +38,11 @@ async function findAndStorePhoto(query: string): Promise<string | null> {
     await ensureBucket();
     const objectPath = `foods/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
     const { error } = await supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
+      .from(PUBLIC_BUCKET)
       .upload(objectPath, buffer, { contentType: "image/jpeg", upsert: false });
     if (error) return null;
 
-    const { data } = supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(objectPath);
+    const { data } = supabaseAdmin.storage.from(PUBLIC_BUCKET).getPublicUrl(objectPath);
     return data.publicUrl;
   } catch {
     return null;

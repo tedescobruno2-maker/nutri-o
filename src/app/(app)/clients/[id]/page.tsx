@@ -15,12 +15,22 @@ import { ExamsSection } from "@/components/clients/ExamsSection";
 import { EditClientButton } from "@/components/clients/EditClientButton";
 import { ImportScaleButton } from "@/components/clients/ImportScaleButton";
 import { BodyCompositionSection } from "@/components/clients/BodyCompositionSection";
+import { getSignedDocumentUrl } from "@/actions/upload";
 import { KANBAN_LABELS, initials, formatDate, formatDateFull, calculateAge, type KanbanStatusValue } from "@/lib/utils";
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [client, foods] = await Promise.all([getClientProfile(id), getFoods()]);
   if (!client) notFound();
+
+  // Exames guardam apenas o CAMINHO do documento (bucket privado) — resolve para URL assinada
+  // de curta duração aqui, no momento da exibição (Fase 0: dado de saúde nunca fica público).
+  const exams = await Promise.all(
+    client.exams.map(async (exam) => ({
+      ...exam,
+      fileUrl: exam.fileUrl ? await getSignedDocumentUrl(exam.fileUrl) : null,
+    }))
+  );
 
   const age = client.birthDate ? calculateAge(client.birthDate) : client.age;
   const latest = client.measurements.at(-1);
@@ -292,7 +302,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
       {/* Exames solicitados */}
       <section className="section">
-        <ExamsSection clientId={client.id} exams={client.exams} hasEmail={!!client.email} />
+        <ExamsSection clientId={client.id} exams={exams} hasEmail={!!client.email} />
       </section>
 
       {(client.email || client.phone || client.notes || client.document || client.profession || lastConsultation) && (

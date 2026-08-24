@@ -45,7 +45,7 @@ next-env.d.ts
 # database
 /dev.db
 /dev.db-journal
-/prisma/data-export.json
+/prisma/data-export*.json
 
 # uploaded photos (recipes, etc.)
 /public/uploads

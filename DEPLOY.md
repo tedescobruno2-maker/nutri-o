@@ -12,9 +12,26 @@ No painel do Supabase → botão **Connect** (topo do dashboard) → aba **Conne
 Cole as duas no `.env` local, depois rode:
 
 ```bash
-npm run db:push              # cria as tabelas no Postgres
+npm run db:deploy            # aplica as migrações versionadas (prisma/migrations) no Postgres
 npm run db:import-postgres   # importa o backup local (prisma/data-export.json) com os dados reais
 ```
+
+### Migrações (a partir da Fase 0 do plano mestre)
+
+O projeto usa **migrações versionadas** (`prisma/migrations/`) em vez de `db push`. Isso existe porque
+há dados reais de paciente em produção — `db push` não gera histórico nem permite reverter uma
+alteração de schema com segurança.
+
+- **`npm run db:migrate`** (`prisma migrate dev`) — cria uma nova migração a partir de uma mudança no
+  `schema.prisma` e já aplica no banco apontado por `DIRECT_URL`. Use em desenvolvimento.
+- **`npm run db:deploy`** (`prisma migrate deploy`) — aplica migrações pendentes sem gerar novas.
+  Use em produção/CI.
+- **`npm run db:push`** (`prisma db push`) continua existindo por compatibilidade, mas **não deve
+  mais ser usado** — ele não registra migração e pode dessincronizar o histórico. Antes de mudar o
+  schema, exporte o banco (`npm run db:export-backup -- prisma/data-export-<fase>.json`).
+- Colunas obrigatórias novas em tabela com dados existentes precisam de três passos (três
+  migrações separadas): adicionar a coluna como opcional → preencher (backfill) os valores → só
+  então tornar obrigatória.
 
 ## 2. Variáveis de ambiente (Vercel)
 
@@ -39,7 +56,30 @@ Configure em Vercel → Project Settings → Environment Variables:
 
 Conectar o repositório GitHub (`tedescobruno2-maker/nutri-o`) ao Vercel — framework Next.js é detectado automaticamente, nenhuma configuração extra de build é necessária.
 
+### Região (LGPD — dado de saúde de paciente brasileiro)
+
+As Vercel Functions rodam por padrão em `iad1` (Washington, EUA) — sem configuração explícita, todo
+o processamento de prontuário de saúde acontece nos Estados Unidos, o que é transferência
+internacional de dado sensível (LGPD Art. 33) sem amparo claro. O arquivo `vercel.json` na raiz do
+projeto fixa `"regions": ["gru1"]` (São Paulo) para as funções serverless.
+
+> **Pendente (decisão do Bruno):** o banco de dados (Supabase) continua hospedado na região
+> configurada quando o projeto foi criado — mudar a região de um projeto Supabase existente exige
+> criar um projeto novo e reimportar os dados (janela de manutenção). Ver seção 9.2 do plano mestre.
+
+### Storage — dois buckets, por sensibilidade
+
+- **`public-assets`** (bucket público): fotos de alimentos, receitas e o logo da nutricionista. Não é
+  dado pessoal, pode ficar acessível por URL direta.
+- **`patient-docs`** (bucket privado): PDFs de exame e laudos importados. Nunca público — servido por
+  **URL assinada de curta duração** (300s), gerada sob demanda em `actions/upload.ts` →
+  `getSignedDocumentUrl`. O campo no banco (`Exam.fileUrl`, `ExamResult.sourceFileUrl`) guarda o
+  **caminho do objeto**, não uma URL.
+
+Sem `SUPABASE_URL`/`SUPABASE_SECRET_KEY` configurados, o upload cai em modo de desenvolvimento local
+(grava em `public/uploads`, que **não persiste** em produção serverless).
+
 ## Observações
 
-- O upload de fotos de receitas usa o Supabase Storage quando `SUPABASE_URL`/`SUPABASE_SECRET_KEY` estão configurados (bucket `uploads`, criado automaticamente no primeiro upload). Sem essas variáveis, cai em modo de desenvolvimento local (grava em `public/uploads`, que **não persiste** em produção serverless).
-- A pasta `PACIENTES/` (documentos originais dos pacientes) e o arquivo `prisma/data-export.json` (backup dos dados reais) nunca são commitados — ficam só na máquina local (ver `.gitignore`).
+- A pasta `PACIENTES/` (documentos originais dos pacientes) e os arquivos `prisma/data-export*.json`
+  (backups dos dados reais) nunca são commitados — ficam só na máquina local (ver `.gitignore`).

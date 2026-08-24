@@ -14,7 +14,7 @@ export function ThemeToggle() {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("nutrikanban-theme", next);
+    localStorage.setItem("nlg-theme", next);
   }
 
   return (
