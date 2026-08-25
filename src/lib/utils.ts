@@ -18,6 +18,51 @@ export const FOOD_PREPARATION_LABELS: Record<string, string> = {
   EM_PO: "Em pó",
 };
 
+export const MEAL_BLOCK_TYPE_LABELS: Record<string, string> = {
+  AO_ACORDAR: "Ao acordar",
+  DESJEJUM: "Desjejum",
+  COLACAO: "Colação",
+  PRE_TREINO: "Pré-treino",
+  INTRA_TREINO: "Intra-treino",
+  POS_TREINO: "Pós-treino",
+  ALMOCO: "Almoço",
+  SOBREMESA: "Sobremesa",
+  LANCHE_TARDE: "Lanche da tarde",
+  JANTAR_LANCHE: "Jantar/Lanche",
+  CEIA: "Ceia",
+  HIDRATACAO: "Hidratação",
+  TAREFAS_INICIAIS: "Tarefas iniciais",
+  RECEITAS_EXTRAS: "Receitas extras",
+  LIVRE: "Bloco livre",
+};
+
+/** Ordem inicial ao criar plano novo (5.4.2), derivada dos 10 planos reais. */
+export const MEAL_BLOCK_TYPE_DEFAULT_ORDER = [
+  "AO_ACORDAR",
+  "DESJEJUM",
+  "COLACAO",
+  "HIDRATACAO",
+  "PRE_TREINO",
+  "ALMOCO",
+  "SOBREMESA",
+  "POS_TREINO",
+  "LANCHE_TARDE",
+  "JANTAR_LANCHE",
+  "CEIA",
+  "TAREFAS_INICIAIS",
+  "RECEITAS_EXTRAS",
+] as const;
+
+/** Começam ocultos — aparecem em só 3 dos 10 planos reais (5.4.2). */
+export const MEAL_BLOCK_TYPE_STARTS_HIDDEN = new Set(["COLACAO", "SOBREMESA", "POS_TREINO", "INTRA_TREINO", "CEIA"]);
+
+export const CALC_STATUS_LABELS: Record<string, string> = {
+  CALCULADO: "Calculado",
+  PARCIAL: "Parcial",
+  FAIXA: "Faixa",
+  NAO_CALCULAVEL: "Não calculável",
+};
+
 export const NUTRIENT_SOURCE_LABELS: Record<string, string> = {
   TACO: "TACO",
   IBGE_POF: "IBGE/POF",

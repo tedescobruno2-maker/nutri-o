@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getClientProfile, getFoods } from "@/lib/dal";
+import { getClientProfile, getFoodsForBuilder, getRecipesWithIngredients, getChoiceGroupsForBuilder, getGuidanceTexts, getMealPlanTemplates } from "@/lib/dal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { AdherenceChart } from "@/components/charts/AdherenceChart";
 import { MacroChart } from "@/components/charts/MacroChart";
@@ -23,7 +23,14 @@ import { KANBAN_LABELS, initials, formatDate, formatDateFull, calculateAge, type
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [client, foods] = await Promise.all([getClientProfile(id), getFoods()]);
+  const [client, foodsForBuilder, recipesWithIngredients, choiceGroups, guidanceTexts, mealPlanTemplates] = await Promise.all([
+    getClientProfile(id),
+    getFoodsForBuilder(),
+    getRecipesWithIngredients(),
+    getChoiceGroupsForBuilder(),
+    getGuidanceTexts(),
+    getMealPlanTemplates(),
+  ]);
   if (!client) notFound();
 
   const actor = await getCurrentUser();
@@ -237,7 +244,23 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
       </section>
 
       <section className="section">
-        <MealPlanSection clientId={client.id} mealPlan={activePlan} foods={foods} />
+        <MealPlanSection
+          clientId={client.id}
+          client={{
+            allergies: client.allergies,
+            intolerances: client.intolerances,
+            dietaryRestrictions: client.dietaryRestrictions,
+            foodAversions: client.foodAversions,
+            consultations: client.consultations,
+            measurements: client.measurements,
+          }}
+          mealPlan={activePlan}
+          foods={foodsForBuilder}
+          recipes={recipesWithIngredients}
+          choiceGroups={choiceGroups}
+          guidanceTexts={guidanceTexts}
+          templates={mealPlanTemplates}
+        />
       </section>
 
       {/* Histórico de planos alimentares anteriores */}

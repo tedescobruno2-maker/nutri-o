@@ -28,7 +28,7 @@ export async function createMealPlanFromRecipes(input: PlanBuilderInput) {
   const client = await prisma.client.findUnique({ where: { id: clientId } });
   if (!client) throw new Error("Paciente não encontrado");
 
-  await prisma.mealPlan.updateMany({ where: { clientId, active: true }, data: { active: false } });
+  await prisma.mealPlan.updateMany({ where: { clientId, active: true }, data: { active: false, status: "SUBSTITUIDO" } });
 
   const mealPlan = await prisma.mealPlan.create({
     data: { clientId, title, objective, active: true },
@@ -53,7 +53,7 @@ export async function createMealPlanFromRecipes(input: PlanBuilderInput) {
       });
 
       await prisma.mealOptionItem.create({
-        data: { mealOptionId: option.id, recipeId: recipe.id, order: 0 },
+        data: { mealOptionId: option.id, recipeId: recipe.id, itemType: "RECEITA", order: 0 },
       });
     }
   }

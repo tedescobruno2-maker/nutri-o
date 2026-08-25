@@ -32,9 +32,8 @@ export function AddMealOptionForm({ mealId, clientId, nextLabel }: { mealId: str
       <textarea
         className="input"
         name="freeText"
-        rows={3}
-        required
-        placeholder={"3 ovos (omelete ou mexido)\n2 fatias de pão integral\n..."}
+        rows={2}
+        placeholder="Texto opcional — para montar com alimentos/receitas estruturados, use “+ Item” depois de salvar"
       />
       <div style={{ display: "flex", gap: 8 }}>
         <button type="submit" className="btn btn-primary btn-sm" disabled={isPending}>

@@ -44,13 +44,23 @@ export async function getClientProfile(id: string) {
           orderBy: { createdAt: "desc" },
           take: 1,
           include: {
+            consultation: true,
+            initialGuidance: true,
             meals: {
               orderBy: { order: "asc" },
               include: {
                 options: {
                   orderBy: { order: "asc" },
                   include: {
-                    items: { orderBy: { order: "asc" }, include: { food: true, recipe: true } },
+                    items: {
+                      orderBy: { order: "asc" },
+                      include: {
+                        food: true,
+                        foodMeasure: true,
+                        recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
+                        choiceGroup: { include: { items: { orderBy: { order: "asc" }, include: { food: true } } } },
+                      },
+                    },
                   },
                 },
               },
@@ -75,6 +85,46 @@ export async function getClientProfile(id: string) {
   return client ? { ...client, mealPlanHistory } : null;
 }
 
+/** Árvore completa de um plano por id — usada por duplicar/finalizar/salvar como modelo, que
+ * operam sobre um `mealPlanId` arbitrário, não necessariamente o plano ativo do paciente. */
+export async function getMealPlanFullTree(mealPlanId: string) {
+  return prisma.mealPlan.findUnique({
+    where: { id: mealPlanId },
+    include: {
+      meals: {
+        orderBy: { order: "asc" },
+        include: {
+          options: {
+            orderBy: { order: "asc" },
+            include: {
+              items: {
+                orderBy: { order: "asc" },
+                include: {
+                  food: true,
+                  foodMeasure: true,
+                  recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
+                  choiceGroup: { include: { items: { orderBy: { order: "asc" }, include: { food: true } } } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function getMealPlanTemplates() {
+  return prisma.mealPlanTemplate.findMany({ orderBy: { name: "asc" } });
+}
+
+export async function getChoiceGroupsForBuilder() {
+  return prisma.choiceGroup.findMany({
+    orderBy: { order: "asc" },
+    include: { items: { orderBy: { order: "asc" }, include: { food: true } } },
+  });
+}
+
 export async function getRecipes() {
   return prisma.recipe.findMany({ orderBy: { createdAt: "desc" } });
 }
@@ -90,6 +140,16 @@ export async function getRecipeById(id: string) {
   return prisma.recipe.findUnique({
     where: { id },
     include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } },
+  });
+}
+
+/** Alimentos para o construtor de plano (Fase 4) — inclui as medidas caseiras cadastradas, para o
+ * seletor "1 unidade" × multiplicador em vez de forçar tudo em grama (5.4.3). */
+export async function getFoodsForBuilder() {
+  return prisma.food.findMany({
+    where: { active: true },
+    orderBy: { baseName: "asc" },
+    include: { measures: { orderBy: { isDefault: "desc" } } },
   });
 }
 

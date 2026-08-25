@@ -228,6 +228,8 @@ model Consultation {
   notes     String?
   createdAt DateTime @default(now())
 
+  mealPlans MealPlan[]
+
   @@index([clientId])
 }
 
@@ -472,6 +474,7 @@ model Recipe {
   protein      Float? // g
   carbs        Float? // g
   fat          Float? // g
+  servings     Int? // nº de porções — motor de cálculo divide a soma dos ingredientes por isto (5.3.2 regra 7)
   imageUrl     String?
   tags         String? // separadas por vírgula (ex: "café da manhã,low carb")
   createdAt    DateTime @default(now())
@@ -499,6 +502,50 @@ model RecipeIngredient {
 // Plano alimentar do paciente
 // ---------------------------------------------------------------------------
 
+enum MealBlockType {
+  AO_ACORDAR
+  DESJEJUM
+  COLACAO
+  PRE_TREINO
+  INTRA_TREINO
+  POS_TREINO
+  ALMOCO
+  SOBREMESA
+  LANCHE_TARDE
+  JANTAR_LANCHE
+  CEIA
+  HIDRATACAO
+  TAREFAS_INICIAIS
+  RECEITAS_EXTRAS
+  LIVRE
+}
+
+enum BlockSeparator {
+  OU // opções alternativas — refeições
+  LISTA // itens cumulativos — TAREFAS INICIAIS
+}
+
+enum MealPlanStatus {
+  RASCUNHO
+  FINALIZADO
+  SUBSTITUIDO
+}
+
+enum PlanItemType {
+  ALIMENTO
+  RECEITA
+  GRUPO_ESCOLHA
+  TEXTO_LIVRE
+  SUPLEMENTO
+}
+
+enum CalcStatus {
+  CALCULADO // todos os itens com nutriente validado e quantidade numérica
+  PARCIAL // algum item pendente ou não quantificável
+  FAIXA // contém grupo de escolha — resultado é intervalo
+  NAO_CALCULAVEL
+}
+
 model MealPlan {
   id                String   @id @default(cuid())
   clientId          String
@@ -510,9 +557,36 @@ model MealPlan {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  meals Meal[]
+  consultationId          String? // consulta de referência — traz peso e data (5.4.5)
+  consultation            Consultation?   @relation(fields: [consultationId], references: [id])
+  version                 Int             @default(1)
+  status                  MealPlanStatus  @default(RASCUNHO)
+  templateId              String? // se veio de um modelo
+  initialGuidanceId       String? // FK → GuidanceText (orientação inicial)
+  initialGuidance         GuidanceText?   @relation(fields: [initialGuidanceId], references: [id])
+  initialGuidanceOverride String? // ajuste pontual do texto, sem alterar a biblioteca
+  finalNotes              String?
+  pdfUrl                  String?
+  pdfNoPhotosUrl          String?
+  signedAt                DateTime?
+  signatureRef            String?
+  // Totais materializados no momento do "Finalizar" — o PDF nunca recalcula depois.
+  kcalTotalMin    Float?
+  kcalTotalMax    Float?
+  proteinTotalMin Float?
+  proteinTotalMax Float?
+  carbsTotalMin   Float?
+  carbsTotalMax   Float?
+  fatTotalMin     Float?
+  fatTotalMax     Float?
+  calcStatus      CalcStatus @default(NAO_CALCULAVEL)
+  calcWarnings    Json? // lista de itens excluídos do somatório e por quê
+
+  meals     Meal[]
+  deliveries PlanDelivery[]
 
   @@index([clientId])
+  @@index([clientId, status])
 }
 
 model Meal {
@@ -521,6 +595,16 @@ model Meal {
   mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
   name       String // "Desjejum", "Almoço", "Jantar"...
   order      Int      @default(0)
+
+  blockType     MealBlockType  @default(LIVRE)
+  displayTitle  String? // título literal, com condição embutida: "DESJEJUM SEGUNDA E QUINTA"
+  suggestedTime String? // "07:00", "1 HR ANTES DO TREINO"
+  separator     BlockSeparator @default(OU)
+  daysOfWeek    Int[]          @default([]) // 1=seg ... 7=dom; vazio = todos os dias
+  visible       Boolean        @default(true)
+  kcalMin       Float?
+  kcalMax       Float?
+  calcStatus    CalcStatus     @default(NAO_CALCULAVEL)
 
   options MealOption[]
 
@@ -533,7 +617,18 @@ model MealOption {
   meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
   label    String @default("Opção 1")
   order    Int    @default(0)
-  freeText String // texto original / autoritativo da opção
+  freeText String // texto legado — só é autoritativo quando isStructured = false (5.5.3)
+
+  isStructured Boolean @default(false)
+  kcalMin      Float?
+  kcalMax      Float?
+  proteinMin   Float?
+  proteinMax   Float?
+  carbsMin     Float?
+  carbsMax     Float?
+  fatMin       Float?
+  fatMax       Float?
+  calcStatus   CalcStatus @default(NAO_CALCULAVEL)
 
   items MealOptionItem[]
 
@@ -557,11 +652,58 @@ model MealOptionItem {
   unit          String?
   order         Int          @default(0)
 
+  itemType     PlanItemType @default(TEXTO_LIVRE)
+  quantityMax  Float? // faixa: "160 A 180 GR" → quantity=160, quantityMax=180
+  quantityText String? // literal não-quantificável: "A VONTADE", "PONTA DA FACA"
+  literalText  String? // texto original do .docx, SEMPRE preservado
+  showPhoto    Boolean    @default(false)
+  kcal         Float? // materializado no "Finalizar" — o PDF nunca recalcula
+  protein      Float?
+  carbs        Float?
+  fat          Float?
+  calcStatus   CalcStatus @default(NAO_CALCULAVEL)
+  calcNote     String? // "alimento sem valor nutricional (pendente)"
+
   @@index([mealOptionId])
   @@index([foodId])
   @@index([foodMeasureId])
   @@index([recipeId])
   @@index([choiceGroupId])
+}
+
+/// Modelo de plano reutilizável entre pacientes ("Salvar como modelo").
+model MealPlanTemplate {
+  id              String   @id @default(cuid())
+  name            String
+  goal            String? // "Emagrecimento", "Hipertrofia", "Low carb"
+  description     String?
+  structure       Json // blocos → opções → itens, serializado (resolve foodId/recipeId/choiceGroupId por id)
+  createdByUserId String?
+  isShared        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum DeliveryChannel {
+  SISTEMA
+  WHATSAPP
+  EMAIL
+  IMPRESSO
+}
+
+/// Log de entrega — Res. CFN 731/2022 exige confirmação de recebimento do plano pelo paciente.
+model PlanDelivery {
+  id           String    @id @default(cuid())
+  mealPlanId   String?
+  mealPlan     MealPlan? @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  clientId     String
+  channel      DeliveryChannel
+  sentByUserId String?
+  sentAt       DateTime  @default(now())
+  acknowledgedAt DateTime? // confirmação de recebimento pelo paciente no portal
+  notes        String?
+
+  @@index([clientId, sentAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -663,4 +805,6 @@ model GuidanceText {
   tags      String? // ex: "corrida curta,musculação"
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+
+  mealPlansAsInitialGuidance MealPlan[]
 }
