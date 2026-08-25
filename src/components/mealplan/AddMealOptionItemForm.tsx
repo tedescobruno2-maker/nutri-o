@@ -2,10 +2,23 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { addMealOptionItem } from "@/actions/mealPlans";
+import { calcItem, type FoodRef } from "@/lib/nutrition";
 import type { Food } from "@/generated/prisma/client";
 
 function round1(n: number) {
   return Math.round(n * 10) / 10;
+}
+
+function toFoodRef(food: Food): FoodRef {
+  return {
+    name: food.name,
+    kcal100: food.kcal100,
+    protein100: food.protein100,
+    carbs100: food.carbs100,
+    fat100: food.fat100,
+    fiber100: food.fiber100,
+    nutrientStatus: food.nutrientStatus,
+  };
 }
 
 export function AddMealOptionItemForm({
@@ -27,18 +40,22 @@ export function AddMealOptionItemForm({
 
   const preview = useMemo(() => {
     if (!selectedFood) return null;
-    // Alimento PENDENTE (sem valor nutricional confirmado) — nunca inventa um número aqui.
-    if (selectedFood.kcal100 == null || selectedFood.protein100 == null || selectedFood.carbs100 == null || selectedFood.fat100 == null) {
-      return null;
-    }
     const qty = parseFloat(quantity);
-    const factor = (Number.isFinite(qty) && qty > 0 ? qty : 100) / 100;
+    const isEstimate = !(Number.isFinite(qty) && qty > 0);
+    // Motor de cálculo centralizado (Fase 3) — nunca multiplica kcal100 aqui.
+    const result = calcItem({
+      type: "ALIMENTO",
+      food: toFoodRef(selectedFood),
+      quantity: isEstimate ? 100 : qty,
+      unit: selectedFood.defaultUnit,
+    });
+    if (result.status !== "CALCULADO") return null;
     return {
-      kcal: Math.round(selectedFood.kcal100 * factor),
-      protein: round1(selectedFood.protein100 * factor),
-      carbs: round1(selectedFood.carbs100 * factor),
-      fat: round1(selectedFood.fat100 * factor),
-      isEstimate: !(Number.isFinite(qty) && qty > 0),
+      kcal: Math.round(result.range.min.kcal),
+      protein: round1(result.range.min.protein),
+      carbs: round1(result.range.min.carbs),
+      fat: round1(result.range.min.fat),
+      isEstimate,
     };
   }, [selectedFood, quantity]);
 
@@ -135,9 +152,14 @@ export function AddMealOptionItemForm({
           </div>
         </div>
       )}
-      {selectedFood && !preview && (
+      {selectedFood && !preview && selectedFood.nutrientStatus === "PENDENTE" && (
         <p className="text-tertiary" style={{ fontSize: "0.78rem" }}>
           Este alimento ainda não tem valor nutricional confirmado (pendente) — ele será adicionado, mas não entra no cálculo do plano até ser preenchido em Banco de Alimentos.
+        </p>
+      )}
+      {selectedFood && !preview && selectedFood.nutrientStatus !== "PENDENTE" && (
+        <p className="text-tertiary" style={{ fontSize: "0.78rem" }}>
+          Unidade &quot;{selectedFood.defaultUnit}&quot; sem medida caseira cadastrada para este alimento — o item será adicionado, mas o cálculo fica pendente até haver uma gramatura confirmada.
         </p>
       )}
     </form>

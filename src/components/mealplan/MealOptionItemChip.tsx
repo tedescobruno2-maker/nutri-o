@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { deleteMealOptionItem } from "@/actions/mealPlans";
+import { calcItem } from "@/lib/nutrition";
 import type { MealOptionItemView } from "./types";
 
 function round1(n: number) {
@@ -14,22 +15,36 @@ export function MealOptionItemChip({ item, clientId }: { item: MealOptionItemVie
   const label = item.food ? item.food.name : item.recipe ? item.recipe.name : item.description || "Item";
   const qty = item.quantity ? `${item.quantity}${item.unit ? ` ${item.unit}` : ""}` : null;
 
-  const hasConfirmedMacros =
-    item.food &&
-    item.food.kcal100 != null &&
-    item.food.protein100 != null &&
-    item.food.carbs100 != null &&
-    item.food.fat100 != null;
+  // Motor de cálculo centralizado (Fase 3) — nunca multiplica kcal100 aqui.
+  const result =
+    item.food && item.quantity
+      ? calcItem({
+          type: "ALIMENTO",
+          food: {
+            name: item.food.name,
+            kcal100: item.food.kcal100,
+            protein100: item.food.protein100,
+            carbs100: item.food.carbs100,
+            fat100: item.food.fat100,
+            fiber100: item.food.fiber100,
+            nutrientStatus: item.food.nutrientStatus,
+          },
+          quantity: item.quantity,
+          unit: item.unit,
+        })
+      : null;
 
   const macros =
-    item.food && item.quantity && hasConfirmedMacros
+    result && result.status === "CALCULADO"
       ? {
-          kcal: Math.round((item.food.kcal100! * item.quantity) / 100),
-          protein: round1((item.food.protein100! * item.quantity) / 100),
-          carbs: round1((item.food.carbs100! * item.quantity) / 100),
-          fat: round1((item.food.fat100! * item.quantity) / 100),
+          kcal: Math.round(result.range.min.kcal),
+          protein: round1(result.range.min.protein),
+          carbs: round1(result.range.min.carbs),
+          fat: round1(result.range.min.fat),
         }
       : null;
+
+  const pendingTitle = result?.warnings[0]?.message;
 
   return (
     <span
@@ -38,8 +53,8 @@ export function MealOptionItemChip({ item, clientId }: { item: MealOptionItemVie
       title={
         macros
           ? `${macros.kcal} kcal · P ${macros.protein}g · C ${macros.carbs}g · G ${macros.fat}g — clique para remover`
-          : item.food && !hasConfirmedMacros
-            ? "Alimento pendente (sem valor nutricional confirmado) — clique para remover"
+          : pendingTitle
+            ? `${pendingTitle} — clique para remover`
             : "Clique para remover"
       }
       onClick={() => startTransition(() => deleteMealOptionItem(item.id, clientId))}
