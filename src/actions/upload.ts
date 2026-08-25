@@ -94,6 +94,22 @@ export async function saveUploadedDocument(file: File | null, folder: string): P
  * assinada de curta duração. Se o valor já for uma URL/caminho diretamente acessível (fallback
  * local de desenvolvimento, ou dado legado), retorna como está.
  */
+/** Salva um documento gerado no servidor (ex.: PDF de plano alimentar) — não vem de um <input>. */
+export async function saveGeneratedDocument(buffer: Buffer, folder: string, filename: string, contentType: string): Promise<string> {
+  if (!supabaseAdmin) {
+    const dir = path.join(process.cwd(), "public", "uploads", folder);
+    await mkdir(dir, { recursive: true });
+    await writeFile(path.join(dir, filename), buffer);
+    return `/uploads/${folder}/${filename}`;
+  }
+
+  await ensureBucket(PATIENT_BUCKET, false);
+  const objectPath = `${folder}/${filename}`;
+  const { error } = await supabaseAdmin.storage.from(PATIENT_BUCKET).upload(objectPath, buffer, { contentType, upsert: true });
+  if (error) throw new Error(`Falha ao salvar documento gerado: ${error.message}`);
+  return objectPath;
+}
+
 export async function getSignedDocumentUrl(objectPathOrUrl: string, ttlSeconds = 300): Promise<string | null> {
   if (!objectPathOrUrl) return null;
   if (objectPathOrUrl.startsWith("http") || objectPathOrUrl.startsWith("/uploads/")) {

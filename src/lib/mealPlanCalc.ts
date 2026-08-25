@@ -15,6 +15,7 @@ export type FoodLike = {
   fat100: number | null;
   fiber100: number | null;
   nutrientStatus: string;
+  imageUrl?: string | null;
 };
 
 export type MealOptionItemLike = {

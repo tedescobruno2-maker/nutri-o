@@ -247,6 +247,8 @@ export async function getMealPlanForExport(mealPlanId: string) {
     where: { id: mealPlanId },
     include: {
       client: true,
+      consultation: true,
+      initialGuidance: true,
       meals: {
         orderBy: { order: "asc" },
         include: {
@@ -257,7 +259,9 @@ export async function getMealPlanForExport(mealPlanId: string) {
                 orderBy: { order: "asc" },
                 include: {
                   food: true,
+                  foodMeasure: true,
                   recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
+                  choiceGroup: { include: { items: { orderBy: { order: "asc" }, include: { food: true } } } },
                 },
               },
             },
@@ -266,6 +270,13 @@ export async function getMealPlanForExport(mealPlanId: string) {
       },
     },
   });
+}
+
+/** Medida de peso mais próxima da data informada (nunca inventa peso — 5.4.5/5.5.1). */
+export async function getNearestMeasurement(clientId: string, date: Date) {
+  const measurements = await prisma.measurement.findMany({ where: { clientId }, orderBy: { date: "asc" } });
+  if (measurements.length === 0) return null;
+  return measurements.reduce((closest, m) => (Math.abs(m.date.getTime() - date.getTime()) < Math.abs(closest.date.getTime() - date.getTime()) ? m : closest));
 }
 
 export async function getClientForExamsExport(id: string) {
