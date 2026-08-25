@@ -1,5 +1,4 @@
 import { getCurrentUser } from "@/lib/session";
-import { logout } from "@/actions/auth";
 import { ThemeToggle } from "./ThemeToggle";
 import { initials } from "@/lib/utils";
 
@@ -21,11 +20,6 @@ export async function PatientTopbar() {
             {initials(user.name)}
           </div>
         )}
-        <form action={logout}>
-          <button type="submit" className="btn btn-ghost btn-sm">
-            Sair
-          </button>
-        </form>
       </div>
     </header>
   );

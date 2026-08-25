@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { PatientTopbar } from "@/components/layout/PatientTopbar";
+import { PatientSidebar } from "@/components/layout/PatientSidebar";
 
 export const metadata: Metadata = {
   title: "Meu Portal — Nutri Luana Gois",
@@ -28,9 +29,12 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
-        <div className="app-main">
-          <PatientTopbar />
-          <main className="app-content">{children}</main>
+        <div className="app-shell">
+          <PatientSidebar />
+          <div className="app-main">
+            <PatientTopbar />
+            <main className="app-content">{children}</main>
+          </div>
         </div>
       </body>
     </html>
