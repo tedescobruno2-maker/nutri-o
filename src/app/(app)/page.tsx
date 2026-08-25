@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDashboardStats } from "@/lib/dal";
 import { KANBAN_LABELS, KANBAN_ICONS, KANBAN_STATUSES, initials, formatDate, calculateAge, calculateBMI, type KanbanStatusValue } from "@/lib/utils";
 import { ReturnReminderRow } from "@/components/dashboard/ReturnReminderRow";
+import { RescheduleRequestRow } from "@/components/dashboard/RescheduleRequestRow";
 
 // A contagem de dias desde a última consulta (retornos de consulta) precisa ser
 // calculada a cada acesso — sem isso a página fica em cache estático e o alerta
@@ -71,6 +72,19 @@ export default async function DashboardPage() {
           ))}
         </div>
       </section>
+
+      {stats.pendingRescheduleRequests.length > 0 && (
+        <section className="section">
+          <div className="page-header">
+            <h2>📅 Solicitações de reagendamento ({stats.pendingRescheduleRequests.length})</h2>
+          </div>
+          <div className="card card-pad">
+            {stats.pendingRescheduleRequests.map((request) => (
+              <RescheduleRequestRow key={request.id} request={request} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="page-header">

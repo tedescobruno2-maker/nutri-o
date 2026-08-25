@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { dbForPatient } from "@/lib/dbPatient";
+import { RequestRescheduleForm } from "@/components/portal/RequestRescheduleForm";
 import { formatDateFull } from "@/lib/utils";
 
 const TYPE_LABELS: Record<string, string> = { CONSULTA: "Consulta", RETORNO: "Retorno" };
@@ -30,15 +31,27 @@ export default async function PortalAgendaPage() {
         </div>
       ) : (
         <div className="card card-pad">
-          {appointments.map((a) => (
-            <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--border-subtle)" }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{TYPE_LABELS[a.type] ?? a.type}</div>
-                <div className="text-muted" style={{ fontSize: "0.8rem" }}>{formatDateFull(a.scheduledAt)}</div>
+          {appointments.map((a) => {
+            const latestRequest = a.rescheduleRequests[0];
+            const canRequest = (a.status === "AGENDADO" || a.status === "CONFIRMADO") && latestRequest?.status !== "PENDENTE";
+            return (
+              <div key={a.id} style={{ padding: "10px 0", borderBottom: "1px solid var(--border-subtle)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{TYPE_LABELS[a.type] ?? a.type}</div>
+                    <div className="text-muted" style={{ fontSize: "0.8rem" }}>{formatDateFull(a.scheduledAt)}</div>
+                  </div>
+                  <span className="badge badge-info">{STATUS_LABELS[a.status] ?? a.status}</span>
+                </div>
+                {canRequest && <RequestRescheduleForm appointmentId={a.id} />}
+                {latestRequest?.status === "PENDENTE" && (
+                  <span className="badge badge-warm" style={{ marginTop: 8, display: "inline-block" }}>
+                    Reagendamento solicitado — aguardando resposta
+                  </span>
+                )}
               </div>
-              <span className="badge badge-info">{STATUS_LABELS[a.status] ?? a.status}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

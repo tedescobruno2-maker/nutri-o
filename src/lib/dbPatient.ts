@@ -169,7 +169,10 @@ export function dbForPatient(clientId: string) {
       prisma.appointment.findMany({
         where: { clientId, scheduledAt: { gte: new Date() } },
         orderBy: { scheduledAt: "asc" },
+        include: { rescheduleRequests: { orderBy: { createdAt: "desc" }, take: 1 } },
       }),
+
+    getAppointmentById: (id: string) => prisma.appointment.findFirst({ where: { id, clientId } }),
 
     getLastConsultationDate: async () => {
       const consultation = await prisma.consultation.findFirst({ where: { clientId }, orderBy: { date: "desc" }, select: { date: true } });

@@ -371,7 +371,7 @@ export async function getFollowUpDue() {
 }
 
 export async function getDashboardStats() {
-  const [totalClients, board, recipesCount, latestMeasurements, followUpDue] = await Promise.all([
+  const [totalClients, board, recipesCount, latestMeasurements, followUpDue, pendingRescheduleRequests] = await Promise.all([
     prisma.client.count(),
     getKanbanBoard(),
     prisma.recipe.count(),
@@ -381,6 +381,7 @@ export async function getDashboardStats() {
       include: { client: true },
     }),
     getFollowUpDue(),
+    getPendingRescheduleRequests(),
   ]);
 
   const avgAdherence = await prisma.dietLog.aggregate({ _avg: { adherence: true } });
@@ -391,8 +392,18 @@ export async function getDashboardStats() {
     recipesCount,
     latestMeasurements,
     followUpDue,
+    pendingRescheduleRequests,
     avgAdherence: Math.round(avgAdherence._avg.adherence ?? 0),
   };
+}
+
+/** 5.9.2 ponto 2 — cartão "Solicitações de reagendamento (N)" no dashboard. */
+export async function getPendingRescheduleRequests() {
+  return prisma.appointmentRescheduleRequest.findMany({
+    where: { status: "PENDENTE" },
+    orderBy: { createdAt: "asc" },
+    include: { appointment: { include: { client: { select: { id: true, name: true } } } } },
+  });
 }
 
 /** Dados da nutricionista usados no cabeçalho/rodapé dos PDFs — sempre retorna algo (cria o padrão se ainda não existir). */

@@ -367,8 +367,40 @@ model Appointment {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
+  // Fase 9 — janela mínima para o paciente pedir reagendamento pelo portal (5.9.1).
+  cancellationDeadlineHours Int                            @default(24)
+  rescheduleRequests        AppointmentRescheduleRequest[]
+
   @@index([clientId])
   @@index([scheduledAt])
+}
+
+enum RescheduleStatus {
+  PENDENTE
+  APROVADO
+  RECUSADO
+  CANCELADO_PELO_PACIENTE
+}
+
+/// Solicitação de reagendamento feita pelo paciente no portal (5.9.2). A regra das 24h
+/// (Appointment.cancellationDeadlineHours) é validada no servidor, nunca só escondendo o botão.
+model AppointmentRescheduleRequest {
+  id                String           @id @default(cuid())
+  appointmentId     String
+  appointment       Appointment      @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  clientId          String
+  requestedByUserId String
+  proposedAt        DateTime // novo horário proposto
+  alternativeAt     DateTime? // segunda opção
+  reason            String?
+  status            RescheduleStatus @default(PENDENTE)
+  decidedByUserId   String?
+  decidedAt         DateTime?
+  decisionNote      String?
+  createdAt         DateTime         @default(now())
+
+  @@index([appointmentId])
+  @@index([status, createdAt])
 }
 
 model Measurement {
