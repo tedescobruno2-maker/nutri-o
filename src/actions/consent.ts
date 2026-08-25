@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
@@ -44,6 +45,13 @@ export async function setConsent(input: z.infer<typeof setConsentSchema>) {
     throw new Error("Você só pode alterar o próprio consentimento.");
   }
 
+  // A2 (6.2 bloco A) — timestamp, versão do texto, IP e origem gravados na própria linha do
+  // consentimento (não só no AuditLog em paralelo, abaixo) — é a prova de como o consentimento
+  // foi dado, exigida junto com o registro em si.
+  const h = await headers();
+  const ip = h.get("x-forwarded-for") ?? h.get("x-real-ip") ?? null;
+  const userAgent = h.get("user-agent") ?? null;
+
   await prisma.consent.create({
     data: {
       clientId: parsed.clientId,
@@ -52,6 +60,8 @@ export async function setConsent(input: z.infer<typeof setConsentSchema>) {
       textVersion: PRIVACY_POLICY_VERSION,
       grantedAt: parsed.granted ? new Date() : null,
       revokedAt: parsed.granted ? null : new Date(),
+      ip,
+      userAgent,
     },
   });
 
