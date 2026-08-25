@@ -4,8 +4,9 @@ import { validateSessionToken, SESSION_HEADERS } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 
 // Rotas que nunca exigem sessão: login, definição de senha por token (primeiro acesso /
-// redefinição), e o formulário pré-consulta enviado ao paciente (link público, sem senha).
-const PUBLIC_PATHS = ["/login", "/definir-senha", "/formulario"];
+// redefinição), o formulário pré-consulta enviado ao paciente (link público, sem senha), e a
+// política de privacidade (Fase 11, 6.2 A4/F2 — precisa ser acessível sem login).
+const PUBLIC_PATHS = ["/login", "/definir-senha", "/formulario", "/privacidade"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

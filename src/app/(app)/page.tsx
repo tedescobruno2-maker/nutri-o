@@ -3,6 +3,7 @@ import { getDashboardStats } from "@/lib/dal";
 import { KANBAN_LABELS, KANBAN_ICONS, KANBAN_STATUSES, initials, formatDate, calculateAge, calculateBMI, type KanbanStatusValue } from "@/lib/utils";
 import { ReturnReminderRow } from "@/components/dashboard/ReturnReminderRow";
 import { RescheduleRequestRow } from "@/components/dashboard/RescheduleRequestRow";
+import { SubjectRequestRow } from "@/components/dashboard/SubjectRequestRow";
 
 // A contagem de dias desde a última consulta (retornos de consulta) precisa ser
 // calculada a cada acesso — sem isso a página fica em cache estático e o alerta
@@ -72,6 +73,20 @@ export default async function DashboardPage() {
           ))}
         </div>
       </section>
+
+      {stats.openSubjectRequests.length > 0 && (
+        <section className="section">
+          <div className="page-header">
+            <h2>🔐 Solicitações de titular ({stats.openSubjectRequests.length})</h2>
+            <p className="text-muted" style={{ fontSize: "0.82rem" }}>Prazo legal de resposta: 15 dias (LGPD Art. 19).</p>
+          </div>
+          <div className="card card-pad">
+            {stats.openSubjectRequests.map((request) => (
+              <SubjectRequestRow key={request.id} request={request} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {stats.pendingRescheduleRequests.length > 0 && (
         <section className="section">

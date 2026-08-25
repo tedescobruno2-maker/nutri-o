@@ -174,6 +174,16 @@ export function dbForPatient(clientId: string) {
 
     getAppointmentById: (id: string) => prisma.appointment.findFirst({ where: { id, clientId } }),
 
+    /** Consentimentos do próprio paciente, um por finalidade — sempre a linha mais recente
+     * (append-only, ver src/actions/consent.ts). */
+    getConsents: async () => {
+      const CONSENT_PURPOSES = ["TELENUTRICAO", "USO_IA_EXAMES", "IMAGEM_DIVULGACAO", "MARKETING", "PESQUISA"] as const;
+      const rows = await prisma.consent.findMany({ where: { clientId }, orderBy: { createdAt: "desc" } });
+      return CONSENT_PURPOSES.map((purpose) => ({ purpose, latest: rows.find((r) => r.purpose === purpose) ?? null }));
+    },
+
+    getSubjectRequests: () => prisma.subjectRequest.findMany({ where: { clientId }, orderBy: { createdAt: "desc" } }),
+
     getLastConsultationDate: async () => {
       const consultation = await prisma.consultation.findFirst({ where: { clientId }, orderBy: { date: "desc" }, select: { date: true } });
       return consultation?.date ?? null;

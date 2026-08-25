@@ -285,6 +285,8 @@ model Client {
   examResults             ExamResult[]
   examReferences          ClientExamReference[]
   appointments            Appointment[]
+  consents                Consent[]
+  subjectRequests         SubjectRequest[]
 
   @@index([nutritionistId])
 }
@@ -299,6 +301,9 @@ model Consultation {
   client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   date      DateTime
   notes     String?
+  // Fase 11 (6.2 bloco H — telenutrição, Res. CFN 760/2023): registra que o atendimento foi por
+  // TIC. false por padrão — não presume telenutrição para consultas presenciais já existentes.
+  viaTic    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   mealPlans MealPlan[]
@@ -1121,4 +1126,70 @@ model GuidanceText {
   updatedAt DateTime         @updatedAt
 
   mealPlansAsInitialGuidance MealPlan[]
+}
+
+// ---------------------------------------------------------------------------
+// Conformidade LGPD — consentimento e direitos do titular (Fase 11 — 3.7/6.2 blocos A e E)
+// ---------------------------------------------------------------------------
+
+enum ConsentPurpose {
+  TUTELA_SAUDE // base legal Art. 11, II, "f" — REGISTRADA, nunca pedida como consentimento (A1)
+  TELENUTRICAO // termo exigido pela Res. CFN 760/2023
+  USO_IA_EXAMES // envio de PDF de exame a serviço de IA
+  IMAGEM_DIVULGACAO // fotos, antes-e-depois, redes sociais
+  MARKETING // newsletter, conteúdo comercial
+  PESQUISA
+}
+
+/// Append-only por finalidade: revogar não apaga a linha anterior, cria uma nova com
+/// granted=false e revokedAt preenchido — histórico completo sempre reconstituível (Art. 18, IX).
+model Consent {
+  id          String         @id @default(cuid())
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  purpose     ConsentPurpose
+  granted     Boolean
+  textVersion String // versão do texto aceito (ver PRIVACY_POLICY_VERSION)
+  grantedAt   DateTime?
+  revokedAt   DateTime?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime       @default(now())
+
+  @@index([clientId, purpose])
+}
+
+enum SubjectRequestType {
+  ACESSO
+  CORRECAO
+  PORTABILIDADE
+  ELIMINACAO
+  REVOGACAO
+  INFO_COMPARTILHAMENTO
+}
+
+enum SubjectRequestStatus {
+  ABERTA
+  EM_ANDAMENTO
+  ATENDIDA
+  RECUSADA_FUNDAMENTADA
+}
+
+/// Fila de requisições de titular — prazo legal de 15 dias (LGPD Art. 19).
+model SubjectRequest {
+  id              String               @id @default(cuid())
+  clientId        String
+  client          Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type            SubjectRequestType
+  status          SubjectRequestStatus @default(ABERTA)
+  description     String?
+  responseText    String?
+  responseFileUrl String?
+  dueAt           DateTime // createdAt + 15 dias
+  handledByUserId String?
+  handledAt       DateTime?
+  createdAt       DateTime             @default(now())
+
+  @@index([status, dueAt])
+  @@index([clientId])
 }

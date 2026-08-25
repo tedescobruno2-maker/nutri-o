@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export default async function LoginPage({
@@ -16,6 +17,10 @@ export default async function LoginPage({
       </div>
 
       <LoginForm next={next ?? "/"} />
+
+      <Link href="/privacidade" className="text-tertiary" style={{ fontSize: "0.8rem", marginTop: 16, display: "block", textAlign: "center" }}>
+        Política de Privacidade
+      </Link>
     </div>
   );
 }

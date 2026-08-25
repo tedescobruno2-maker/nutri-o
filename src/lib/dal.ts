@@ -372,7 +372,7 @@ export async function getFollowUpDue() {
 }
 
 export async function getDashboardStats() {
-  const [totalClients, board, recipesCount, latestMeasurements, followUpDue, pendingRescheduleRequests] = await Promise.all([
+  const [totalClients, board, recipesCount, latestMeasurements, followUpDue, pendingRescheduleRequests, openSubjectRequests] = await Promise.all([
     prisma.client.count(),
     getKanbanBoard(),
     prisma.recipe.count(),
@@ -383,6 +383,7 @@ export async function getDashboardStats() {
     }),
     getFollowUpDue(),
     getPendingRescheduleRequests(),
+    getOpenSubjectRequests(),
   ]);
 
   const avgAdherence = await prisma.dietLog.aggregate({ _avg: { adherence: true } });
@@ -394,6 +395,7 @@ export async function getDashboardStats() {
     latestMeasurements,
     followUpDue,
     pendingRescheduleRequests,
+    openSubjectRequests,
     avgAdherence: Math.round(avgAdherence._avg.adherence ?? 0),
   };
 }
@@ -404,6 +406,16 @@ export async function getPendingRescheduleRequests() {
     where: { status: "PENDENTE" },
     orderBy: { createdAt: "asc" },
     include: { appointment: { include: { client: { select: { id: true, name: true } } } } },
+  });
+}
+
+/** Fila de requisições de titular ainda não atendidas (Fase 11, E7) — ordenada pelo prazo mais
+ * próximo primeiro, para nunca deixar passar os 15 dias sem perceber. */
+export async function getOpenSubjectRequests() {
+  return prisma.subjectRequest.findMany({
+    where: { status: { in: ["ABERTA", "EM_ANDAMENTO"] } },
+    orderBy: { dueAt: "asc" },
+    include: { client: { select: { id: true, name: true } } },
   });
 }
 
