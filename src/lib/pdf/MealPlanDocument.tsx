@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
   // (endereço + telefone + e-mail + instagram) e colidiria com o número de página na mesma linha.
   footerPageNumber: { fontSize: 8, color: "#555", textAlign: "right", marginBottom: 1 },
   footerContact: { fontSize: 8, color: "#555" },
-  footerCustomLine: { fontSize: 8, color: "#555", textAlign: "center", marginTop: 1 },
   footerCitation: { fontSize: 7, color: "#888", marginTop: 2, textAlign: "center" },
   identBlock: { marginBottom: 14, flexDirection: "column" },
   identRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 2 },
@@ -103,10 +102,9 @@ function formatDatePt(date: Date | null) {
 export function MealPlanDocument({ professional, client, weight, consultationDate, objective, initialGuidanceText, generalGuidelines, meals, withPhotos, generatedAt }: MealPlanDocumentProps) {
   const crnLine = professional.crnRegion ? `CRN ${professional.crnRegion} ${professional.crn}` : `CRN ${professional.crn}`;
   const visibleMeals = meals.filter((m) => m.visible);
+  // footerText não entra aqui de propósito: no cadastro dela hoje ele só repete
+  // endereço/telefone/e-mail, que já aparecem nesta linha — mostrar os dois duplicava a informação.
   const footerContactLine = [professional.address, professional.phone, professional.email, professional.instagram].filter(Boolean).join(" · ");
-  const footerCustomLines = professional.footerText
-    ? professional.footerText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
-    : [];
 
   return (
     <Document>
@@ -217,9 +215,6 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
         <View style={styles.footer} fixed>
           <Text style={styles.footerPageNumber} render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
           <Text style={styles.footerContact}>{footerContactLine}</Text>
-          {footerCustomLines.map((line, i) => (
-            <Text key={i} style={styles.footerCustomLine}>{line}</Text>
-          ))}
           <Text style={styles.footerCitation}>Composição: NEPA/UNICAMP. TACO, 4ª ed. rev. e ampl. Campinas, 2011.</Text>
         </View>
       </Page>
