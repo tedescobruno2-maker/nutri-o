@@ -110,6 +110,25 @@ export async function saveGeneratedDocument(buffer: Buffer, folder: string, file
   return objectPath;
 }
 
+/** Salva uma imagem gerada/baixada no servidor (ex.: foto do Pixabay) no bucket público — não
+ * vem de um <input>. Usado pela biblioteca de imagens (Fase 10/5.11), que sempre baixa a imagem
+ * em vez de fazer hotlink. Retorna a URL pública direta (bucket público-de-catálogo). */
+export async function saveGeneratedImage(buffer: Buffer, folder: string, filename: string, contentType: string): Promise<string> {
+  if (!supabaseAdmin) {
+    const dir = path.join(process.cwd(), "public", "uploads", folder);
+    await mkdir(dir, { recursive: true });
+    await writeFile(path.join(dir, filename), buffer);
+    return `/uploads/${folder}/${filename}`;
+  }
+
+  await ensureBucket(PUBLIC_BUCKET, true);
+  const objectPath = `${folder}/${filename}`;
+  const { error } = await supabaseAdmin.storage.from(PUBLIC_BUCKET).upload(objectPath, buffer, { contentType, upsert: true });
+  if (error) throw new Error(`Falha ao salvar imagem: ${error.message}`);
+  const { data } = supabaseAdmin.storage.from(PUBLIC_BUCKET).getPublicUrl(objectPath);
+  return data.publicUrl;
+}
+
 export async function getSignedDocumentUrl(objectPathOrUrl: string, ttlSeconds = 300): Promise<string | null> {
   if (!objectPathOrUrl) return null;
   if (objectPathOrUrl.startsWith("http") || objectPathOrUrl.startsWith("/uploads/")) {

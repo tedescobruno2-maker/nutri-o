@@ -1,4 +1,4 @@
-import type { Food, Recipe, RecipeIngredient, FoodMeasure, ChoiceGroup, ChoiceGroupItem } from "@/generated/prisma/client";
+import type { Food, Recipe, RecipeIngredient, FoodMeasure, ChoiceGroup, ChoiceGroupItem, ImageAsset } from "@/generated/prisma/client";
 
 export type RecipeIngredientView = RecipeIngredient & { food: Food | null };
 export type RecipeView = Recipe & { ingredientItems: RecipeIngredientView[] };
@@ -26,6 +26,7 @@ export type MealOptionView = {
   label: string;
   freeText: string;
   isStructured: boolean;
+  imageAsset: ImageAsset | null;
   items: MealOptionItemView[];
 };
 

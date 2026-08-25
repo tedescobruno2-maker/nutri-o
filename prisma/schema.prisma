@@ -178,6 +178,59 @@ model AiUsageLog {
   @@index([createdAt])
 }
 
+// ---------------------------------------------------------------------------
+// Biblioteca de imagens (Fase 2B, construída retroativamente na Fase 10 — 5.11/3.8)
+// ---------------------------------------------------------------------------
+
+enum ImageSource {
+  PIXABAY // buscada via API do Pixabay e baixada para o storage próprio
+  UPLOAD_NUTRICIONISTA // foto enviada pela Luana
+  CEDIDA_FABRICANTE // material oficial de marca (suplementos)
+  GERADA_IA // imagem gerada por IA — precisa ser rotulada como tal
+  OUTRA
+}
+
+/// Biblioteca única de imagens, compartilhada por alimentos, receitas, suplementos e produtos.
+/// TODA imagem vive no bucket público-de-catálogo do projeto — nunca é servida por hotlink de
+/// terceiro (5.11.3: a licença do Pixabay proíbe hotlink permanente).
+model ImageAsset {
+  id               String      @id @default(cuid())
+  url              String // URL no storage próprio
+  thumbUrl         String? // miniatura ~320px, usada em grade e no PDF
+  source           ImageSource
+  sourceRef        String? // id da imagem no Pixabay, ou nome do arquivo enviado
+  sourcePageUrl    String? // página de origem (Pixabay), para auditoria
+  author           String? // autor declarado na origem
+  license          String? // "Pixabay Content License" | "Foto própria — Luana Gois" | ...
+  altText          String? // acessibilidade e alt no PDF/portal
+  searchTerm       String? // termo usado na busca — ajuda a reencontrar e a auditar
+  width            Int?
+  height           Int?
+  bytes            Int?
+  uploadedByUserId String?
+  createdAt        DateTime    @default(now())
+
+  foods              Food[]
+  recipes            Recipe[]
+  supplements        Supplement[]
+  supplementProducts SupplementProduct[]
+  mealOptions        MealOption[]
+
+  @@index([source])
+  @@index([searchTerm])
+}
+
+/// Cache de busca do Pixabay — exigência da própria licença (24h). Também reduz o consumo do
+/// limite de 100 requisições/60s (5.11.3).
+model PixabaySearchCache {
+  id        String   @id @default(cuid())
+  query     String   @unique
+  payload   Json // resposta crua da API, já normalizada
+  fetchedAt DateTime @default(now())
+
+  @@index([fetchedAt])
+}
+
 model Client {
   id         String       @id @default(cuid())
   name       String
@@ -488,12 +541,14 @@ model Food {
   parentFood   Food?           @relation("FoodVariants", fields: [parentFoodId], references: [id])
   variants     Food[]          @relation("FoodVariants")
 
-  brand       String? // DANONE, YOPRO, VERDE CAMPO...
-  category    String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
-  defaultUnit String  @default("g") // g, ml, unidade, fatia, colher de sopa...
-  imageUrl    String? // foto ilustrativa do alimento (Pixabay, ou upload manual)
-  imageCredit String? // origem/licença da foto
-  aliases     String? // nomes regionais alternativos, separados por "|" (ex: "Mexerica|Tangerina")
+  brand        String? // DANONE, YOPRO, VERDE CAMPO...
+  category     String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
+  defaultUnit  String      @default("g") // g, ml, unidade, fatia, colher de sopa...
+  imageUrl     String? // legado — sombra até a Fase 11, use imageAsset a partir da Fase 10
+  imageCredit  String? // legado — origem/licença da foto pré-biblioteca de imagens
+  imageAssetId String?
+  imageAsset   ImageAsset? @relation(fields: [imageAssetId], references: [id])
+  aliases      String? // nomes regionais alternativos, separados por "|" (ex: "Mexerica|Tangerina")
 
   kcal100    Float? // kcal por 100g (ou por 100ml) — opcional, pode estar pendente
   protein100 Float?
@@ -572,19 +627,28 @@ model ChoiceGroupItem {
 // ---------------------------------------------------------------------------
 
 model Recipe {
-  id           String   @id @default(cuid())
-  name         String
-  description  String?
-  ingredients  String // lista separada por linha (texto livre, sempre exibido)
-  instructions String?
-  calories     Int? // kcal (opcional — nem toda receita importada tem macro conhecido)
-  protein      Float? // g
-  carbs        Float? // g
-  fat          Float? // g
-  servings     Int? // nº de porções — motor de cálculo divide a soma dos ingredientes por isto (5.3.2 regra 7)
-  imageUrl     String?
-  tags         String? // separadas por vírgula (ex: "café da manhã,low carb")
-  createdAt    DateTime @default(now())
+  id               String      @id @default(cuid())
+  name             String
+  description      String?
+  ingredients      String // lista separada por linha (texto livre, sempre exibido)
+  instructions     String?
+  // Fase 10: cache MATERIALIZADO, recalculado do RecipeIngredient pelo motor da Fase 3 ao salvar —
+  // deixaram de ser campo digitado. null = ingredientes não permitem cálculo ("macros pendentes"),
+  // nunca herda o valor antigo sem revisão (esse fica em legacyMacrosNote, ver abaixo).
+  calories         Int? // kcal
+  protein          Float? // g
+  carbs            Float? // g
+  fat              Float? // g
+  legacyMacrosNote String? // valor digitado antes da Fase 10, preservado só para comparação
+  servings         Int? // nº de porções — motor de cálculo divide a soma dos ingredientes por isto (5.3.2 regra 7)
+  prepTimeMin      Int? // tempo de preparo em minutos
+  mealCategory     String? // desjejum/almoço/lanche/jantar/ceia/extra (5.10.1)
+  isExtra          Boolean     @default(false) // aparece priorizada no bloco RECEITAS EXTRAS (5.10.1)
+  imageUrl         String? // legado — sombra até a Fase 11, use imageAsset a partir da Fase 10
+  imageAssetId     String?
+  imageAsset       ImageAsset? @relation(fields: [imageAssetId], references: [id])
+  tags             String? // separadas por vírgula (ex: "café da manhã,low carb")
+  createdAt        DateTime    @default(now())
 
   ingredientItems RecipeIngredient[]
   mealOptionItems MealOptionItem[]
@@ -737,6 +801,11 @@ model MealOption {
   fatMax       Float?
   calcStatus   CalcStatus @default(NAO_CALCULAVEL)
 
+  // Fase 10 (5.10.3) — foto opcional para uma opção que não é receita cadastrada (combinação
+  // livre de alimentos, ex. "3 ovos mexidos + 2 fatias de pão"). Nunca sugerida automaticamente.
+  imageAssetId String?
+  imageAsset   ImageAsset? @relation(fields: [imageAssetId], references: [id])
+
   items MealOptionItem[]
 
   @@index([mealId])
@@ -835,8 +904,10 @@ model Supplement {
   defaultRoute  String?          @default("Oral")
   ulNote        String? // limite superior tolerável, quando aplicável (Res. CFN 731/2022)
   notes         String?
-  imageUrl      String?
+  imageUrl      String? // legado — sombra até a Fase 11, use imageAsset a partir da Fase 10
   imageCredit   String?
+  imageAssetId  String?
+  imageAsset    ImageAsset?      @relation(fields: [imageAssetId], references: [id])
   active        Boolean          @default(true)
   createdAt     DateTime         @default(now())
 
@@ -867,9 +938,11 @@ model SupplementProduct {
   doseLabel      String? // dose do rótulo
   nutritionJson  Json? // tabela nutricional do rótulo, quando existir
   anvisaRef      String? // registro/notificação — consultas.anvisa.gov.br
-  imageUrl       String?
+  imageUrl       String? // legado — sombra até a Fase 11, use imageAsset a partir da Fase 10
   imageCredit    String? // OBRIGATÓRIO quando imageUrl existe
   imageLicense   String? // "cedida pelo fabricante", "foto própria", "catálogo Essentia"
+  imageAssetId   String?
+  imageAsset     ImageAsset?     @relation(fields: [imageAssetId], references: [id])
   sourceRef      String? // "ESSENTIA GROUP.pdf, p. 12"
   active         Boolean         @default(true)
 

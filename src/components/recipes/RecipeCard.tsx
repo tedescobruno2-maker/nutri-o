@@ -1,21 +1,22 @@
 import Link from "next/link";
-import type { Recipe } from "@/generated/prisma/client";
+import type { Recipe, ImageAsset } from "@/generated/prisma/client";
 import { pickRecipeEmoji } from "@/lib/utils";
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
+export function RecipeCard({ recipe }: { recipe: Recipe & { imageAsset?: ImageAsset | null } }) {
   const hasMacros = recipe.protein != null && recipe.carbs != null && recipe.fat != null;
   const total = hasMacros ? (recipe.protein! + recipe.carbs! + recipe.fat!) || 1 : 1;
   const proteinPct = hasMacros ? Math.round((recipe.protein! / total) * 100) : 0;
   const carbsPct = hasMacros ? Math.round((recipe.carbs! / total) * 100) : 0;
   const fatPct = hasMacros ? Math.max(0, 100 - proteinPct - carbsPct) : 0;
   const tags = recipe.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
+  const imageSrc = recipe.imageAsset?.url ?? recipe.imageUrl;
 
   return (
     <Link href={`/recipes/${recipe.id}`} className="recipe-card card card-hover animate-in">
       <div className="recipe-media-wrap">
-        {recipe.imageUrl ? (
+        {imageSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={recipe.imageUrl} alt={recipe.name} className="recipe-media" />
+          <img src={imageSrc} alt={recipe.imageAsset?.altText ?? recipe.name} className="recipe-media" />
         ) : (
           <div
             className="recipe-media recipe-media-placeholder"
@@ -35,8 +36,10 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           {recipe.description && <p className="text-muted" style={{ fontSize: "0.85rem" }}>{recipe.description}</p>}
         </div>
 
-        {tags.length > 0 && (
+        {(recipe.isExtra || recipe.calories == null || tags.length > 0) && (
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {recipe.isExtra && <span className="badge badge-warm">Extra</span>}
+            {recipe.calories == null && <span className="badge badge-neutral">Macros pendentes</span>}
             {tags.slice(0, 3).map((tag) => (
               <span key={tag} className="badge badge-neutral">
                 {tag}

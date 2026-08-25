@@ -42,7 +42,7 @@ export type MealOptionItemLike = {
   quantityText: string | null;
 };
 
-function toFoodRef(food: FoodLike): FoodRef {
+export function toFoodRef(food: FoodLike): FoodRef {
   return {
     name: food.name,
     kcal100: food.kcal100,

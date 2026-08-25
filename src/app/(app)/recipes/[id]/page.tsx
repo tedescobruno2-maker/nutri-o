@@ -10,6 +10,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
   const tags = recipe.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
   const hasMacros = recipe.protein != null && recipe.carbs != null && recipe.fat != null;
+  const imageSrc = recipe.imageAsset?.url ?? recipe.imageUrl;
 
   return (
     <div className="animate-in">
@@ -18,15 +19,18 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
       </Link>
 
       <div className="recipe-hero">
-        {recipe.imageUrl ? (
+        {imageSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={recipe.imageUrl} alt={recipe.name} className="recipe-hero-media" />
+          <img src={imageSrc} alt={recipe.imageAsset?.altText ?? recipe.name} className="recipe-hero-media" />
         ) : (
           <div className="recipe-hero-media recipe-hero-placeholder">{pickRecipeEmoji(recipe.name, recipe.tags)}</div>
         )}
         <div className="recipe-hero-overlay">
-          {tags.length > 0 && (
+          {(tags.length > 0 || recipe.isExtra) && (
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+              {recipe.isExtra && (
+                <span className="badge badge-warm" style={{ background: "oklch(1 0 0 / 0.85)" }}>Receita extra</span>
+              )}
               {tags.map((tag) => (
                 <span key={tag} className="badge badge-neutral" style={{ background: "oklch(1 0 0 / 0.85)" }}>
                   {tag}
@@ -43,7 +47,13 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      {(recipe.calories != null || hasMacros) && (
+      <p className="text-muted" style={{ marginTop: 12, fontSize: "0.85rem", display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {recipe.servings != null && <span>🍽️ {recipe.servings} porção(ões)</span>}
+        {recipe.prepTimeMin != null && <span>⏱️ {recipe.prepTimeMin} min de preparo</span>}
+        {recipe.mealCategory && <span>📂 {recipe.mealCategory}</span>}
+      </p>
+
+      {recipe.calories != null || hasMacros ? (
         <section className="section stat-grid" style={{ marginTop: 24 }}>
           {recipe.calories != null && (
             <div className="card glass stat-tile">
@@ -71,6 +81,25 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
               </div>
             </>
           )}
+        </section>
+      ) : (
+        <section className="section">
+          <div className="card card-pad" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span className="badge badge-warm">Macros pendentes</span>
+            <span className="text-muted" style={{ fontSize: "0.85rem" }}>
+              Vincule alimentos do banco aos ingredientes para calcular calorias e macros automaticamente.
+            </span>
+          </div>
+        </section>
+      )}
+
+      {recipe.legacyMacrosNote && (
+        <section className="section">
+          <div className="card card-pad">
+            <span className="text-tertiary" style={{ fontSize: "0.78rem" }}>
+              Valor digitado antes do cálculo automático (Fase 10), para comparação: {recipe.legacyMacrosNote}
+            </span>
+          </div>
         </section>
       )}
 

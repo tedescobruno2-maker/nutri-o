@@ -56,6 +56,7 @@ export async function getClientProfile(id: string) {
                 options: {
                   orderBy: { order: "asc" },
                   include: {
+                    imageAsset: true,
                     items: {
                       orderBy: { order: "asc" },
                       include: {
@@ -130,20 +131,20 @@ export async function getChoiceGroupsForBuilder() {
 }
 
 export async function getRecipes() {
-  return prisma.recipe.findMany({ orderBy: { createdAt: "desc" } });
+  return prisma.recipe.findMany({ orderBy: { createdAt: "desc" }, include: { imageAsset: true } });
 }
 
 export async function getRecipesWithIngredients() {
   return prisma.recipe.findMany({
     orderBy: { createdAt: "desc" },
-    include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } },
+    include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } }, imageAsset: true },
   });
 }
 
 export async function getRecipeById(id: string) {
   return prisma.recipe.findUnique({
     where: { id },
-    include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } },
+    include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } }, imageAsset: true },
   });
 }
 

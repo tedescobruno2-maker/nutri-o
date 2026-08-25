@@ -154,6 +154,13 @@ export async function deleteMealOption(mealOptionId: string, clientId: string) {
   revalidateClient(clientId);
 }
 
+/** 5.10.3 — foto opcional para uma opção que não é receita cadastrada (combinação livre de
+ * alimentos). Nunca sugerida automaticamente — a Luana decide quando buscar uma. */
+export async function attachMealOptionImage(mealOptionId: string, imageAssetId: string | null, clientId: string) {
+  await prisma.mealOption.update({ where: { id: mealOptionId }, data: { imageAssetId } });
+  revalidateClient(clientId);
+}
+
 // ---------------------------------------------------------------------------
 // Itens (MealOptionItem) — os quatro tipos de 5.4.3, com alerta de restrição (5.4.6)
 // ---------------------------------------------------------------------------
