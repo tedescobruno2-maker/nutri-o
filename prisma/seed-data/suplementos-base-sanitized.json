@@ -1,0 +1,737 @@
+{
+  "meta": {
+    "descricao": "Seed do banco de suplementos do sistema Nutri Luana Gois, por PRINCÍPIO ATIVO + MARCAS.",
+    "data_consolidacao": "2026-08-21",
+    "regra_de_ouro": "Nenhum valor de composição, dose por cápsula ou tabela nutricional foi estimado. Campos null = ausentes na fonte e devem ser preenchidos pelo rótulo do fabricante ou pela nutricionista.",
+    "total_ativos": 27,
+    "total_formulas_manipuladas": 4,
+    "arquivo_complementar": "seed/essentia-catalog.json (32 produtos da linha Essentia/Essential lidos do catálogo em PDF)"
+  },
+  "marcas": [
+    "TRUE SOURCE",
+    "VITAFOR",
+    "NUTRIFY",
+    "DUX",
+    "GROWTH",
+    "ESSENTIAL / ESSENTIA",
+    "EQUALIV",
+    "BODY ACTION",
+    "Farmácia de manipulação (sem marca)"
+  ],
+  "ativos": [
+    {
+      "nome_ativo": "Whey protein concentrado / 3W",
+      "categoria": "Proteína",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó"
+      ],
+      "dosagens_observadas": [
+        "1 a 2 doses ao dia"
+      ],
+      "horarios_observados": [
+        "ao dia (depende da escala)"
+      ],
+      "marcas_citadas": [
+        "DUX",
+        "VITAFOR",
+        "GROWTH"
+      ],
+      "observacoes_literais": "WHEY CONCENTRADO OU 3 W (DUX, VITAFOR, GROWTH) – 1 A 2 DOSES AO DIA. DEPENDE DA ESCALA",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Whey protein isolado e hidrolisado",
+      "categoria": "Proteína",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó"
+      ],
+      "dosagens_observadas": [
+        "1 dosador ao dia",
+        "1 a 2 doses ao dia",
+        "½ dose café da manhã + ½ lanche da tarde"
+      ],
+      "horarios_observados": [
+        "café da manhã",
+        "lanche da tarde",
+        "substituição do jantar"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE",
+        "ESSENTIAL",
+        "VITAFOR"
+      ],
+      "observacoes_literais": "NAS FRUTAS, EM ÁGUA, SHAKE OU IOGURTE.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Whey vegano / proteína vegetal",
+      "categoria": "Proteína",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó"
+      ],
+      "dosagens_observadas": [
+        "1 a 2 doses ao dia"
+      ],
+      "horarios_observados": [
+        "ao dia"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE",
+        "VITAFOR",
+        "ESSENTIAL"
+      ],
+      "observacoes_literais": "WHEY VEGANO OU COLLAGEN PROTEIN (TRUE SOURCE, VITAFOR, ESSENTIAL) 1 A 2 DOSES AO DIA.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Peptídeos de colágeno (Collagen Protein)",
+      "categoria": "Proteína / colágeno",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó"
+      ],
+      "dosagens_observadas": [
+        "1 a 2 doses ao dia",
+        "1 ou 2 dosadores ao dia"
+      ],
+      "horarios_observados": [
+        "café da manhã",
+        "lanche da tarde",
+        "substituição do jantar"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE",
+        "VITAFOR",
+        "ESSENTIAL",
+        "EQUALIV"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Creatina monoidratada",
+      "categoria": "Performance",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó"
+      ],
+      "dosagens_observadas": [
+        "3 g",
+        "5 g",
+        "1 dosador"
+      ],
+      "horarios_observados": [
+        "todos os dias, no café da manhã",
+        "almoço ou jantar (1 caso)"
+      ],
+      "marcas_citadas": [
+        "VITAFOR (Creafort)",
+        "NUTRIFY",
+        "DUX",
+        "TRUE SOURCE"
+      ],
+      "observacoes_literais": "DILUIR UMA DOSE EM ÁGUA. TOMAR TODOS OS DIAS.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Ômega 3 (EPA/DHA)",
+      "categoria": "Ácido graxo",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "1 cápsula",
+        "1 dose"
+      ],
+      "horarios_observados": [
+        "almoço",
+        "jantar"
+      ],
+      "marcas_citadas": [
+        "VITAFOR (Omegafor Plus / Omega Plus)"
+      ],
+      "observacoes_literais": "Nomes comerciais citados: OMEGAFOR PLUS, OMEGA PLUS, OMEGAFOR PLUS 3, OMEGA DHA.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Magnésio bisglicinato",
+      "categoria": "Mineral",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "350 mg — 3 cápsulas por dia"
+      ],
+      "horarios_observados": [
+        "por dia (dias embarcados)"
+      ],
+      "marcas_citadas": [
+        "NUTRIFY",
+        "ESSENTIAL"
+      ],
+      "observacoes_literais": "MAGNÉSIO BISGLICINATO 350 MG- 3 CAPS (NUTRIFY, ESSENTIAL) POR DIA, DIAS EMBARCADOS.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Magnésio + inositol",
+      "categoria": "Mineral",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó para diluir"
+      ],
+      "dosagens_observadas": [
+        "1 dose"
+      ],
+      "horarios_observados": [
+        "20:00",
+        "20:30",
+        "ao dormir"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE (Magnésio Inositol 3.0 maracujá)",
+        "BODY ACTION"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Magnésio complex (multiformas)",
+      "categoria": "Mineral",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "3 cápsulas"
+      ],
+      "horarios_observados": [
+        "20:00",
+        "1 hora antes de dormir"
+      ],
+      "marcas_citadas": [
+        "ESSENTIAL (Magnesio Complex)",
+        "NUTRIFY (MAG 5 COMPLEX)"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Cúrcuma / curcumina",
+      "categoria": "Bioativo",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "2 cápsulas"
+      ],
+      "horarios_observados": [
+        "após o café da manhã"
+      ],
+      "marcas_citadas": [
+        "VITAFOR (Curcuma Plus)"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Zinco",
+      "categoria": "Mineral",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "1 cápsula"
+      ],
+      "horarios_observados": [
+        "após o café da manhã"
+      ],
+      "marcas_citadas": [
+        "NUTRIFY"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Vitamina C lipossomal",
+      "categoria": "Vitamina",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "dose"
+      ],
+      "dosagens_observadas": [
+        "1 dose"
+      ],
+      "horarios_observados": [
+        "horário do almoço"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Cafeína + nootrópico (pré-treino Energyzer Focus)",
+      "categoria": "Pré-treino",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó para diluir"
+      ],
+      "dosagens_observadas": [
+        "1 dose"
+      ],
+      "horarios_observados": [
+        "20 min antes do treino",
+        "30 min antes do treino",
+        "não tomar à tarde"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE"
+      ],
+      "observacoes_literais": "DILUIR UMA DOSE EM 1 COPO DE AGUA. NÃO TOMAR A TARDE.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Nootrópico (Brain Up)",
+      "categoria": "Bioativo",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "1 cápsula"
+      ],
+      "horarios_observados": [
+        "após o almoço"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Glutamina",
+      "categoria": "Aminoácido",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó para diluir"
+      ],
+      "dosagens_observadas": [
+        "1 dosador",
+        "conforme prescrição"
+      ],
+      "horarios_observados": [
+        "pela manhã",
+        "em jejum"
+      ],
+      "marcas_citadas": [
+        "VITAFOR (Glutamax)"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Suporte intestinal (Gut Balance)",
+      "categoria": "Saúde intestinal",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "pó para diluir"
+      ],
+      "dosagens_observadas": [
+        "1 dose"
+      ],
+      "horarios_observados": [
+        "antes do desjejum, em dias alternados"
+      ],
+      "marcas_citadas": [
+        "TRUE SOURCE"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Suporte hormonal feminino (Boraprim)",
+      "categoria": "Bioativo",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "2 cápsulas"
+      ],
+      "horarios_observados": [
+        "café da manhã, 7 dias antes da menstruação"
+      ],
+      "marcas_citadas": [
+        "VITAFOR"
+      ],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Eletrólitos (sachê)",
+      "categoria": "Hidratação",
+      "origem": "loja_suplementos",
+      "formas_apresentacao_citadas": [
+        "sachê"
+      ],
+      "dosagens_observadas": [
+        "1 sachê"
+      ],
+      "horarios_observados": [
+        "reposição nos dias de corrida"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": "SACHÊ DE ELETRÓLITOS- FAZER REPOSIÇÃO NOS DIAS DE CORRIDA.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Tintura de melissa, camomila e lavanda",
+      "categoria": "Fitoterápico",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "tintura"
+      ],
+      "dosagens_observadas": [],
+      "horarios_observados": [],
+      "marcas_citadas": [],
+      "observacoes_literais": "TINTURA DE MELISSA, CAMOMILA E LAVANDA.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Psyllium",
+      "categoria": "Fibra",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "dose"
+      ],
+      "dosagens_observadas": [
+        "500 mg — 60 doses"
+      ],
+      "horarios_observados": [
+        "1 dose 30 min antes do almoço e do jantar"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": "PARA MANIPULAR: PSYLLIUM – 500 MG / 60 DOSES.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Biointestil",
+      "categoria": "Saúde intestinal",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "cápsula gastrorresistente"
+      ],
+      "dosagens_observadas": [
+        "300 mg — 30 doses",
+        "300 mg — 40 doses",
+        "300 mg — 60 doses"
+      ],
+      "horarios_observados": [
+        "1 dose à noite, 1 h antes de deitar",
+        "uma dose à noite, não comer mais nada depois"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": "NO INICIO TOMAR DURANTE 20 DIAS CONSECUTIVOS. DEPOIS MANTER NOS FINAIS DE SEMANA E VIAGENS.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Ashwagandha (extrato padronizado)",
+      "categoria": "Adaptógeno",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "cápsula"
+      ],
+      "dosagens_observadas": [
+        "300 mg — 60 doses"
+      ],
+      "horarios_observados": [
+        "1 dose após o café da manhã",
+        "1 dose às 18 h"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Beta alanina",
+      "categoria": "Performance",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "sachê saborizado"
+      ],
+      "dosagens_observadas": [
+        "2 g (em fórmula de 40 doses)"
+      ],
+      "horarios_observados": [
+        "30 min antes do treino"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": "Compõe fórmula pré-treino manipulada junto com taurina, cafeína, chá verde e citrulina malato.",
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Taurina",
+      "categoria": "Performance",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "sachê saborizado"
+      ],
+      "dosagens_observadas": [
+        "1 g (em fórmula de 40 doses)"
+      ],
+      "horarios_observados": [
+        "30 min antes do treino"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Cafeína anidra",
+      "categoria": "Performance",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "sachê saborizado"
+      ],
+      "dosagens_observadas": [
+        "150 mg (em fórmula de 40 doses)"
+      ],
+      "horarios_observados": [
+        "30 min antes do treino"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Chá verde (extrato seco)",
+      "categoria": "Bioativo",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "sachê saborizado"
+      ],
+      "dosagens_observadas": [
+        "100 mg (em fórmula de 40 doses)"
+      ],
+      "horarios_observados": [
+        "30 min antes do treino"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    },
+    {
+      "nome_ativo": "Citrulina malato",
+      "categoria": "Performance",
+      "origem": "manipulado",
+      "formas_apresentacao_citadas": [
+        "sachê saborizado"
+      ],
+      "dosagens_observadas": [
+        "1 g (em fórmula de 40 doses)"
+      ],
+      "horarios_observados": [
+        "30 min antes do treino"
+      ],
+      "marcas_citadas": [],
+      "observacoes_literais": null,
+      "composicao_por_dose": null,
+      "unidade_medida_padrao": null,
+      "imagem_url": null,
+      "registro_anvisa": null,
+      "fonte_dado_nutricional": "pendente"
+    }
+  ],
+  "formulas_manipuladas": [
+    {
+      "nome": "Pré-treino manipulado (sachê saborizado)",
+      "apresentacao": "40 doses em sachês saborizados",
+      "posologia": "Diluir uma dose em copo de água. Tomar 30 min antes do treino.",
+      "composicao": [
+        {
+          "ativo": "Beta alanina",
+          "quantidade": "2 g"
+        },
+        {
+          "ativo": "Taurina",
+          "quantidade": "1 g"
+        },
+        {
+          "ativo": "Cafeína",
+          "quantidade": "150 mg"
+        },
+        {
+          "ativo": "Chá verde ext seco",
+          "quantidade": "100 mg"
+        },
+        {
+          "ativo": "Citrulina malato",
+          "quantidade": "1 g"
+        }
+      ]
+    },
+    {
+      "nome": "Psyllium 500 mg",
+      "apresentacao": "60 doses",
+      "posologia": "Tomar 1 dose 30 min antes do almoço e jantar.",
+      "composicao": [
+        {
+          "ativo": "Psyllium",
+          "quantidade": "500 mg"
+        }
+      ]
+    },
+    {
+      "nome": "Biointestil 300 mg",
+      "apresentacao": "30 / 40 / 60 doses em cápsulas gastrorresistentes",
+      "posologia": "1 dose à noite, 1 h antes de deitar. No início 20 dias consecutivos; depois manter finais de semana e viagens.",
+      "composicao": [
+        {
+          "ativo": "Biointestil",
+          "quantidade": "300 mg"
+        }
+      ]
+    },
+    {
+      "nome": "Ashwagandha extrato padronizado 300 mg",
+      "apresentacao": "60 doses em cápsulas",
+      "posologia": "1 dose após o café da manhã e outra dose às 18 h.",
+      "composicao": [
+        {
+          "ativo": "Ashwagandha (ext padronizado)",
+          "quantidade": "300 mg"
+        }
+      ]
+    }
+  ],
+  "citados_apenas_nos_planos_alimentares": [
+    {
+      "nome_ativo": "Supercoffee",
+      "categoria": "Bebida funcional",
+      "observacao_literal": "1 XICARA DE SUPERCOFFE (bloco: ao acordar)"
+    },
+    {
+      "nome_ativo": "Palatinose (isomaltulose)",
+      "categoria": "Carboidrato",
+      "observacao_literal": "CORRIDA LONGA: PALATINOSE OU 1 C DE SOPA DE MEL"
+    },
+    {
+      "nome_ativo": "Sachê de carboidrato",
+      "categoria": "Carboidrato",
+      "observacao_literal": "SACHÊ DE CARBO A CADA 5 KM"
+    }
+  ]
+}

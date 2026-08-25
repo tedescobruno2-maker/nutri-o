@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/alimentos", label: "Alimentos", icon: "🥕" },
   { href: "/recipes", label: "Receitas", icon: "🍽️" },
   { href: "/planos", label: "Plano Alimentar", icon: "📝" },
+  { href: "/suplementos", label: "Suplementos", icon: "💊" },
   { href: "/textos", label: "Biblioteca de Textos", icon: "📚" },
   { href: "/configuracoes", label: "Configurações", icon: "⚙️" },
 ];

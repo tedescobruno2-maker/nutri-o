@@ -36,6 +36,10 @@ export async function getClientProfile(id: string) {
         measurements: { orderBy: { date: "asc" } },
         dietLogs: { orderBy: { weekStart: "asc" } },
         supplements: { orderBy: [{ active: "desc" }, { order: "asc" }] },
+        supplementPrescriptions: {
+          orderBy: { version: "desc" },
+          include: { items: { orderBy: { order: "asc" }, include: { supplement: true, formula: true } } },
+        },
         consultationForms: { orderBy: { createdAt: "desc" }, take: 1 },
         consultations: { orderBy: { date: "desc" } },
         exams: { orderBy: { requestedDate: "desc" } },
@@ -389,4 +393,64 @@ export async function getProfessionalSettings() {
 
 export async function getGuidanceTexts() {
   return prisma.guidanceText.findMany({ orderBy: [{ type: "asc" }, { title: "asc" }] });
+}
+
+// ---------------------------------------------------------------------------
+// Suplementos (Fase 6)
+// ---------------------------------------------------------------------------
+
+/** Ativos curados (não-arquivados) com as marcas de produto já cadastradas, para a tela de
+ * prescrição (sugestão de posologia/marcas) e para a aba "Ativos" de `/suplementos`. */
+export async function getActiveSupplementsForPrescription() {
+  return prisma.supplement.findMany({
+    where: { active: true },
+    orderBy: { activeName: "asc" },
+    include: { products: { where: { active: true }, include: { brand: true } } },
+  });
+}
+
+export async function getSupplementCatalog() {
+  const [actives, archived, brands, formulas] = await Promise.all([
+    prisma.supplement.findMany({
+      where: { active: true },
+      orderBy: { activeName: "asc" },
+      include: { _count: { select: { products: true } } },
+    }),
+    prisma.supplement.count({ where: { active: false } }),
+    prisma.supplementBrand.findMany({
+      orderBy: { name: "asc" },
+      include: { products: { where: { active: true }, orderBy: { commercialName: "asc" }, include: { supplement: true } } },
+    }),
+    prisma.compoundedFormula.findMany({
+      orderBy: { name: "asc" },
+      include: { items: { orderBy: { order: "asc" } } },
+    }),
+  ]);
+  return { actives, archivedCount: archived, brands, formulas };
+}
+
+export async function getClientSupplementPrescriptions(clientId: string) {
+  return prisma.supplementPrescription.findMany({
+    where: { clientId },
+    orderBy: { version: "desc" },
+    include: {
+      items: {
+        orderBy: { order: "asc" },
+        include: { supplement: true, formula: true },
+      },
+    },
+  });
+}
+
+export async function getSupplementPrescriptionForExport(prescriptionId: string) {
+  return prisma.supplementPrescription.findUnique({
+    where: { id: prescriptionId },
+    include: {
+      client: true,
+      items: {
+        orderBy: { order: "asc" },
+        include: { supplement: true, formula: true },
+      },
+    },
+  });
 }

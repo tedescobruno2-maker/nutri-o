@@ -1,14 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getClientProfile, getFoodsForBuilder, getRecipesWithIngredients, getChoiceGroupsForBuilder, getGuidanceTexts, getMealPlanTemplates } from "@/lib/dal";
+import { getClientProfile, getFoodsForBuilder, getRecipesWithIngredients, getChoiceGroupsForBuilder, getGuidanceTexts, getMealPlanTemplates, getActiveSupplementsForPrescription } from "@/lib/dal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { AdherenceChart } from "@/components/charts/AdherenceChart";
 import { MacroChart } from "@/components/charts/MacroChart";
 import { AddMeasurementForm } from "@/components/clients/AddMeasurementForm";
 import { AddDietLogForm } from "@/components/clients/AddDietLogForm";
 import { MealPlanSection } from "@/components/mealplan/MealPlanSection";
-import { AddSupplementForm } from "@/components/supplements/AddSupplementForm";
-import { SupplementRow } from "@/components/supplements/SupplementRow";
+import { SupplementPrescriptionSection } from "@/components/supplements/SupplementPrescriptionSection";
 import { ConsultationFormSection } from "@/components/consultation/ConsultationFormSection";
 import { ConsultationHistorySection } from "@/components/clients/ConsultationHistorySection";
 import { ExamsSection } from "@/components/clients/ExamsSection";
@@ -23,13 +22,14 @@ import { KANBAN_LABELS, initials, formatDate, formatDateFull, calculateAge, type
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [client, foodsForBuilder, recipesWithIngredients, choiceGroups, guidanceTexts, mealPlanTemplates] = await Promise.all([
+  const [client, foodsForBuilder, recipesWithIngredients, choiceGroups, guidanceTexts, mealPlanTemplates, activeSupplements] = await Promise.all([
     getClientProfile(id),
     getFoodsForBuilder(),
     getRecipesWithIngredients(),
     getChoiceGroupsForBuilder(),
     getGuidanceTexts(),
     getMealPlanTemplates(),
+    getActiveSupplementsForPrescription(),
   ]);
   if (!client) notFound();
 
@@ -303,29 +303,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
       </section>
 
       <section className="section chart-grid-2">
-        <div className="card card-pad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="chart-card-header">
-            <h3>Suplementação</h3>
-          </div>
-          {client.supplements.length === 0 ? (
-            <p className="text-tertiary" style={{ fontSize: "0.85rem" }}>Nenhum suplemento cadastrado.</p>
-          ) : (
-            <div>
-              {client.supplements.map((s) => (
-                <SupplementRow
-                  key={s.id}
-                  id={s.id}
-                  name={s.name}
-                  instructions={s.instructions}
-                  clientId={client.id}
-                  active={s.active}
-                  discontinuedAt={s.discontinuedAt}
-                />
-              ))}
-            </div>
-          )}
-          <AddSupplementForm clientId={client.id} />
-        </div>
+        <SupplementPrescriptionSection clientId={client.id} prescriptions={client.supplementPrescriptions} supplements={activeSupplements} />
 
         <ConsultationFormSection clientId={client.id} hasEmail={!!client.email} form={client.consultationForms[0] ?? null} />
       </section>

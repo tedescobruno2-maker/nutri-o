@@ -1,0 +1,579 @@
+{
+  "fonte": "ESSENTIA GROUP.pdf",
+  "total_paginas": 35,
+  "produtos": [
+    {
+      "nome_comercial": "COLLAGEN ESSENTIAL PROTEIN",
+      "marca": "Essential Nutrition",
+      "categoria": "colágeno",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Colágeno BODYBALANCE® - colágeno hidrolisado em peptídeos a partir de processo controlado e patenteado - em sinergia com vitamina C.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (15g de colágeno BODYBALANCE®) no café da manhã ou lanche da tarde. Pode ser usado também no pré-treino.",
+      "sabores": [
+        "Neutro",
+        "Chocolate",
+        "Baunilha",
+        "Tangerina",
+        "Frutas tropicais"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 2,
+      "observacoes": "Indicação impressa: 'Manutenção de massa magra e melhora da composição corporal.' Texto afirma que o colágeno BODYBALANCE® favorece a saúde muscular e a composição corporal, promovendo a síntese de massa magra e reduzindo os níveis de gordura, conforme comprovado em estudos (refs. 11,12). Foto mostra pote (lata) preto/dourado; gramatura do pote não impressa na página. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "MUSCLE SYNERGY",
+      "marca": "Essential Nutrition",
+      "categoria": "colágeno + creatina + BCAA (blend para composição corporal e performance)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Colágeno BODYBALANCE®, creatina mono-hidratada, BCAA 2:1:1 e outros ingredientes selecionados que atuam em sinergia.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (15g de colágeno BODYBALANCE®, 3g de creatina mono-hidratada e 3g de BCAA 2:1:1) no pré-treino ou 1x ao dia.",
+      "sabores": [
+        "Pêssego e frutas tropicais",
+        "Jabuticaba com limão"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 3,
+      "observacoes": "Indicação impressa: 'Oferece nutrientes para a síntese de massa magra e funcionamento muscular.' Alegação: potencializa composição corporal e desempenho físico mesmo em restrição calórica (refs. 13,14 e 10). Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "COLLAGEN BONES",
+      "marca": "Essential Nutrition",
+      "categoria": "colágeno / saúde óssea",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Cálcio marinho de alta biodisponibilidade + colágeno tipo I hidrolisado em peptídeos + nutrientes sinérgicos: manganês, boro, zinco, vitaminas do complexo B, ácido ortosilícico, magnésio e vitaminas D3 e K2.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (9,3g de colágeno hidrolisado em peptídeos) no café da manhã ou no lanche da tarde.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 4,
+      "observacoes": "Indicações impressas: 'Nutrientes para a manutenção de massa magra, principalmente óssea' e 'Aporte de cálcio de alta biodisponibilidade'. Cita estudos clínicos sobre alta ingestão de cálcio em dietas restritivas (ref. 15). Não há lista de sabores impressa nesta página. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "IMMUNO WHEY",
+      "marca": "Essential Nutrition",
+      "categoria": "proteína (whey) / imunidade",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Whey protein associado aos nutrientes necessários para a produção natural de glutationa; betaglucana de levedura.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (22g de proteína), diluída em água, no café da manhã ou lanche da tarde.",
+      "sabores": [
+        "Golden milk",
+        "Chocolate",
+        "Baunilha"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 5,
+      "observacoes": "Rótulo na foto: 'IMMUNO GOLDEN WHEY' (título da página é 'IMMUNO WHEY'). Indicações impressas: 'Manutenção da massa magra durante o tratamento' e 'Oferece suporte ao sistema imune'. Texto informa: 'Também disponível na versão vegana'. Alegação de associação a análogos de GLP-1 para minimizar perda de massa muscular. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "WHEY PROTEIN",
+      "marca": "Essential Nutrition",
+      "categoria": "proteína (whey)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Whey protein isolado e whey protein hidrolisado + colágeno em peptídeos; cada sabor pode oferecer fontes de compostos bioativos, como cacau e frutas liofilizadas.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (22g de proteína), diluída em água, no café da manhã ou lanche da tarde.",
+      "sabores": [
+        "Cacao",
+        "Vanilla",
+        "Açaí",
+        "Espresso",
+        "Cappuccino",
+        "Red Berry",
+        "Pineapple",
+        "Cookies & Lime",
+        "Neutro"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 6,
+      "observacoes": "Página descreve uma LINHA (vários sabores). Rótulo visível na foto: 'CACAO WHEY'. Indicações impressas: 'Manutenção da massa magra durante o tratamento' e 'Oferece proteína com excelente perfil de aminoácidos'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "VEGGIE PROTEIN",
+      "marca": "Essential Nutrition",
+      "categoria": "proteína vegetal (vegana)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Proteína isolada da ervilha e proteína da amêndoa (ambas não geneticamente modificadas); conjunto de 13 vitaminas e 9 minerais (com exceção do sabor neutro), com destaque para vitamina B12 e vitamina D3 vegana.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (22g de proteína), diluída em água, no café da manhã ou lanche da tarde.",
+      "sabores": [
+        "Baunilha",
+        "Cacau",
+        "Banana com canela",
+        "Neutro"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 7,
+      "observacoes": "Posicionamento impresso: opção para veganos, vegetarianos e adeptos de alimentação plant-based. Indicações impressas: 'Manutenção da massa magra durante o tratamento' e 'Oferece um blend de nutrientes pensados especialmente para uma alimentação vegana'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "BEEF PROTEIN",
+      "marca": "Essential Nutrition",
+      "categoria": "proteína (carne bovina)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Proteína da carne bovina proveniente de processo de purificação, isolada e 100% hidrolisada em peptídeos.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (24g de proteína) diluída em água, no café da manhã ou lanche da tarde.",
+      "sabores": [
+        "Cacau",
+        "Banana com canela"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 8,
+      "observacoes": "Indicações impressas: 'Suporte proteico durante o tratamento' e 'Excelente digestibilidade e absorção'. Rótulo na foto: 'BEEF PROTEIN'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "AMINO GREENS",
+      "marca": "Essential Nutrition",
+      "categoria": "aminoácidos essenciais",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "5g de aminoácidos livres englobando os 9 aminoácidos essenciais + magnésio + vitamina B6 + 5 plantas germinadas.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (5g de aminoácidos livres) 1x ao dia. Pode ser utilizado na ceia ou pós-treino.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 9,
+      "observacoes": "Indicação impressa: 'Manutenção da massa magra e promoção da síntese muscular.' Texto do rótulo na foto (legível): '9 ESSENTIAL AMINO ACIDS', 'MAGNESIUM & VITAMIN B6', 'SABOR SUCO VERDE E LIMÃO YUZU', '30 DOSES', 'ESSENTIAL ENHANCED FORMULAS'; selos VEGAN e '...FREE' visíveis. Essas informações vêm da foto do rótulo, não do texto do catálogo. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "AMINOLIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "aminoácidos essenciais",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Blend dos 9 aminoácidos essenciais na forma livre, associados ao magnésio e à vitamina B6.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (5g de aminoácidos livres) 1x ao dia. Pode ser utilizado na ceia ou pós-treino.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 10,
+      "observacoes": "Indicação impressa: 'Manutenção da massa magra e promoção da síntese muscular' (refs. 17,18). Texto do rótulo na foto (legível): '9 ESSENTIAL AMINO ACIDS', 'MAGNESIUM & VITAMIN B6', 'SABOR TANGERINA', '30 DOSES', 'ESSENTIAL ENHANCED FORMULAS'; selo VEGAN visível. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "BCAA LIFT 8:1:1",
+      "marca": "Essential Nutrition",
+      "categoria": "aminoácidos de cadeia ramificada (BCAA)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Aminoácidos de cadeia ramificada (BCAAs) na proporção 8:1:1 (L-leucina:L-isoleucina:L-valina) + vitamina B6 ativa.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (3g de BCAA) 1x ao dia. Em dias de treino, sugere-se o uso após o exercício.",
+      "sabores": [
+        "Neutro",
+        "Limão"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 11,
+      "observacoes": "Indicação impressa: 'Promove a síntese muscular mesmo durante restrições calóricas.' Texto informa que os BCAAs correspondem a aproximadamente 35% dos aminoácidos das proteínas musculares (ref. 10). Rótulo na foto: 'BCAALIFT', 'ULTRA CONCENTRATED IN LEUCINE', '8:1:1', 'SABOR NEUTRO'; nº de doses no rótulo ilegível. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "CREALIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "creatina",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "100% de creatina Creapure® (creatina mono-hidratada altamente purificada, processo patenteado).",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (3g de creatina) 1x ao dia, preferencialmente pela manhã. Em dias de treino, pode ser usado antes do exercício.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 12,
+      "observacoes": "Indicação impressa: 'Preservar a massa muscular e melhorar a composição corporal durante as dietas restritivas.' Texto do rótulo na foto (legível): 'MICRONIZED CREATINE MONOHYDRATE', 'Creapure®', '100% PURE CREATINE / GERMAN TECHNOLOGY / HIGH PERFORMANCE', '100 DOSES'; selos SUGAR FREE e VEGAN visíveis. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "FIBER BIOME",
+      "marca": "Essential Nutrition",
+      "categoria": "fibras / prebiótico",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Combinação de fibras solúveis e insolúveis: fibra solúvel resistente de milho, goma acácia, celulose microcristalina e psyllium. Fórmula FODMAP Friendly.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (9g de fibras no sabor laranja ou 8,7g de fibras no sabor neutro) antes de uma das refeições principais.",
+      "sabores": [
+        "Laranja",
+        "Neutro"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 13,
+      "observacoes": "Indicações impressas: 'Amenizar os efeitos gastrointestinais dos medicamentos' e 'Melhorar o controle glicêmico e a saciedade'. Selo/alegação: 'FODMAP Friendly'. Rótulo na foto: 'FIBERBIOME - PREBIOTIC FIBER BLEND'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "FIBERLIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "fibras / prebiótico",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Combinação de fibras solúveis e insolúveis: inulina, fibra da casca de aveia (sem glúten), frutooligossacarídeos (FOS), goma guar e goma acácia.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (8,9g de fibras) antes de uma das refeições principais.",
+      "sabores": [
+        "Neutro"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 14,
+      "observacoes": "Indicações impressas: 'Amenizar os efeitos gastrointestinais dos medicamentos' e 'Melhorar o controle glicêmico e a saciedade'. Texto declara sabor neutro (pode ser adicionado a qualquer alimento ou bebida) e fibra da casca de aveia sem glúten. Rótulo na foto: 'FIBERLIFT - PREBIOTIC FIBER'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "PROBIO 20Bi",
+      "marca": "Essential Nutrition",
+      "categoria": "probiótico",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "20 bilhões de microrganismos vivos por dose, blend de 5 cepas probióticas: Bifidobacterium animalis subsp. lactis HN019, Bifidobacterium lactis BI-07, Lactobacillus acidophilus NCFM, Bifidobacterium lactis BI-04 e Lactobacillus paracasei LPC-37.",
+      "apresentacao": "Cápsulas (rótulo da foto indica 'CONTÉM 30 CÁPSULAS'; leitura da foto, com baixa nitidez)",
+      "dose_rotulo": "Tomar 1 dose (2 cápsulas = 20bi de UFC) após o jantar.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 15,
+      "observacoes": "Indicação impressa: 'Equilíbrio da microbiota intestinal durante o tratamento' (ref. 28). Único item do catálogo cuja embalagem é caixa/cartucho azul; a caixa exibe os selos '5' (5 cepas) e 'PREMIUM QUALITY'. A contagem de cápsulas foi lida da foto do rótulo e NÃO consta do texto do catálogo - confirmar. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "HYDROLIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "hidratação / eletrólitos",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Eletrólitos, oligoelementos, vitamina C e outros micronutrientes.",
+      "apresentacao": "Sachê (texto: 'Diluir o conteúdo do sachê'; peso do sachê não impresso)",
+      "dose_rotulo": "Diluir o conteúdo do sachê em cerca de 500ml de água e consumir quando houver necessidade de hidratação. Sugere-se o uso de até 3 sachês ao dia.",
+      "sabores": [
+        "Neutro",
+        "Tangerina",
+        "Limão-siciliano"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 16,
+      "observacoes": "Indicação impressa: 'Para auxiliar no equilíbrio hídrico entre os compartimentos corporais, favorecendo a hidratação efetiva.' Rótulo na foto: 'HYDROLIFT - FOR AN ENHANCED WATER'. Foto mostra lata, mas o texto fala em sachês - verificar apresentação real. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "VITALIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "multivitamínico / multimineral",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Multivitamínico composto por 13 vitaminas e 8 minerais; vitaminas na forma ativa (riboflavina-5-fosfato, piridoxal 5-fosfato, metilcobalamina e metilfolato), vitamina K2 Mk7, mix de tocoferóis (formas de vitamina E) e minerais quelados.",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 dose (3 cápsulas) 1x ao dia, junto a uma das refeições.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 17,
+      "observacoes": "Campo impresso como 'Sugestão de dose' (nas demais páginas é 'Sugestão de uso'). Indicação impressa: 'Prevenir as deficiências vitamínicas e minerais durante a restrição calórica.' Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "[B] COMPLEX",
+      "marca": "Essential Nutrition",
+      "categoria": "vitaminas do complexo B",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Todas as vitaminas do complexo B - incluindo suas formas ativas - associadas ao magnésio quelado.",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 cápsula 1x ao dia, junto a uma das refeições.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 18,
+      "observacoes": "Indicação impressa: 'Suprir as necessidades diárias de vitaminas do complexo B' (ref. 22). Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "VIT D3",
+      "marca": "Essential Nutrition",
+      "categoria": "vitamina D",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Vitamina D na forma ativa (colecalciferol), 2000UI por cápsula, em meio lipofílico (azeite de oliva extravirgem prensado a frio e TCM).",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 cápsula 1x ao dia, junto a uma das refeições principais.",
+      "sabores": null,
+      "tabela_nutricional": {
+        "vitamina_D3": "2000 UI por cápsula"
+      },
+      "pagina": 19,
+      "observacoes": "Indicação impressa: 'Manter níveis adequados de vitamina D3 durante a dieta restritiva' (ref. 20). Texto identifica explicitamente a marca: 'o Vit D3 da Essential Nutrition'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "[MG] COMPLEX",
+      "marca": "Essential Nutrition",
+      "categoria": "magnésio",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Quatro fontes de magnésio: bisglicinato, malato, taurato e citrato, de excelente biodisponibilidade.",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 dose (3 cápsulas) 1x ao dia.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 20,
+      "observacoes": "Indicação impressa: 'Manter níveis adequados de magnésio durante a dieta restritiva' (ref. 23). Texto cita que o magnésio é essencial para mais de 300 reações biológicas. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "SUPER OMEGA-3 TG",
+      "marca": "Essential Nutrition",
+      "categoria": "ômega-3",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Ômega-3 na forma de triglicerídeos, altamente concentrado em EPA (1080mg por dose) e DHA (720mg por dose), obtido por processo patenteado de destilação molecular.",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 dose junto ao almoço/refeição principal.",
+      "sabores": null,
+      "tabela_nutricional": {
+        "EPA": "1080 mg por dose",
+        "DHA": "720 mg por dose"
+      },
+      "pagina": 21,
+      "observacoes": "Indicação impressa: 'Contribuir para o controle dos níveis de inflamação durante as dietas restritivas' (ref. 25). Alegação: pureza do óleo de peixe sem metais pesados e contaminantes (mercúrio, PCBs, dioxinas). Rótulo na foto: 'ΩMEGA3'. Nº de cápsulas por dose não impresso. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "COQ10",
+      "marca": "Essential Nutrition",
+      "categoria": "coenzima Q10 / antioxidante",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "CoQ10 + Omega-3 TG + Natural Vitamin E: coenzima Q10, ômega-3 TG altamente purificado e vitamina E (mistura de tocoferóis).",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 dose (100mg de CoQ10; 100mg de Vit E; 277mg de EPA; 185mg de DHA) junto ao almoço/refeição principal.",
+      "sabores": null,
+      "tabela_nutricional": {
+        "CoQ10": "100 mg por dose",
+        "vitamina_E": "100 mg por dose",
+        "EPA": "277 mg por dose",
+        "DHA": "185 mg por dose"
+      },
+      "pagina": 22,
+      "observacoes": "Indicação impressa: 'Aporte antioxidante e contribuição para o controle dos processos inflamatórios relacionados ao tratamento' (ref. 26). Texto afirma ser 'o único a associar vitamina E (mistura de tocoferóis) e ômega-3 TG altamente purificado'. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "NAC + GLYCINE + TAURINE",
+      "marca": "Essential Nutrition",
+      "categoria": "aminoácidos / suporte antioxidante (precursores de glutationa)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "N-acetil L-cisteína (NAC), glicina e taurina (combinação GliNAC).",
+      "apresentacao": "Cápsulas (frasco; quantidade de cápsulas não impressa)",
+      "dose_rotulo": "Tomar 1 dose (600mg de NAC; 1000mg de glicina; 500mg de taurina) 1x ao dia.",
+      "sabores": null,
+      "tabela_nutricional": {
+        "NAC": "600 mg por dose",
+        "glicina": "1000 mg por dose",
+        "taurina": "500 mg por dose"
+      },
+      "pagina": 23,
+      "observacoes": "Indicação impressa: 'Suporte antioxidante e apoio ao metabolismo e a imunidade.' Alegação: a combinação GliNAC potencializa a síntese da glutationa (ref. 27). Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "COLLAGEN SKIN",
+      "marca": "Essential Nutrition",
+      "categoria": "colágeno / beleza (pele, cabelo e unhas)",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Peptídeos bioativos de colágeno, ácido ortosilícico biodisponível, ácido hialurônico, biotina e vitaminas A, C & E.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (9,3g de peptídeos de colágeno) ao dia, preferencialmente pela manhã ou antes de dormir.",
+      "sabores": [
+        "Cranberry",
+        "Neutro",
+        "Limão-siciliano"
+      ],
+      "tabela_nutricional": null,
+      "pagina": 24,
+      "observacoes": "Indicação impressa: 'Nutrientes para a saúde da pele, cabelo e unhas.' Alegações: reestruturação da pele, hidratação, elasticidade, minimização de rugas, flacidez e linhas de expressão (refs. 31,32), que podem ficar mais evidentes após emagrecimento rápido. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "COLLAGEN RESILIENCE",
+      "marca": "Essential Nutrition",
+      "categoria": "colágeno / beleza e relaxamento",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Triptofano, taurina, maracujá, magnésio e vitamina B6 com peptídeos bioativos de colágeno hidrolisado, ácido ortosilícico, ácido hialurônico, glicina e biotina, além das vitaminas A, C, E e do complexo B.",
+      "apresentacao": null,
+      "dose_rotulo": "Tomar 1 dose (9,3g de peptídeos de colágeno) ao dia, preferencialmente pela manhã ou antes de dormir.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 25,
+      "observacoes": "Indicação impressa: 'Nutrientes para a saúde da pele, cabelo e unhas e para o relaxamento e a homeostase' (refs. 31-33). Não há lista de sabores impressa nesta página. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "PRO-COLLAGEN VEGAN",
+      "marca": "Essential Nutrition",
+      "categoria": "precursores de colágeno (vegano) / beleza",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Precursores e cofatores da síntese de colágeno endógena; ácido hialurônico e ácido ortosilícico; betacaroteno, licopeno, chá verde e astaxantina; vitaminas A, C & E e biotina; minerais cobre e zinco.",
+      "apresentacao": "Caixa/cartucho (foto mostra embalagem tipo caixa; conteúdo e nº de doses não impressos)",
+      "dose_rotulo": "Tomar 1 dose ao dia, preferencialmente pela manhã ou antes de dormir.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 26,
+      "observacoes": "Indicação impressa: 'Precursores de colágeno e nutrientes para pele, cabelo e unhas' (refs. 34, 31, 35, 36). Rótulo na foto: 'VEGAN PRO COLLAGEN'. Quantidade por dose não impressa. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "RENAISSANCE",
+      "marca": "Noorskin",
+      "categoria": "nutracêutico para cabelo e unhas / antioxidante",
+      "categoria_inferida": true,
+      "principio_ativo_ou_composicao": "Aminoácidos cisteína e metionina, biotina, licopeno, luteína, ácido ortosilícico e enxofre orgânico (MSM), além de vitaminas e minerais selecionados.",
+      "apresentacao": "Cápsulas (frasco/pote; quantidade total não impressa)",
+      "dose_rotulo": "Tomar 1 dose (4 cápsulas) 1x ao dia.",
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 27,
+      "observacoes": "Único produto do catálogo com marca diferente: o título impresso é 'RENAISSANCE / Noorskin' e o rótulo da foto mostra 'noorskin'. Indicação impressa: 'Aporte de antioxidantes e nutrientes para a pele e a saúde geral' (ref. 36). Objetivo declarado: fortalecer cabelo e unhas e reduzir a queda."
+    },
+    {
+      "nome_comercial": "FEEL COMPLETE",
+      "marca": "Essential Nutrition",
+      "categoria": "shake nutricionalmente completo",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "Proteínas, carboidratos de baixo índice glicêmico, fibras prebióticas, vitaminas, minerais, aminoácidos e substâncias bioativas.",
+      "apresentacao": null,
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 30,
+      "observacoes": "Descritor impresso: 'Shake nutricionalmente completo'. Alegação: 'Ideal para refeições práticas e equilibradas durante o desmame e o pós-tratamento.' Página da linha complementar - NÃO traz sugestão de uso/dose nem sabores. Rótulo na foto: 'feel COMPLETE - BALANCED NUTRITION', 'DIET SUPPLEMENT', 'DELICIOUS Shake', 'REAL FOOD INGREDIENTS', 'FITS YOUR DIET'; há selos numéricos no rótulo (aparentemente 17?, 14, 13, 9.1?) que NÃO estão legíveis na digitalização. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "RADIANCE JOY",
+      "marca": null,
+      "categoria": "barrinha proteica plant-based",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "Proteínas vegetais (amêndoas, ervilha e arroz); fibras, vitaminas ativas e minerais quelados.",
+      "apresentacao": null,
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 31,
+      "observacoes": "Descritor impresso: 'Barrinha proteica plant-based'. Alegação: 'Une nutrição e sabor em lanches saudáveis e nutritivos.' A foto mostra 4 variações de sabor (embalagens cinza/chocolate, rosa/frutas vermelhas, laranja e verde-limão) - os nomes dos sabores NÃO estão legíveis. As embalagens exibem selos numéricos (proteína/fibras/vitaminas/minerais) que não são legíveis o suficiente para transcrição confiável. Rótulo: 'RADIANCE JOY - VEGAN PROTEIN BAR'; emblema Essential visível, nome da marca não legível na foto."
+    },
+    {
+      "nome_comercial": "COLLAGEN PEPT PROTEIN",
+      "marca": "Essential Nutrition",
+      "categoria": "bebida proteica pronta para beber",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "20g de colágeno hidrolisado em peptídeos; TCM isolado em C8, fibras, glicina, glutamina e micronutrientes; quantidade mínima de carboidratos.",
+      "apresentacao": "Embalagem cartonada tipo 'ready to drink' (volume não impresso)",
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": {
+        "colageno_hidrolisado_em_peptideos": "20 g"
+      },
+      "pagina": 32,
+      "observacoes": "Descritor impresso: 'Bebida proteica pronta para beber'. Alegações impressas: 'Sem lactose e sem adição de açúcares'. Rótulo na foto: 'COLLAGEN PEPT PROTEIN', '20g PROTEIN', 'ZERO LACTOSE', e linhas parcialmente legíveis ('FIBRAS | TCM C8', 'GLICINA GLUTAMINA', 'ADOÇADO COM ESTÉVIA'). Página da linha complementar - sem sugestão de uso/dose. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "LINHA CHOCOLIFT",
+      "marca": "Essential Nutrition",
+      "categoria": "chocolates funcionais gourmet",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "Puro cacau belga Barry Callebaut, whey protein isolado, óleo de coco e fibras prebióticas.",
+      "apresentacao": "Barra/tablete (peso não impresso)",
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 33,
+      "observacoes": "É uma LINHA (vários itens), não um SKU único. Descritor impresso: 'Chocolates funcionais gourmet'. Alegações: 'Livres de lactose, glúten, adição de açúcares e aditivos artificiais'; 'Alternativa saudável e prazerosa ao chocolate convencional'. A embalagem na foto traz a advertência frontal 'ALTO EM GORDURA SATURADA' e o rótulo 'CHOCOLIFT - BE UNIQUE'; o sabor específico da barra fotografada não é legível. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    },
+    {
+      "nome_comercial": "MONDZ",
+      "marca": "Mondz",
+      "categoria": "amêndoas cobertas com chocolate (snack)",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "Amêndoas levemente torradas cobertas com dupla camada de Chocolift; whey protein isolado; fonte de fibras.",
+      "apresentacao": "Sachê/pouch. Rótulo mostra 'PESO LIQ.' com valor de leitura incerta na digitalização (parece 50 g) - CONFIRMAR.",
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": null,
+      "pagina": 34,
+      "observacoes": "Descritor impresso: 'Amêndoas cobertas com dupla camada de Chocolift'. Alegações: 'Fonte de fibras', 'Com whey protein isolado', 'Sem adição de açúcares'. Embalagem branca (única do catálogo) com advertência frontal 'ALTO EM GORDURA SATURADA'. Rótulo: 'Mondz - CHOCOLATE-COATED ALMONDS', 'LIGHTLY ROASTED CRUNCHY ALMONDS', 'DOUBLE DIPPED IN GOURMET CHOCOLATE', 'WHEY PROTEIN ISOLATE | SOURCE OF FIBER'. O logo Essential não aparece nesta embalagem."
+    },
+    {
+      "nome_comercial": "JOURNEY",
+      "marca": "Essential Nutrition",
+      "categoria": "snack assado",
+      "categoria_inferida": false,
+      "principio_ativo_ou_composicao": "Proteína de ervilha, grão-de-bico, azeite de oliva e fibras.",
+      "apresentacao": "Sachê/pouch (peso não impresso)",
+      "dose_rotulo": null,
+      "sabores": null,
+      "tabela_nutricional": {
+        "proteina": "4,6 g por porção",
+        "valor_energetico": "92 kcal por porção"
+      },
+      "pagina": 35,
+      "observacoes": "Descritor impresso: 'Snack assado de inspiração mediterrânea'. Alegações: 'Oferece 4,6g de proteína e 92 calorias por porção'; 'Opção leve e fonte de fibras para lanches equilibrados'. A embalagem na foto exibe selos (aparentemente VEGAN, '...FREE' e valores) que NÃO estão legíveis. Marca impressa no rótulo da foto: 'ESSENTIAL NUTRITION'. Capa do documento: 'ESSENTIA GROUP'."
+    }
+  ],
+  "paginas_sem_produto": [
+    {
+      "pagina": 1,
+      "descricao": "Capa: logotipo 'ESSENTIA GROUP' e título 'GLP-1 SUPPORT NUTRITION - Suporte inteligente durante o emagrecimento'."
+    },
+    {
+      "pagina": 28,
+      "descricao": "Página institucional/clínica 'TRATAMENTO - Sugestões de protocolos de suporte para pacientes em uso de medicamentos análogos de GLP-1', com a tabela 'GLP-1 Suporte Básico' (Muscle Synergy / Fiber Biome / Vitalift / Hydrolift) - referencia produtos, mas não os apresenta."
+    },
+    {
+      "pagina": 29,
+      "descricao": "Tabela 'GLP-1 Suporte Plus' (Muscle Synergy + Immuno Whey / Fiber Biome + Probio 20Bi / Vitalift + Vit D3 / Hydrolift); rodapé 'GLP-1 SUPPORT NUTRITION 23'."
+    }
+  ],
+  "protocolos_sugeridos": [
+    {
+      "nome": "GLP-1 Suporte Básico",
+      "pagina": 28,
+      "colunas": {
+        "PRESERVAR MASSA MAGRA": {
+          "produto": "MUSCLE SYNERGY",
+          "para": "Para síntese de massa magra e funcionamento muscular",
+          "indicacao": "1 dose ao dia*"
+        },
+        "NUTRIR O INTESTINO": {
+          "produto": "FIBER BIOME",
+          "para": "Para promover saciedade e ação prebiótica sem provocar desconfortos gastrointestinais",
+          "indicacao": "1 dose antes de uma das refeições principais"
+        },
+        "EQUILIBRAR OS NUTRIENTES": {
+          "produto": "VITALIFT",
+          "para": "Para nutrir e evitar deficiências de vitaminas e minerais",
+          "indicacao": "1 dose (3 cápsulas) 1x ao dia, junto a uma refeição*"
+        },
+        "HIDRATAÇÃO": {
+          "produto": "HYDROLIFT",
+          "para": "Para promover uma hidratação eficaz",
+          "indicacao": "Até 3 sachês ao dia"
+        }
+      },
+      "nota": "*A dose diária pode ser adaptada conforme a necessidade do paciente."
+    },
+    {
+      "nome": "GLP-1 Suporte Plus",
+      "pagina": 29,
+      "colunas": {
+        "PRESERVAR MASSA MAGRA": {
+          "produtos": [
+            "MUSCLE SYNERGY",
+            "IMMUNO WHEY"
+          ],
+          "para": "MUSCLE SYNERGY: Para síntese de massa magra e funcionamento muscular. IMMUNO WHEY: Para a manutenção da massa magra durante o tratamento, além de oferecer suporte ao sistema imune",
+          "indicacao": "1 dose ao dia de cada uma das proteínas*"
+        },
+        "NUTRIR O INTESTINO": {
+          "produtos": [
+            "FIBER BIOME",
+            "PROBIO 20Bi"
+          ],
+          "para": "FIBER BIOME: Para promover saciedade e ação prebiótica sem provocar desconfortos gastrointestinais. PROBIO 20Bi: Para o equilíbrio da microbiota intestinal durante o tratamento",
+          "indicacao": "1 dose de Fiber Biome antes de uma das refeições principais, e do Probio 20bi antes de dormir ou em jejum"
+        },
+        "EQUILIBRAR OS NUTRIENTES": {
+          "produtos": [
+            "VITALIFT",
+            "VIT D3"
+          ],
+          "para": "VITALIFT: Para nutrir e evitar deficiências de vitaminas e minerais. VIT D3: Manter os níveis adequados de vitamina D3 durante a dieta restritiva",
+          "indicacao": "1 dose (3 cápsulas) do Vitalift e 1 cápsula de Vit D3 1x ao dia, junto a uma refeição*"
+        },
+        "HIDRATAÇÃO": {
+          "produtos": [
+            "HYDROLIFT"
+          ],
+          "para": "Para promover uma hidratação eficaz",
+          "indicacao": "Até 3 sachês diluídos em água, ao longo do dia"
+        }
+      },
+      "nota": "*A dose diária pode ser adaptada conforme a necessidade do paciente."
+    }
+  ],
+  "observacoes_gerais": "PDF 100% imagem (escaneado/fotografado), 35 páginas A4, lido visualmente página por página a partir de PNGs renderizados com pypdfium2 (scale=2.0); nenhuma biblioteca de OCR foi usada. Cada página do PDF corresponde a UMA coluna estreita do catálogo impresso (a digitalização cortou as margens laterais), com um produto por página (páginas 2-27 e 30-35). O catálogo NÃO traz tabela nutricional (kcal, carboidratos, gorduras, sódio) para nenhum produto: os únicos valores numéricos impressos são de dose/concentração (g de proteína, g de colágeno, mg de EPA/DHA/NAC/CoQ10, UI de vitamina D) e, no Journey, proteína e calorias por porção. O catálogo também NÃO informa gramatura de pote, volume ou contagem de cápsulas em nenhuma página de texto - onde há indicação de apresentação, ela veio da foto do rótulo e está sinalizada. A estrutura padrão de cada página de produto é: nome, descritivo, 'Indicação:', 'Sugestão de uso:' (na página 17 aparece como 'Sugestão de dose:') e, quando aplicável, 'Sabores:'. Há chamadas de referência bibliográfica numeradas (10 a 36) ao longo dos textos, mas a lista de referências não aparece nas 35 páginas deste PDF; a numeração das páginas internas do impresso não coincide com a do PDF (o rodapé da página 29 do PDF diz '23'). Marca: a capa diz 'ESSENTIA GROUP'; os rótulos fotografados dizem 'ESSENTIAL NUTRITION'. Exceções: RENAISSANCE (marca 'Noorskin') e MONDZ (rótulo só com 'Mondz', sem o logo Essential). Nenhum preço, código/SKU, EAN ou registro ANVISA aparece no documento. Selos observados apenas nas fotos dos rótulos (VEGAN, SUGAR FREE, 'ALTO EM GORDURA SATURADA' no Chocolift e no Mondz) - registrados em 'observacoes' e não como campo próprio, por serem leitura de foto.",
+  "fotos_dos_produtos": {
+    "tipo": "Fotografias reais das embalagens (não são renders vetoriais), com iluminação de estúdio e sombra suave projetada à direita.",
+    "fundo": "Fundo branco/cinza-claro uniforme; por ser digitalização, há leve granulação, halo esbranquiçado e pequenas variações de tom no fundo.",
+    "isolamento": "Uma foto por produto, isolada, sempre no topo da página, acima do texto - EXCEÇÃO: página 31 (RADIANCE JOY) traz 4 embalagens de sabores diferentes empilhadas numa única foto.",
+    "resolucao_nativa_da_pagina": "As imagens embutidas no PDF têm ~840-1250 px de largura por ~2130-2420 px de altura (aprox. 180 dpi da coluna impressa).",
+    "resolucao_util_por_produto": "A embalagem ocupa cerca de 300-500 px de largura por 400-700 px de altura na resolução nativa - suficiente para thumbnail/uso pequeno, insuficiente para e-commerce em alta resolução.",
+    "legibilidade": "O nome do produto no rótulo é legível; as informações finas do rótulo (ingredientes, gramatura, nº de doses) são apenas parcialmente legíveis ou ilegíveis.",
+    "recorte_por_produto": "Viável e simples (fundo claro uniforme + um produto por página). Exige remoção de sombra/halo se for necessário fundo branco puro, e a página 31 precisa de 4 recortes separados. Páginas 1, 28 e 29 não têm foto de produto."
+  }
+}

@@ -48,6 +48,7 @@ export async function generateMealPlanPdf(mealPlanId: string, withPhotos: boolea
     <MealPlanDocument
       professional={{
         nutritionistName: settings.nutritionistName,
+        profession: nutritionist?.profession ?? null,
         crn: settings.crn,
         crnRegion: nutritionist?.crnRegion ?? null,
         logoUrl: settings.logoUrl,

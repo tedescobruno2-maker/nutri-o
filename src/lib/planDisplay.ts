@@ -37,12 +37,21 @@ export function itemIsPending(item: MealOptionItemLike): boolean {
   return item.food != null && item.food.nutrientStatus === "PENDENTE";
 }
 
-/** "PlanoAlimentar_JoaoDaSilva_2026-08-25.pdf" — sem acento, sem espaço (5.5.2). */
-export function mealPlanPdfFileName(clientName: string, date: Date): string {
-  const noAccents = clientName
+function stripToFileSafe(name: string): string {
+  return name
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-zA-Z0-9]/g, "");
+}
+
+/** "PlanoAlimentar_JoaoDaSilva_2026-08-25.pdf" — sem acento, sem espaço (5.5.2). */
+export function mealPlanPdfFileName(clientName: string, date: Date): string {
   const iso = date.toISOString().slice(0, 10);
-  return `PlanoAlimentar_${noAccents}_${iso}.pdf`;
+  return `PlanoAlimentar_${stripToFileSafe(clientName)}_${iso}.pdf`;
+}
+
+/** "PrescricaoSuplementos_JoaoDaSilva_2026-08-25.pdf" — mesma convenção de 5.5.2, para 5.6.3. */
+export function supplementPrescriptionPdfFileName(clientName: string, date: Date): string {
+  const iso = date.toISOString().slice(0, 10);
+  return `PrescricaoSuplementos_${stripToFileSafe(clientName)}_${iso}.pdf`;
 }

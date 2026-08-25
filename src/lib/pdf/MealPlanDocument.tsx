@@ -1,21 +1,8 @@
-import { Document, Page, View, Text, Image, Font, StyleSheet } from "@react-pdf/renderer";
-import path from "node:path";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import "@/lib/pdf/registerFonts";
 import { itemDisplayLabel, itemQuantityLabel, itemKcalLabel, itemIsPending } from "@/lib/planDisplay";
 import { MEAL_BLOCK_TYPE_LABELS } from "@/lib/utils";
 import type { MealOptionItemLike } from "@/lib/mealPlanCalc";
-
-Font.register({
-  family: "Roboto",
-  fonts: [
-    { src: path.join(process.cwd(), "src/lib/pdf/fonts/Roboto-Regular.ttf"), fontWeight: "normal" },
-    { src: path.join(process.cwd(), "src/lib/pdf/fonts/Roboto-Bold.ttf"), fontWeight: "bold" },
-  ],
-});
-
-// Desativa a hifenização automática (o dicionário embutido é de inglês, e quebraria palavras em
-// português de forma errada) — também evita um bug de resolução de módulo do @react-pdf/hyphenate
-// fora do bundler do Next.
-Font.registerHyphenationCallback((word) => [word]);
 
 // IMPORTANTE: ao contrário do React Native, o flexDirection padrão do @react-pdf/renderer é
 // "row", não "column" — todo <View> que deve empilhar filhos verticalmente precisa dizer isso
@@ -23,8 +10,10 @@ Font.registerHyphenationCallback((word) => [word]);
 const styles = StyleSheet.create({
   page: { fontFamily: "Roboto", fontSize: 11, paddingTop: 90, paddingBottom: 60, paddingHorizontal: 36, color: "#1a1a1a", flexDirection: "column" },
   header: { position: "absolute", top: 24, left: 36, right: 36, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottom: "1pt solid #ccc", paddingBottom: 8 },
-  headerLogo: { height: 28, objectFit: "contain" },
+  headerLeft: { flexDirection: "column", gap: 2 },
+  headerLogo: { height: 24, objectFit: "contain", marginBottom: 2 },
   headerName: { fontSize: 12, fontWeight: "bold" },
+  headerProfession: { fontSize: 9, color: "#555" },
   headerCrn: { fontSize: 9, color: "#555" },
   footer: { position: "absolute", bottom: 20, left: 36, right: 36, borderTop: "1pt solid #ccc", paddingTop: 6, flexDirection: "column" },
   // Página X de Y fica na SUA PRÓPRIA linha, nunca ao lado do contato — o contato pode ser longo
@@ -76,6 +65,7 @@ export type PdfMeal = {
 export type MealPlanDocumentProps = {
   professional: {
     nutritionistName: string;
+    profession: string | null;
     crn: string;
     crnRegion: string | null;
     logoUrl: string | null;
@@ -112,13 +102,15 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header} fixed>
-          <View>
-            {professional.logoUrl ? (
+          <View style={styles.headerLeft}>
+            {professional.logoUrl && (
               // eslint-disable-next-line jsx-a11y/alt-text
               <Image src={professional.logoUrl} style={styles.headerLogo} />
-            ) : (
-              <Text style={styles.headerName}>{professional.nutritionistName} — Nutricionista</Text>
             )}
+            {/* Nome + profissão sempre aparecem, com ou sem logo — carimbo obrigatório em todo
+                registro (Res. CFN 594/2017, Art. 8º, II). Um logo não pode substituir o nome. */}
+            <Text style={styles.headerName}>{professional.nutritionistName}</Text>
+            <Text style={styles.headerProfession}>{professional.profession ?? "Nutricionista"}</Text>
           </View>
           <Text style={styles.headerCrn}>{crnLine}</Text>
         </View>

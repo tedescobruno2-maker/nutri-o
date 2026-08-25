@@ -65,12 +65,12 @@ enum UserRole {
 }
 
 model User {
-  id     String   @id @default(cuid())
-  email  String   @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
-  name   String
-  role   UserRole @default(NUTRICIONISTA)
-  active Boolean  @default(true)
+  name         String
+  role         UserRole @default(NUTRICIONISTA)
+  active       Boolean  @default(true)
 
   // Dados profissionais — obrigatórios em todo registro de prontuário (Res. CFN 594/2017, Art. 8º)
   crn          String?
@@ -203,15 +203,16 @@ model Client {
   deletedReason String?
   lastRecordAt  DateTime? // último registro clínico — base da contagem dos 20 anos
 
-  measurements      Measurement[]
-  dietLogs          DietLog[]
-  mealPlans         MealPlan[]
-  supplements       ClientSupplement[]
-  consultationForms ConsultationForm[]
-  consultations     Consultation[]
-  exams             Exam[]
-  examResults       ExamResult[]
-  appointments      Appointment[]
+  measurements            Measurement[]
+  dietLogs                DietLog[]
+  mealPlans               MealPlan[]
+  supplements             ClientSupplement[]
+  supplementPrescriptions SupplementPrescription[]
+  consultationForms       ConsultationForm[]
+  consultations           Consultation[]
+  exams                   Exam[]
+  examResults             ExamResult[]
+  appointments            Appointment[]
 
   @@index([nutritionistId])
 }
@@ -558,12 +559,12 @@ model MealPlan {
   updatedAt         DateTime @updatedAt
 
   consultationId          String? // consulta de referência — traz peso e data (5.4.5)
-  consultation            Consultation?   @relation(fields: [consultationId], references: [id])
-  version                 Int             @default(1)
-  status                  MealPlanStatus  @default(RASCUNHO)
+  consultation            Consultation?  @relation(fields: [consultationId], references: [id])
+  version                 Int            @default(1)
+  status                  MealPlanStatus @default(RASCUNHO)
   templateId              String? // se veio de um modelo
   initialGuidanceId       String? // FK → GuidanceText (orientação inicial)
-  initialGuidance         GuidanceText?   @relation(fields: [initialGuidanceId], references: [id])
+  initialGuidance         GuidanceText?  @relation(fields: [initialGuidanceId], references: [id])
   initialGuidanceOverride String? // ajuste pontual do texto, sem alterar a biblioteca
   finalNotes              String?
   pdfUrl                  String?
@@ -571,18 +572,18 @@ model MealPlan {
   signedAt                DateTime?
   signatureRef            String?
   // Totais materializados no momento do "Finalizar" — o PDF nunca recalcula depois.
-  kcalTotalMin    Float?
-  kcalTotalMax    Float?
-  proteinTotalMin Float?
-  proteinTotalMax Float?
-  carbsTotalMin   Float?
-  carbsTotalMax   Float?
-  fatTotalMin     Float?
-  fatTotalMax     Float?
-  calcStatus      CalcStatus @default(NAO_CALCULAVEL)
-  calcWarnings    Json? // lista de itens excluídos do somatório e por quê
+  kcalTotalMin            Float?
+  kcalTotalMax            Float?
+  proteinTotalMin         Float?
+  proteinTotalMax         Float?
+  carbsTotalMin           Float?
+  carbsTotalMax           Float?
+  fatTotalMin             Float?
+  fatTotalMax             Float?
+  calcStatus              CalcStatus     @default(NAO_CALCULAVEL)
+  calcWarnings            Json? // lista de itens excluídos do somatório e por quê
 
-  meals     Meal[]
+  meals      Meal[]
   deliveries PlanDelivery[]
 
   @@index([clientId])
@@ -619,7 +620,7 @@ model MealOption {
   order    Int    @default(0)
   freeText String // texto legado — só é autoritativo quando isStructured = false (5.5.3)
 
-  isStructured Boolean @default(false)
+  isStructured Boolean    @default(false)
   kcalMin      Float?
   kcalMax      Float?
   proteinMin   Float?
@@ -656,12 +657,12 @@ model MealOptionItem {
   quantityMax  Float? // faixa: "160 A 180 GR" → quantity=160, quantityMax=180
   quantityText String? // literal não-quantificável: "A VONTADE", "PONTA DA FACA"
   literalText  String? // texto original do .docx, SEMPRE preservado
-  showPhoto    Boolean    @default(false)
+  showPhoto    Boolean      @default(false)
   kcal         Float? // materializado no "Finalizar" — o PDF nunca recalcula
   protein      Float?
   carbs        Float?
   fat          Float?
-  calcStatus   CalcStatus @default(NAO_CALCULAVEL)
+  calcStatus   CalcStatus   @default(NAO_CALCULAVEL)
   calcNote     String? // "alimento sem valor nutricional (pendente)"
 
   @@index([mealOptionId])
@@ -693,29 +694,163 @@ enum DeliveryChannel {
 
 /// Log de entrega — Res. CFN 731/2022 exige confirmação de recebimento do plano pelo paciente.
 model PlanDelivery {
-  id           String    @id @default(cuid())
-  mealPlanId   String?
-  mealPlan     MealPlan? @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
-  clientId     String
-  channel      DeliveryChannel
-  sentByUserId String?
-  sentAt       DateTime  @default(now())
-  acknowledgedAt DateTime? // confirmação de recebimento pelo paciente no portal
-  notes        String?
+  id                       String                  @id @default(cuid())
+  mealPlanId               String?
+  mealPlan                 MealPlan?               @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  supplementPrescriptionId String?
+  supplementPrescription   SupplementPrescription? @relation(fields: [supplementPrescriptionId], references: [id], onDelete: Cascade)
+  clientId                 String
+  channel                  DeliveryChannel
+  sentByUserId             String?
+  sentAt                   DateTime                @default(now())
+  acknowledgedAt           DateTime? // confirmação de recebimento pelo paciente no portal
+  notes                    String?
 
   @@index([clientId, sentAt])
 }
 
 // ---------------------------------------------------------------------------
-// Suplementação
+// Suplementação (Fase 6) — três níveis: ativo → marca → produto, mais fórmula manipulada
 // ---------------------------------------------------------------------------
 
+enum SupplementOrigin {
+  LOJA_SUPLEMENTOS
+  MANIPULADO
+  AMBOS
+}
+
 model Supplement {
-  id    String  @id @default(cuid())
-  name  String  @unique
-  notes String?
+  id            String           @id @default(cuid())
+  activeName    String           @unique // "Magnésio bisglicinato", "Creatina monoidratada"
+  category      String? // Proteína, Mineral, Vitamina, Pré-treino, Fibra, Bioativo...
+  origin        SupplementOrigin @default(LOJA_SUPLEMENTOS)
+  defaultDose   String? // "5 g", "3 cápsulas" — como a Luana escreve
+  defaultTiming String? // "café da manhã", "30 min antes do treino"
+  defaultRoute  String?          @default("Oral")
+  ulNote        String? // limite superior tolerável, quando aplicável (Res. CFN 731/2022)
+  notes         String?
+  imageUrl      String?
+  imageCredit   String?
+  active        Boolean          @default(true)
+  createdAt     DateTime         @default(now())
 
   clientSupplements ClientSupplement[]
+  products          SupplementProduct[]
+  prescriptionItems SupplementPrescriptionItem[]
+  formulaItems      CompoundedFormulaItem[]
+}
+
+model SupplementBrand {
+  id      String  @id @default(cuid())
+  name    String  @unique // TRUE SOURCE, VITAFOR, NUTRIFY, DUX, GROWTH, ESSENTIAL, EQUALIV, BODY ACTION
+  website String?
+  notes   String?
+
+  products SupplementProduct[]
+}
+
+model SupplementProduct {
+  id             String          @id @default(cuid())
+  supplementId   String
+  supplement     Supplement      @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+  brandId        String
+  brand          SupplementBrand @relation(fields: [brandId], references: [id])
+  commercialName String // "Creafort", "Magnesio Complex", "Energyzer Focus"
+  presentation   String? // "pote 300 g", "60 cápsulas" — NULL quando não impresso
+  flavors        String?
+  doseLabel      String? // dose do rótulo
+  nutritionJson  Json? // tabela nutricional do rótulo, quando existir
+  anvisaRef      String? // registro/notificação — consultas.anvisa.gov.br
+  imageUrl       String?
+  imageCredit    String? // OBRIGATÓRIO quando imageUrl existe
+  imageLicense   String? // "cedida pelo fabricante", "foto própria", "catálogo Essentia"
+  sourceRef      String? // "ESSENTIA GROUP.pdf, p. 12"
+  active         Boolean         @default(true)
+
+  @@unique([brandId, commercialName])
+  @@index([supplementId])
+}
+
+model CompoundedFormula {
+  id              String   @id @default(cuid())
+  name            String // "Pré-treino manipulado (sachê saborizado)"
+  presentation    String? // "40 doses em sachês saborizados"
+  posology        String? // "Diluir uma dose em copo de água. Tomar 30 min antes do treino."
+  route           String?  @default("Oral")
+  notes           String?
+  createdByUserId String?
+  isShared        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  items             CompoundedFormulaItem[]
+  prescriptionItems SupplementPrescriptionItem[]
+}
+
+model CompoundedFormulaItem {
+  id           String            @id @default(cuid())
+  formulaId    String
+  formula      CompoundedFormula @relation(fields: [formulaId], references: [id], onDelete: Cascade)
+  supplementId String?
+  supplement   Supplement?       @relation(fields: [supplementId], references: [id])
+  activeName   String // denormalizado
+  quantity     String // "2 g", "150 mg" — texto, porque a unidade varia
+  order        Int               @default(0)
+
+  @@index([formulaId])
+}
+
+enum PrescriptionStatus {
+  RASCUNHO
+  FINALIZADA
+  SUBSTITUIDA
+}
+
+/// Documento de prescrição. Campos obrigatórios conforme Res. CFN 656/2020 Art. 3º, XI
+/// (com redação da Res. CFN 731/2022): nome do paciente, via, composição, posologia, data,
+/// assinatura e carimbo com nº de inscrição e jurisdição no CRN, e contato.
+model SupplementPrescription {
+  id              String             @id @default(cuid())
+  clientId        String
+  client          Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  consultationId  String?
+  date            DateTime           @default(now())
+  // Autoria do documento — exigida em todo registro de prontuário (Res. CFN 594/2017, Art. 8º)
+  createdByUserId String?
+  version         Int                @default(1)
+  status          PrescriptionStatus @default(RASCUNHO)
+  generalNotes    String?
+  pdfUrl          String?
+  signedAt        DateTime?
+  signatureRef    String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  items      SupplementPrescriptionItem[]
+  deliveries PlanDelivery[]
+
+  @@index([clientId, date])
+}
+
+model SupplementPrescriptionItem {
+  id             String                 @id @default(cuid())
+  prescriptionId String
+  prescription   SupplementPrescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  section        SupplementOrigin       @default(LOJA_SUPLEMENTOS) // separa "PARA MANIPULAR" no PDF
+  supplementId   String?
+  supplement     Supplement?            @relation(fields: [supplementId], references: [id])
+  formulaId      String?
+  formula        CompoundedFormula?     @relation(fields: [formulaId], references: [id])
+  displayName    String // denormalizado — o que sai no PDF
+  acceptedBrands String? // "TRUE SOURCE, VITAFOR, NUTRIFY" — como a Luana escreve
+  composition    String? // EXIGIDO pela Res. CFN 656/2020
+  route          String                 @default("Oral") // EXIGIDO
+  posology       String // EXIGIDO — "5 g diluído em água, no café da manhã, todos os dias"
+  justification  String? // EXIGIDO no prontuário (Res. CFN 731/2022) — não vai no PDF do paciente
+  active         Boolean                @default(true)
+  discontinuedAt DateTime?
+  order          Int                    @default(0)
+
+  @@index([prescriptionId])
 }
 
 model ClientSupplement {
@@ -773,16 +908,16 @@ model ConsultationForm {
 // ---------------------------------------------------------------------------
 
 model ProfessionalSettings {
-  id                String   @id @default("default")
-  nutritionistName  String   @default("Luana Gois")
-  crn               String   @default("09100683")
-  logoUrl           String?
-  address           String?
-  phone             String?
-  email             String?
-  instagram         String?
-  footerText        String?
-  updatedAt         DateTime @updatedAt
+  id               String   @id @default("default")
+  nutritionistName String   @default("Luana Gois")
+  crn              String   @default("09100683")
+  logoUrl          String?
+  address          String?
+  phone            String?
+  email            String?
+  instagram        String?
+  footerText       String?
+  updatedAt        DateTime @updatedAt
 }
 
 // ---------------------------------------------------------------------------
