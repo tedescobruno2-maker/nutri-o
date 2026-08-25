@@ -291,11 +291,14 @@ export async function getClientForExamsExport(id: string) {
 }
 
 export async function getExamResultsGrouped(clientId: string) {
-  const [client, results] = await Promise.all([
+  const [client, results, references] = await Promise.all([
     prisma.client.findUnique({ where: { id: clientId }, select: { id: true, name: true } }),
-    prisma.examResult.findMany({ where: { clientId }, orderBy: { collectedAt: "asc" } }),
+    prisma.examResult.findMany({ where: { clientId }, orderBy: { collectedAt: "asc" }, include: { parameter: true } }),
+    prisma.clientExamReference.findMany({ where: { clientId } }),
   ]);
   if (!client) return null;
+
+  const referenceByParameterId = new Map(references.map((r) => [r.parameterId, r]));
 
   const byParameter = new Map<string, typeof results>();
   for (const r of results) {
@@ -305,16 +308,26 @@ export async function getExamResultsGrouped(clientId: string) {
   }
 
   const parameters = [...byParameter.entries()]
-    .map(([parameterName, points]) => ({
-      parameterName,
-      unit: points.at(-1)!.unit,
-      referenceText: points.at(-1)!.referenceText,
-      referenceMin: points.at(-1)!.referenceMin,
-      referenceMax: points.at(-1)!.referenceMax,
-      latest: points.at(-1)!,
-      flag: points.at(-1)!.flag,
-      points,
-    }))
+    .map(([parameterName, points]) => {
+      const latest = points.at(-1)!;
+      const clientRef = latest.parameterId ? referenceByParameterId.get(latest.parameterId) : undefined;
+      return {
+        parameterName,
+        unit: latest.unit,
+        referenceText: latest.referenceText,
+        referenceMin: latest.referenceMin,
+        referenceMax: latest.referenceMax,
+        latest,
+        // effectiveFlag/flagSource podem ser null em linhas antigas nunca recalculadas — cai no
+        // legado `flag` (calculado só a partir do laudo) nesse caso.
+        flag: latest.effectiveFlag ?? latest.flag,
+        flagSource: latest.flagSource,
+        parameterId: latest.parameterId,
+        canonicalName: latest.parameter?.canonicalName ?? null,
+        clientRef: clientRef ? { refMin: clientRef.refMin, refMax: clientRef.refMax, refText: clientRef.refText, reason: clientRef.reason } : null,
+        points,
+      };
+    })
     .sort((a, b) => a.parameterName.localeCompare(b.parameterName, "pt-BR"));
 
   return { client, parameters };

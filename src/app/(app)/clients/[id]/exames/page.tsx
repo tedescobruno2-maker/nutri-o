@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getExamResultsGrouped } from "@/lib/dal";
 import { ExamParameterChart } from "@/components/charts/ExamParameterChart";
 import { DeleteExamResultButton } from "@/components/clients/DeleteExamResultButton";
+import { AdjustExamReferenceButton } from "@/components/clients/AdjustExamReferenceButton";
 import { formatDateFull } from "@/lib/utils";
 
 const FLAG_LABELS: Record<string, string> = {
@@ -92,6 +93,14 @@ export default async function ExamResultsPage({ params }: { params: Promise<{ id
                 <p className="text-tertiary" style={{ fontSize: "0.72rem", whiteSpace: "pre-wrap" }}>
                   V.R.: {p.referenceText}
                 </p>
+              )}
+
+              {p.flagSource && (
+                <p className="text-tertiary" style={{ fontSize: "0.72rem" }}>Faixa usada: {p.flagSource}</p>
+              )}
+
+              {p.parameterId && (
+                <AdjustExamReferenceButton clientId={client.id} parameterId={p.parameterId} currentRef={p.clientRef} />
               )}
 
               <DeleteExamResultButton clientId={client.id} parameterName={p.parameterName} />

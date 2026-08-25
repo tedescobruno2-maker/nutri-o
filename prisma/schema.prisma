@@ -160,6 +160,24 @@ model AuditLog {
   @@index([action, createdAt])
 }
 
+/// Log de toda chamada a modelo de IA externo (D9) — trazido da Fase 11 para a Fase 7 porque
+/// o importador de exames (5.7.3) já precisa gravar aqui. Nunca guarda o prompt nem dado de
+/// paciente além do `clientId` (por id, não por nome).
+model AiUsageLog {
+  id           String   @id @default(cuid())
+  purpose      String // "importar_exame", "importar_balanca", "enriquecer_receita", "anamnese"
+  model        String // "gemini-flash-latest"
+  clientId     String?
+  userId       String?
+  inputBytes   Int?
+  outputTokens Int?
+  success      Boolean
+  errorText    String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model Client {
   id         String       @id @default(cuid())
   name       String
@@ -212,6 +230,7 @@ model Client {
   consultations           Consultation[]
   exams                   Exam[]
   examResults             ExamResult[]
+  examReferences          ClientExamReference[]
   appointments            Appointment[]
 
   @@index([nutritionistId])
@@ -259,22 +278,77 @@ model Exam {
 // ---------------------------------------------------------------------------
 
 model ExamResult {
-  id            String         @id @default(cuid())
+  id            String          @id @default(cuid())
   clientId      String
-  client        Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  parameterName String // ex: "Ferritina Sérica", "Glicemia de Jejum"
+  client        Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  parameterName String // ex: "Ferritina Sérica", "Glicemia de Jejum" — texto literal extraído do laudo
+  // Fase 7: FK para o catálogo curado — null quando a IA trouxe um nome que não bateu com
+  // nenhum ExamParameter (fica pendente de catalogação, não é erro).
+  parameterId   String?
+  parameter     ExamParameter?  @relation(fields: [parameterId], references: [id])
   value         Float
   unit          String? // ex: "ng/mL", "mg/dL"
   collectedAt   DateTime // data da coleta desse resultado
-  referenceMin  Float? // limite inferior do V.R., quando um único intervalo numérico se aplica
-  referenceMax  Float? // limite superior do V.R.
-  referenceText String? // texto original do V.R. impresso no exame (sempre preservado)
-  flag          ExamResultFlag @default(INDETERMINADO)
+  // A partir da Fase 7, referenceMin/referenceMax/referenceText passam a significar
+  // EXCLUSIVAMENTE "o que o laboratório imprimiu neste laudo" — nunca mais sobrescritos por
+  // faixa de catálogo ou de paciente (essas vivem em ExamParameter/ClientExamReference).
+  referenceMin  Float? // limite inferior do V.R. impresso no laudo
+  referenceMax  Float? // limite superior do V.R. impresso no laudo
+  referenceText String? // texto original do V.R. impresso no exame (sempre preservado, prova documental)
+  flag          ExamResultFlag  @default(INDETERMINADO) // legado: calculado só a partir da faixa do laudo
+  // Fase 7: flag recalculado pela precedência de src/lib/examFlags.ts — o que a tela mostra.
+  effectiveFlag ExamResultFlag?
+  flagSource    String? // "faixa do paciente" | "catálogo" | "laudo" — de onde veio a faixa usada
   sourceFileUrl String? // PDF de onde este resultado foi extraído
   importBatchId String? // agrupa resultados vindos da mesma importação de PDF
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime        @default(now())
 
   @@unique([clientId, parameterName, collectedAt])
+  @@index([clientId])
+  @@index([parameterId])
+}
+
+// ---------------------------------------------------------------------------
+// Catálogo de parâmetros de exame + faixa de referência por paciente (Fase 7)
+// ---------------------------------------------------------------------------
+
+/// Catálogo curado de parâmetros de exame. defaultMin/defaultMax ficam vazios de propósito —
+/// faixa laboratorial varia por método/sexo/idade, e preenchê-las de memória seria inventar
+/// (<<DECISÃO BRUNO>> 9.10). Entram por três vias: laudo importado, digitação da Luana aqui,
+/// ou override por paciente em ClientExamReference.
+model ExamParameter {
+  id            String   @id @default(cuid())
+  canonicalName String   @unique // "Ferritina", "Glicemia de jejum", "TSH"
+  aliases       String? // sinônimos separados por "|" — usado no casamento da importação
+  unit          String?
+  category      String? // Hematologia, Bioquímica, Hormônios, Vitaminas...
+  defaultMin    Float?
+  defaultMax    Float?
+  defaultText   String?
+  higherIsWorse Boolean? // orienta a leitura visual do gráfico
+  notes         String?
+
+  results    ExamResult[]
+  references ClientExamReference[]
+}
+
+/// Faixa de referência personalizada por paciente. A faixa impressa no laudo (ExamResult.reference*)
+/// NUNCA é sobrescrita por este registro — ela é prova documental e continua acessível.
+model ClientExamReference {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  parameterId String
+  parameter   ExamParameter @relation(fields: [parameterId], references: [id], onDelete: Cascade)
+  refMin      Float?
+  refMax      Float?
+  refText     String?
+  reason      String? // por que a nutricionista alterou — vira registro de prontuário
+  setByUserId String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([clientId, parameterId])
   @@index([clientId])
 }
 

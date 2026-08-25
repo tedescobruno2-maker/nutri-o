@@ -6,6 +6,8 @@ import { gemini, EXAM_RESULTS_SCHEMA, EXAM_RESULTS_PROMPT, type ExamResultsData 
 import { saveUploadedDocument } from "@/actions/upload";
 import { getCurrentUser } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
+import { matchExamParameter } from "@/lib/examParameterMatch";
+import { computeEffectiveFlag } from "@/lib/examFlags";
 
 function parseBrDate(str: string): Date | undefined {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(str.trim());
@@ -18,6 +20,7 @@ export type ImportExamResultsSummary = {
   parametersImported: number;
   pointsImported: number;
   attentionParams: string[];
+  unmatchedParameters: string[];
 };
 
 export type ImportExamResultsResponse =
@@ -49,32 +52,52 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
     },
   ];
   const config = { responseMimeType: "application/json", responseSchema: EXAM_RESULTS_SCHEMA, maxOutputTokens: 65535 };
+  const actor = await getCurrentUser();
 
   let data: ExamResultsData;
+  let modelUsed = "gemini-flash-latest";
+  let outputTokens: number | null = null;
   try {
     let text: string | undefined;
     try {
-      const result = await gemini.models.generateContent({ model: "gemini-flash-latest", contents, config });
+      const result = await gemini.models.generateContent({ model: modelUsed, contents, config });
       text = result.text;
+      outputTokens = result.usageMetadata?.totalTokenCount ?? null;
     } catch (err) {
       const isOverloaded = err instanceof Error && /503|UNAVAILABLE|overloaded|high demand/i.test(err.message);
       if (!isOverloaded) throw err;
-      const result = await gemini.models.generateContent({ model: "gemini-flash-lite-latest", contents, config });
+      modelUsed = "gemini-flash-lite-latest";
+      const result = await gemini.models.generateContent({ model: modelUsed, contents, config });
       text = result.text;
+      outputTokens = result.usageMetadata?.totalTokenCount ?? null;
     }
 
-    if (!text) return { ok: false, error: "A IA não retornou dados. Tente novamente." };
+    if (!text) throw new Error("A IA não retornou dados. Tente novamente.");
     data = JSON.parse(text) as ExamResultsData;
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Falha ao processar o relatório." };
+    const errorText = err instanceof Error ? err.message : "Falha ao processar o relatório.";
+    await prisma.aiUsageLog.create({
+      data: { purpose: "importar_exame", model: modelUsed, clientId, userId: actor?.id, inputBytes: buffer.length, success: false, errorText },
+    });
+    return { ok: false, error: errorText };
   }
 
   if (!data.results || data.results.length === 0) {
+    await prisma.aiUsageLog.create({
+      data: { purpose: "importar_exame", model: modelUsed, clientId, userId: actor?.id, inputBytes: buffer.length, outputTokens, success: false, errorText: "Nenhum parâmetro reconhecido" },
+    });
     return { ok: false, error: "Nenhum parâmetro de exame foi reconhecido neste PDF." };
   }
 
-  const actor = await getCurrentUser();
+  await prisma.aiUsageLog.create({
+    data: { purpose: "importar_exame", model: modelUsed, clientId, userId: actor?.id, inputBytes: buffer.length, outputTokens, success: true },
+  });
   await logAudit({ actorUserId: actor?.id, action: "CHAMADA_IA", entity: "ExamResult", clientId, metadata: { finalidade: "leitura_exames", parametros: data.results.length } });
+
+  // 5.7.1/5.7.3: casa parameterName com o catálogo por alias — quando não casar, fica null e o
+  // relatório de importação lista para a Luana catalogar depois (nunca é tratado como erro).
+  const catalog = await prisma.examParameter.findMany();
+  const unmatchedParameters: string[] = [];
 
   const sourceFileUrl = await saveUploadedDocument(file, "exame-resultados");
   const importBatchId = `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -92,10 +115,19 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
 
     const hasRange = item.referenceMin != null || item.referenceMax != null;
 
+    const parameter = matchExamParameter(item.parameterName, catalog);
+    if (!parameter) unmatchedParameters.push(item.parameterName);
+    const clientRef = parameter
+      ? await prisma.clientExamReference.findUnique({
+          where: { clientId_parameterId: { clientId, parameterId: parameter.id } },
+        })
+      : null;
+
     for (let i = 0; i < points.length; i++) {
       const point = points[i];
       const isLatest = i === points.length - 1;
 
+      // Legado (5.7 mantém o campo `flag`): calculado só a partir da faixa impressa no laudo.
       let flag: "NORMAL" | "ATENCAO" | "INDETERMINADO";
       if (hasRange) {
         const belowMin = item.referenceMin != null && point.value < item.referenceMin;
@@ -104,6 +136,16 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
       } else {
         flag = isLatest ? item.currentFlag : "INDETERMINADO";
       }
+
+      // Novo (5.7): precedência faixa do paciente → catálogo → laudo → indeterminado.
+      const effective = computeEffectiveFlag(point.value, {
+        clientRefMin: clientRef?.refMin ?? null,
+        clientRefMax: clientRef?.refMax ?? null,
+        catalogDefaultMin: parameter?.defaultMin ?? null,
+        catalogDefaultMax: parameter?.defaultMax ?? null,
+        labReferenceMin: item.referenceMin ?? null,
+        labReferenceMax: item.referenceMax ?? null,
+      });
 
       await prisma.examResult.upsert({
         where: {
@@ -120,6 +162,9 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
           referenceMax: item.referenceMax ?? undefined,
           referenceText: item.referenceText,
           flag,
+          parameterId: parameter?.id ?? null,
+          effectiveFlag: effective.flag,
+          flagSource: effective.source,
           sourceFileUrl: sourceFileUrl ?? undefined,
           importBatchId,
         },
@@ -133,13 +178,16 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
           referenceMax: item.referenceMax ?? undefined,
           referenceText: item.referenceText,
           flag,
+          parameterId: parameter?.id ?? null,
+          effectiveFlag: effective.flag,
+          flagSource: effective.source,
           sourceFileUrl: sourceFileUrl ?? undefined,
           importBatchId,
         },
       });
       pointsImported++;
 
-      if (isLatest && flag === "ATENCAO") attentionParams.push(item.parameterName);
+      if (isLatest && effective.flag === "ATENCAO") attentionParams.push(item.parameterName);
     }
   }
 
@@ -166,7 +214,7 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
 
   return {
     ok: true,
-    summary: { parametersImported: data.results.length, pointsImported, attentionParams },
+    summary: { parametersImported: data.results.length, pointsImported, attentionParams, unmatchedParameters },
   };
 }
 
