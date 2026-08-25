@@ -2,12 +2,17 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getClientForExamsExport, getProfessionalSettings } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { formatDateFull } from "@/lib/utils";
 
 export default async function ExportExamsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [client, settings] = await Promise.all([getClientForExamsExport(id), getProfessionalSettings()]);
   if (!client) notFound();
+
+  const actor = await getCurrentUser();
+  await logAudit({ actorUserId: actor?.id, action: "EXPORTAR", entity: "Exam", entityId: id, clientId: id, metadata: { documento: "solicitacao_exames" } });
 
   const requested = client.exams.filter((e) => e.status === "SOLICITADO");
   const withResult = client.exams.filter((e) => e.status !== "SOLICITADO");

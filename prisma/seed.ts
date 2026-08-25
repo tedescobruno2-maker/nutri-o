@@ -20,6 +20,21 @@ async function main() {
   await prisma.recipe.deleteMany();
   await prisma.client.deleteMany();
 
+  // Fase 1: Client.nutritionistId é obrigatório — garante um ADMIN_MASTER de desenvolvimento
+  // para atribuir aos clientes fictícios deste seed (nunca rode este script contra produção).
+  const { hash } = await import("@node-rs/argon2");
+  const nutritionist =
+    (await prisma.user.findFirst({ where: { role: "ADMIN_MASTER" } })) ??
+    (await prisma.user.create({
+      data: {
+        email: "dev@nutriluanagois.local",
+        passwordHash: await hash("dev-seed-nao-usar-em-producao"),
+        name: "Luana Gois (seed)",
+        role: "ADMIN_MASTER",
+        mustChangePassword: true,
+      },
+    }));
+
   const clientsData = [
     {
       name: "Ana Beatriz Souza",
@@ -100,6 +115,7 @@ async function main() {
         goal: c.goal,
         status: c.status,
         order: c.order,
+        nutritionistId: nutritionist.id,
       },
     });
 

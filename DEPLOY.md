@@ -48,9 +48,19 @@ Configure em Vercel → Project Settings → Environment Variables:
 | `NEXT_PUBLIC_APP_URL` | URL pública do site em produção, ex: `https://seu-projeto.vercel.app` |
 | `GEMINI_API_KEY` | API key do Google Gemini — usada para importar dados da balança e resultados de exames em PDF via IA, e para sugerir dados nutricionais ao cadastrar um alimento novo. Sem ela, esses botões mostram "GEMINI_API_KEY não configurada no servidor". |
 | `PIXABAY_API_KEY` | API key gratuita do Pixabay (opcional — cadastre-se em pixabay.com/api/docs) — usada apenas pelo botão "Preencher com IA" no cadastro de alimentos, para buscar automaticamente uma foto. Sem ela, a IA ainda sugere os valores nutricionais normalmente, só não busca a foto. |
-| `APP_PASSWORD` | senha de acesso ao sistema (opcional) — sem ela, o sistema fica sem proteção por senha. |
 
 > **Importante:** o `.env` local nunca é commitado (está no `.gitignore`) — as variáveis precisam ser cadastradas manualmente em Vercel → Project Settings → Environment Variables (copie os mesmos valores do `.env` local). Depois de adicionar/alterar uma variável, é preciso fazer um novo deploy (ou "Redeploy" no painel da Vercel) para ela entrar em vigor.
+
+### Login (a partir da Fase 1 do plano mestre)
+
+O antigo `APP_PASSWORD` (senha única em variável de ambiente) foi **removido**. O sistema agora tem
+contas reais (`User`) com e-mail + senha (hash Argon2id via `@node-rs/argon2`) e sessão persistida em
+banco (`Session`, token opaco em cookie `httpOnly`). A conta profissional (`ADMIN_MASTER`) exige
+verificação em duas etapas (TOTP) — configurável em `/configuracoes/conta`. Não há mais nenhuma
+variável de ambiente para "a senha do sistema"; o acesso é por conta.
+
+`NEXT_PUBLIC_APP_URL` (acima) também é usada para montar o link de primeiro acesso enviado ao
+paciente convidado ao portal (`/definir-senha/<token>`).
 
 ## 3. Deploy
 

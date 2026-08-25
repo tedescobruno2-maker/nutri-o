@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { gemini, SCALE_REPORT_SCHEMA, SCALE_REPORT_PROMPT, type ScaleReportData } from "@/lib/gemini";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 
 export type ExtractResult =
@@ -52,6 +54,11 @@ export async function extractScaleReport(formData: FormData): Promise<ExtractRes
     if (!text) return { ok: false, error: "A IA não retornou dados. Tente novamente." };
 
     const data = JSON.parse(text) as ScaleReportData;
+
+    const clientId = (formData.get("clientId") as string | null) ?? undefined;
+    const actor = await getCurrentUser();
+    await logAudit({ actorUserId: actor?.id, action: "CHAMADA_IA", entity: "Measurement", clientId, metadata: { finalidade: "leitura_balanca" } });
+
     return { ok: true, data };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Falha ao processar o relatório." };

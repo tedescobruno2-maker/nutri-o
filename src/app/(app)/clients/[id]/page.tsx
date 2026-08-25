@@ -14,14 +14,20 @@ import { ConsultationHistorySection } from "@/components/clients/ConsultationHis
 import { ExamsSection } from "@/components/clients/ExamsSection";
 import { EditClientButton } from "@/components/clients/EditClientButton";
 import { ImportScaleButton } from "@/components/clients/ImportScaleButton";
+import { InvitePortalButton } from "@/components/clients/InvitePortalButton";
 import { BodyCompositionSection } from "@/components/clients/BodyCompositionSection";
 import { getSignedDocumentUrl } from "@/actions/upload";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { KANBAN_LABELS, initials, formatDate, formatDateFull, calculateAge, type KanbanStatusValue } from "@/lib/utils";
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [client, foods] = await Promise.all([getClientProfile(id), getFoods()]);
   if (!client) notFound();
+
+  const actor = await getCurrentUser();
+  await logAudit({ actorUserId: actor?.id, action: "VISUALIZAR_PRONTUARIO", entity: "Client", entityId: id, clientId: id });
 
   // Exames guardam apenas o CAMINHO do documento (bucket privado) — resolve para URL assinada
   // de curta duração aqui, no momento da exibição (Fase 0: dado de saúde nunca fica público).
@@ -63,6 +69,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <span className="badge badge-primary">{KANBAN_LABELS[client.status as KanbanStatusValue]}</span>
           <ImportScaleButton clientId={client.id} clientName={client.name} />
+          <InvitePortalButton clientId={client.id} alreadyInvited={!!client.userId} />
           <EditClientButton client={client} />
         </div>
       </div>

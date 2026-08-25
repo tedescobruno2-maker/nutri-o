@@ -54,6 +54,112 @@ enum AppointmentStatus {
   CANCELADO
 }
 
+// ---------------------------------------------------------------------------
+// Identidade, sessão e auditoria (Fase 1 do plano mestre)
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  ADMIN_MASTER // Luana — única conta profissional hoje; vê tudo
+  NUTRICIONISTA // declarado e não usado — reservado para eventual virada multi-nutricionista (D2)
+  PACIENTE // vê apenas os próprios dados, via dbForPatient
+}
+
+model User {
+  id     String   @id @default(cuid())
+  email  String   @unique
+  passwordHash String
+  name   String
+  role   UserRole @default(NUTRICIONISTA)
+  active Boolean  @default(true)
+
+  // Dados profissionais — obrigatórios em todo registro de prontuário (Res. CFN 594/2017, Art. 8º)
+  crn          String?
+  crnRegion    String? // jurisdição, ex: "CRN-4" — ver <<DECISÃO BRUNO>> 9.4 do plano mestre
+  profession   String? @default("Nutricionista")
+  phone        String?
+  signatureRef String? // referência do certificado/provedor de assinatura eletrônica (Fase 5)
+
+  mustChangePassword Boolean   @default(true)
+  mfaSecret          String? // TOTP — obrigatório para a conta profissional (ADMIN_MASTER)
+  mfaEnabledAt       DateTime?
+  lastLoginAt        DateTime?
+  failedLoginCount   Int       @default(0)
+  lockedUntil        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions       Session[]
+  ownedClients   Client[]        @relation("NutritionistClients")
+  patientProfile Client?         @relation("PatientUser")
+  auditLogs      AuditLog[]
+  passwordResets PasswordReset[]
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique // SHA-256 do token; o token puro só existe no cookie
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// Usado tanto para "esqueci minha senha" quanto para o link de primeiro acesso do
+/// paciente convidado ao portal — funcionalmente é o mesmo fluxo (token de uso único → definir senha).
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+enum AuditAction {
+  LOGIN
+  LOGIN_FALHA
+  LOGOUT
+  VISUALIZAR_PRONTUARIO
+  CRIAR
+  ATUALIZAR
+  EXCLUIR_LOGICO
+  EXPORTAR
+  ENVIAR_DOCUMENTO
+  ALTERAR_REFERENCIA_EXAME
+  CHAMADA_IA
+  ACESSO_NEGADO
+}
+
+/// Append-only. Nunca UPDATE, nunca DELETE. Retenção mínima: 5 anos.
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorUserId String?
+  actor       User?       @relation(fields: [actorUserId], references: [id])
+  action      AuditAction
+  entity      String? // "Client", "MealPlan", "ExamResult"...
+  entityId    String?
+  clientId    String? // qual prontuário foi tocado — permite responder ao titular (Art. 18)
+  ip          String?
+  userAgent   String?
+  metadata    Json? // diff resumido, nunca o dado sensível inteiro
+  createdAt   DateTime    @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+}
+
 model Client {
   id         String       @id @default(cuid())
   name       String
@@ -72,6 +178,31 @@ model Client {
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
+  // Consultório único: sempre a Luana. Era nullable (passo 1 de 3); backfill feito
+  // em prisma/fase1-backfill-nutritionist.ts; agora obrigatória (passo 2 de 3).
+  nutritionistId String
+  nutritionist   User   @relation("NutritionistClients", fields: [nutritionistId], references: [id])
+
+  userId String? @unique // conta do próprio paciente no portal (Fase 1/8)
+  user   User?   @relation("PatientUser", fields: [userId], references: [id])
+
+  // Menor de idade → acesso pelo responsável legal (Res. CFN 594/2017, Art. 3º, IV)
+  guardianName     String?
+  guardianDocument String?
+  guardianEmail    String?
+  guardianPhone    String?
+
+  // Alertas clínicos — o construtor de plano bloqueia/avisa (Fase 4)
+  allergies           String? // texto livre, exibido em faixa vermelha fixa
+  intolerances        String?
+  dietaryRestrictions String?
+  foodAversions       String?
+
+  // LGPD / prontuário (Res. CFN 594/2017, Art. 3º, VI — guarda de 20 anos, sem exclusão física)
+  deletedAt     DateTime? // exclusão LÓGICA — nunca física dentro dos 20 anos
+  deletedReason String?
+  lastRecordAt  DateTime? // último registro clínico — base da contagem dos 20 anos
+
   measurements      Measurement[]
   dietLogs          DietLog[]
   mealPlans         MealPlan[]
@@ -81,6 +212,8 @@ model Client {
   exams             Exam[]
   examResults       ExamResult[]
   appointments      Appointment[]
+
+  @@index([nutritionistId])
 }
 
 // ---------------------------------------------------------------------------

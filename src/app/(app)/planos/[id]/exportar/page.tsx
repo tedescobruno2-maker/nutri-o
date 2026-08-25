@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMealPlanForExport, getProfessionalSettings } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 import { formatDateFull, calculateAge } from "@/lib/utils";
 
 export default async function ExportPlanPage({ params }: { params: Promise<{ id: string }> }) {
@@ -9,6 +11,9 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
   const [plan, settings] = await Promise.all([getMealPlanForExport(id), getProfessionalSettings()]);
   if (!plan) notFound();
   const clientAge = plan.client.birthDate ? calculateAge(plan.client.birthDate) : plan.client.age;
+
+  const actor = await getCurrentUser();
+  await logAudit({ actorUserId: actor?.id, action: "EXPORTAR", entity: "MealPlan", entityId: id, clientId: plan.clientId, metadata: { documento: "plano_alimentar" } });
 
   return (
     <div className="animate-in">

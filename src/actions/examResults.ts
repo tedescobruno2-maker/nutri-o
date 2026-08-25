@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { gemini, EXAM_RESULTS_SCHEMA, EXAM_RESULTS_PROMPT, type ExamResultsData } from "@/lib/gemini";
 import { saveUploadedDocument } from "@/actions/upload";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 
 function parseBrDate(str: string): Date | undefined {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(str.trim());
@@ -70,6 +72,9 @@ export async function importExamResultsPdf(formData: FormData): Promise<ImportEx
   if (!data.results || data.results.length === 0) {
     return { ok: false, error: "Nenhum parâmetro de exame foi reconhecido neste PDF." };
   }
+
+  const actor = await getCurrentUser();
+  await logAudit({ actorUserId: actor?.id, action: "CHAMADA_IA", entity: "ExamResult", clientId, metadata: { finalidade: "leitura_exames", parametros: data.results.length } });
 
   const sourceFileUrl = await saveUploadedDocument(file, "exame-resultados");
   const importBatchId = `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

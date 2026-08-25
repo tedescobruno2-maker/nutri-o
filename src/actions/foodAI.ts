@@ -2,6 +2,8 @@
 
 import { gemini, FOOD_SUGGEST_SCHEMA, FOOD_SUGGEST_PROMPT, type FoodSuggestData } from "@/lib/gemini";
 import { supabaseAdmin, PUBLIC_BUCKET } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 
 export type SuggestFoodResult =
   | { ok: true; data: FoodSuggestData & { imageUrl: string | null } }
@@ -73,5 +75,9 @@ export async function suggestFoodData(formData: FormData): Promise<SuggestFoodRe
   }
 
   const imageUrl = await findAndStorePhoto(data.imageSearchQuery);
+
+  const actor = await getCurrentUser();
+  await logAudit({ actorUserId: actor?.id, action: "CHAMADA_IA", entity: "Food", metadata: { finalidade: "sugestao_nutricional", nome: name } });
+
   return { ok: true, data: { ...data, imageUrl } };
 }

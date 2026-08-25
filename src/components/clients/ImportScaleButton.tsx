@@ -120,6 +120,7 @@ export function ImportScaleButton({ clientId, clientName }: { clientId: string; 
 
             {step === "upload" && (
               <form ref={formRef} action={handleExtract} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <input type="hidden" name="clientId" value={clientId} />
                 <p className="text-muted" style={{ fontSize: "0.85rem" }}>
                   Envie o relatório em PDF da balança de bioimpedância (ex: Bioeasy Pro). A IA vai ler os dados e
                   você poderá conferir tudo antes de salvar.

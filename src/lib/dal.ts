@@ -4,6 +4,7 @@ import { KANBAN_STATUSES, type KanbanStatusValue } from "@/lib/utils";
 
 export async function getKanbanBoard() {
   const clients = await prisma.client.findMany({
+    where: { deletedAt: null },
     orderBy: [{ status: "asc" }, { order: "asc" }],
   });
 
@@ -17,6 +18,7 @@ export async function getKanbanBoard() {
 
 export async function getClients() {
   return prisma.client.findMany({
+    where: { deletedAt: null },
     orderBy: { name: "asc" },
     include: {
       _count: { select: { measurements: true } },
@@ -102,6 +104,7 @@ export async function getFoods(search?: string) {
 
 export async function getClientsBasic() {
   return prisma.client.findMany({
+    where: { deletedAt: null },
     select: { id: true, name: true, goal: true, status: true },
     orderBy: { name: "asc" },
   });
