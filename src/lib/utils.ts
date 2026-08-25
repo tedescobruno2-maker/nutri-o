@@ -2,6 +2,31 @@ export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+export const FOOD_PREPARATION_LABELS: Record<string, string> = {
+  NAO_APLICA: "Padrão",
+  CRU: "Cru",
+  COZIDO: "Cozido",
+  ASSADO: "Assado",
+  GRELHADO: "Grelhado",
+  REFOGADO: "Refogado",
+  FRITO: "Frito",
+  MEXIDO: "Mexido",
+  OMELETE: "Omelete",
+  PURE: "Purê",
+  VAPOR: "No vapor",
+  DESIDRATADO: "Desidratado",
+  EM_PO: "Em pó",
+};
+
+export const NUTRIENT_SOURCE_LABELS: Record<string, string> = {
+  TACO: "TACO",
+  IBGE_POF: "IBGE/POF",
+  USDA: "USDA",
+  ROTULO: "Rótulo",
+  MANUAL: "Manual",
+  IMPORTADO_PENDENTE: "Importado (pendente)",
+};
+
 export function initials(name: string) {
   return name
     .trim()

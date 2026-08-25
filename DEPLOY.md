@@ -33,6 +33,21 @@ alteração de schema com segurança.
   migrações separadas): adicionar a coluna como opcional → preencher (backfill) os valores → só
   então tornar obrigatória.
 
+### Seeds do catálogo de alimentos (a partir da Fase 2 do plano mestre)
+
+- **`npm run db:seed-taco`** — importa os 597 alimentos da TACO 4ª ed. (NEPA/Unicamp, 2011) a
+  partir de `prisma/seed-data/taco-4ed.xlsx` (arquivo oficial baixado e versionado no repo, nunca
+  hotlink). Idempotente — pode rodar de novo sem duplicar. Usa a lib `xlsx` (SheetJS) só neste
+  script de seed offline, nunca em código que roda em produção nem sobre arquivo enviado por
+  usuário — a versão publicada no registro do npm (0.18.5) tem CVEs conhecidas (prototype
+  pollution/ReDoS) não corrigidas ali; o uso aqui é seguro porque o único arquivo processado é o
+  `taco-4ed.xlsx` do próprio repositório, nunca um upload externo.
+- **`npm run db:seed-textos`** / **`npm run db:seed-grupos`** — importam a Biblioteca de Textos e
+  os 9 Grupos de Escolha a partir de `prisma/seed-data/planos-catalogo-sanitized.json` (versão do
+  catálogo consolidado dos planos reais **sem nenhum identificador de paciente** — nomes, arquivos
+  de origem e contagem por paciente foram removidos; o arquivo original com essa informação vive
+  só em `_PLANO-MESTRE/`, fora do git). Ambos idempotentes.
+
 ## 2. Variáveis de ambiente (Vercel)
 
 Configure em Vercel → Project Settings → Environment Variables:

@@ -93,11 +93,14 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
                       )}
                       {item.food ? item.food.name : item.description}
                     </div>
-                    {item.food && (
+                    {item.food && item.food.kcal100 != null && (
                       <div className="ingredient-meta">
                         {item.food.kcal100} kcal · P {item.food.protein100}g · C {item.food.carbs100}g · G {item.food.fat100}g{" "}
                         <span className="text-tertiary">(por 100{item.food.defaultUnit === "ml" ? "ml" : "g"})</span>
                       </div>
+                    )}
+                    {item.food && item.food.kcal100 == null && (
+                      <div className="ingredient-meta text-tertiary">Alimento pendente (sem valor nutricional confirmado)</div>
                     )}
                   </div>
                 </li>

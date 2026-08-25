@@ -134,25 +134,40 @@ export function NewFoodButton() {
                   <input className="input" id="f-unit" name="defaultUnit" defaultValue="g" placeholder="g, ml, unidade..." />
                 </div>
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div className="field">
+                  <label htmlFor="f-brand">Marca (opcional)</label>
+                  <input className="input" id="f-brand" name="brand" placeholder="Ex: Danone, Yopro..." />
+                </div>
+                <div className="field">
+                  <label htmlFor="f-source">Fonte do dado nutricional</label>
+                  <select className="input" id="f-source" name="source" defaultValue="MANUAL">
+                    <option value="MANUAL">Digitado agora (manual)</option>
+                    <option value="ROTULO">Rótulo do produto</option>
+                  </select>
+                </div>
+              </div>
               <p className="text-tertiary" style={{ fontSize: "0.76rem" }}>
-                Valores nutricionais por 100g (ou 100ml){suggested ? " — sugeridos pela IA, confira antes de salvar:" : ":"}
+                Valores nutricionais por 100g (ou 100ml){suggested ? " — sugeridos pela IA, confira antes de salvar" : ""}. Deixe em
+                branco se ainda não souber — o alimento fica marcado como &quot;pendente&quot; e não entra no cálculo do plano até ser
+                preenchido.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
                 <div className="field">
                   <label htmlFor="f-kcal">Kcal</label>
-                  <input className="input" id="f-kcal" name="kcal100" type="number" step="0.1" min={0} required value={kcal} onChange={(e) => setKcal(e.target.value)} />
+                  <input className="input" id="f-kcal" name="kcal100" type="number" step="0.1" min={0} value={kcal} onChange={(e) => setKcal(e.target.value)} />
                 </div>
                 <div className="field">
                   <label htmlFor="f-protein">Proteína (g)</label>
-                  <input className="input" id="f-protein" name="protein100" type="number" step="0.1" min={0} required value={protein} onChange={(e) => setProtein(e.target.value)} />
+                  <input className="input" id="f-protein" name="protein100" type="number" step="0.1" min={0} value={protein} onChange={(e) => setProtein(e.target.value)} />
                 </div>
                 <div className="field">
                   <label htmlFor="f-carbs">Carbo (g)</label>
-                  <input className="input" id="f-carbs" name="carbs100" type="number" step="0.1" min={0} required value={carbs} onChange={(e) => setCarbs(e.target.value)} />
+                  <input className="input" id="f-carbs" name="carbs100" type="number" step="0.1" min={0} value={carbs} onChange={(e) => setCarbs(e.target.value)} />
                 </div>
                 <div className="field">
                   <label htmlFor="f-fat">Gordura (g)</label>
-                  <input className="input" id="f-fat" name="fat100" type="number" step="0.1" min={0} required value={fat} onChange={(e) => setFat(e.target.value)} />
+                  <input className="input" id="f-fat" name="fat100" type="number" step="0.1" min={0} value={fat} onChange={(e) => setFat(e.target.value)} />
                 </div>
               </div>
               {fiber && <input type="hidden" name="fiber100" value={fiber} />}

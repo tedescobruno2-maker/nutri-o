@@ -14,13 +14,20 @@ export function MealOptionItemChip({ item, clientId }: { item: MealOptionItemVie
   const label = item.food ? item.food.name : item.recipe ? item.recipe.name : item.description || "Item";
   const qty = item.quantity ? `${item.quantity}${item.unit ? ` ${item.unit}` : ""}` : null;
 
+  const hasConfirmedMacros =
+    item.food &&
+    item.food.kcal100 != null &&
+    item.food.protein100 != null &&
+    item.food.carbs100 != null &&
+    item.food.fat100 != null;
+
   const macros =
-    item.food && item.quantity
+    item.food && item.quantity && hasConfirmedMacros
       ? {
-          kcal: Math.round((item.food.kcal100 * item.quantity) / 100),
-          protein: round1((item.food.protein100 * item.quantity) / 100),
-          carbs: round1((item.food.carbs100 * item.quantity) / 100),
-          fat: round1((item.food.fat100 * item.quantity) / 100),
+          kcal: Math.round((item.food.kcal100! * item.quantity) / 100),
+          protein: round1((item.food.protein100! * item.quantity) / 100),
+          carbs: round1((item.food.carbs100! * item.quantity) / 100),
+          fat: round1((item.food.fat100! * item.quantity) / 100),
         }
       : null;
 
@@ -28,7 +35,13 @@ export function MealOptionItemChip({ item, clientId }: { item: MealOptionItemVie
     <span
       className="badge badge-primary"
       style={{ display: "inline-flex", alignItems: "center", gap: 6, opacity: isPending ? 0.5 : 1, cursor: "pointer" }}
-      title={macros ? `${macros.kcal} kcal · P ${macros.protein}g · C ${macros.carbs}g · G ${macros.fat}g — clique para remover` : "Clique para remover"}
+      title={
+        macros
+          ? `${macros.kcal} kcal · P ${macros.protein}g · C ${macros.carbs}g · G ${macros.fat}g — clique para remover`
+          : item.food && !hasConfirmedMacros
+            ? "Alimento pendente (sem valor nutricional confirmado) — clique para remover"
+            : "Clique para remover"
+      }
       onClick={() => startTransition(() => deleteMealOptionItem(item.id, clientId))}
     >
       {item.food?.imageUrl && (

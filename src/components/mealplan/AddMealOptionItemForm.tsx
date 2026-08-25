@@ -27,6 +27,10 @@ export function AddMealOptionItemForm({
 
   const preview = useMemo(() => {
     if (!selectedFood) return null;
+    // Alimento PENDENTE (sem valor nutricional confirmado) — nunca inventa um número aqui.
+    if (selectedFood.kcal100 == null || selectedFood.protein100 == null || selectedFood.carbs100 == null || selectedFood.fat100 == null) {
+      return null;
+    }
     const qty = parseFloat(quantity);
     const factor = (Number.isFinite(qty) && qty > 0 ? qty : 100) / 100;
     return {
@@ -130,6 +134,11 @@ export function AddMealOptionItemForm({
             {preview.kcal} kcal · P {preview.protein}g · C {preview.carbs}g · G {preview.fat}g
           </div>
         </div>
+      )}
+      {selectedFood && !preview && (
+        <p className="text-tertiary" style={{ fontSize: "0.78rem" }}>
+          Este alimento ainda não tem valor nutricional confirmado (pendente) — ele será adicionado, mas não entra no cálculo do plano até ser preenchido em Banco de Alimentos.
+        </p>
       )}
     </form>
   );

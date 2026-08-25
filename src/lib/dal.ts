@@ -102,6 +102,57 @@ export async function getFoods(search?: string) {
   });
 }
 
+/**
+ * Tela `/alimentos` (Fase 2): agrupa por `baseName` — cada grupo é um alimento-base com seus
+ * preparos como variantes (ex.: "Ovo de galinha, inteiro" agrupa cru/cozido/frito). O agrupamento
+ * é feito aqui, não por `parentFoodId`, porque a busca precisa achar o grupo mesmo quando o termo
+ * só bate no nome de uma variante (ex.: buscar "frito" acha o grupo do ovo mesmo que o cru tenha
+ * virado o "pai" na importação).
+ */
+export async function getFoodsGrouped(search?: string, category?: string) {
+  const foods = await prisma.food.findMany({
+    where: {
+      active: true,
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { baseName: { contains: search, mode: "insensitive" } },
+              { aliases: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(category ? { category } : {}),
+    },
+    orderBy: [{ baseName: "asc" }, { preparation: "asc" }],
+  });
+
+  const groups = new Map<string, typeof foods>();
+  for (const food of foods) {
+    const list = groups.get(food.baseName) ?? [];
+    list.push(food);
+    groups.set(food.baseName, list);
+  }
+
+  return [...groups.values()]
+    .map((variants) => ({
+      baseName: variants[0].baseName,
+      representative: variants.find((v) => v.preparation === "NAO_APLICA") ?? variants[0],
+      variants,
+    }))
+    .sort((a, b) => a.baseName.localeCompare(b.baseName, "pt-BR"));
+}
+
+export async function getFoodCategories() {
+  const rows = await prisma.food.findMany({
+    where: { active: true, category: { not: null } },
+    select: { category: true },
+    distinct: ["category"],
+    orderBy: { category: "asc" },
+  });
+  return rows.map((r) => r.category as string);
+}
+
 export async function getClientsBasic() {
   return prisma.client.findMany({
     where: { deletedAt: null },

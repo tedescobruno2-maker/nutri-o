@@ -340,21 +340,122 @@ model DietLog {
 // Banco de alimentos
 // ---------------------------------------------------------------------------
 
-model Food {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  category    String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
-  defaultUnit String   @default("g") // g, ml, unidade, fatia, colher de sopa...
-  imageUrl    String? // foto ilustrativa do alimento (Pixabay, ou upload manual)
-  kcal100     Float // kcal por 100g (ou por 100ml)
-  protein100  Float
-  carbs100    Float
-  fat100      Float
-  fiber100    Float?
-  createdAt   DateTime @default(now())
+enum NutrientSource {
+  TACO // NEPA/Unicamp, 4ª ed. 2011
+  IBGE_POF // Tabelas POF 2008-2009
+  USDA // FoodData Central (CC0)
+  ROTULO // rótulo do produto
+  MANUAL // digitado pela nutricionista
+  IMPORTADO_PENDENTE // veio de uma migração anterior, sem valor nutricional
+}
 
+enum NutrientStatus {
+  VALIDADO // entra no somatório calórico
+  PENDENTE // NÃO entra no somatório; interface sinaliza
+}
+
+enum FoodPreparation {
+  NAO_APLICA
+  CRU
+  COZIDO
+  ASSADO
+  GRELHADO
+  REFOGADO
+  FRITO
+  MEXIDO
+  OMELETE
+  PURE
+  VAPOR
+  DESIDRATADO
+  EM_PO
+}
+
+model Food {
+  id           String          @id @default(cuid())
+  name         String // nome de exibição completo, ex: "Ovo de galinha, inteiro, cozido"
+  baseName     String // nome canônico do alimento-base, ex: "Ovo de galinha, inteiro"
+  preparation  FoodPreparation @default(NAO_APLICA)
+  parentFoodId String? // agrupa preparos irmãos
+  parentFood   Food?           @relation("FoodVariants", fields: [parentFoodId], references: [id])
+  variants     Food[]          @relation("FoodVariants")
+
+  brand       String? // DANONE, YOPRO, VERDE CAMPO...
+  category    String? // Proteína, Carboidrato, Fruta, Laticínio, Gordura, Legume/Verdura, Leguminosa...
+  defaultUnit String  @default("g") // g, ml, unidade, fatia, colher de sopa...
+  imageUrl    String? // foto ilustrativa do alimento (Pixabay, ou upload manual)
+  imageCredit String? // origem/licença da foto
+  aliases     String? // nomes regionais alternativos, separados por "|" (ex: "Mexerica|Tangerina")
+
+  kcal100    Float? // kcal por 100g (ou por 100ml) — opcional, pode estar pendente
+  protein100 Float?
+  carbs100   Float?
+  fat100     Float?
+  fiber100   Float?
+  sodium100  Float?
+
+  source         NutrientSource @default(MANUAL)
+  sourceRef      String? // código TACO, página do IBGE, URL do FoodData Central
+  nutrientStatus NutrientStatus @default(PENDENTE)
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  measures          FoodMeasure[]
   mealOptionItems   MealOptionItem[]
   recipeIngredients RecipeIngredient[]
+  choiceGroupItems  ChoiceGroupItem[]
+
+  @@unique([baseName, preparation, brand])
+  @@index([parentFoodId])
+  @@index([category])
+}
+
+/// Medida caseira com gramatura. Um alimento pode ter várias.
+model FoodMeasure {
+  id        String         @id @default(cuid())
+  foodId    String
+  food      Food           @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  label     String // "1 fatia", "1 concha média", "1 colher de sopa", "1 unidade", "1 dose"
+  grams     Float // gramatura correspondente
+  source    NutrientSource @default(MANUAL)
+  sourceRef String?
+  isDefault Boolean        @default(false)
+
+  mealOptionItems MealOptionItem[]
+
+  @@unique([foodId, label])
+  @@index([foodId])
+}
+
+/// "PROTEÍNA: 180 GR (frango, patinho, tilápia...)" — grupo de opções equivalentes de um plano.
+model ChoiceGroup {
+  id              String  @id @default(cuid())
+  name            String  @unique // "Proteína — almoço", "Carboidrato — escolher uma opção"
+  displayLabel    String // rótulo literal impresso no PDF: "PROTEÍNA: 180 GR"
+  defaultQuantity Float? // quantidade do cabeçalho do grupo
+  defaultUnit     String?
+  quantityText    String? // "A VONTADE", "ESCOLHER UMA OPÇÃO"
+  notes           String? // "PRIORIZAR VEGETAIS VERDE ESCUROS"
+  order           Int     @default(0)
+
+  items           ChoiceGroupItem[]
+  mealOptionItems MealOptionItem[]
+}
+
+model ChoiceGroupItem {
+  id            String      @id @default(cuid())
+  choiceGroupId String
+  choiceGroup   ChoiceGroup @relation(fields: [choiceGroupId], references: [id], onDelete: Cascade)
+  foodId        String?
+  food          Food?       @relation(fields: [foodId], references: [id])
+  description   String? // quando não há Food estruturado
+  quantity      Float? // sobrepõe defaultQuantity do grupo
+  unit          String?
+  order         Int         @default(0)
+
+  @@index([choiceGroupId])
+  @@index([foodId])
 }
 
 // ---------------------------------------------------------------------------
@@ -440,21 +541,27 @@ model MealOption {
 }
 
 model MealOptionItem {
-  id           String     @id @default(cuid())
-  mealOptionId String
-  mealOption   MealOption @relation(fields: [mealOptionId], references: [id], onDelete: Cascade)
-  foodId       String?
-  food         Food?      @relation(fields: [foodId], references: [id])
-  recipeId     String?
-  recipe       Recipe?    @relation(fields: [recipeId], references: [id])
-  description  String? // fallback texto quando não há food/recipe estruturado
-  quantity     Float?
-  unit         String?
-  order        Int        @default(0)
+  id            String       @id @default(cuid())
+  mealOptionId  String
+  mealOption    MealOption   @relation(fields: [mealOptionId], references: [id], onDelete: Cascade)
+  foodId        String?
+  food          Food?        @relation(fields: [foodId], references: [id])
+  foodMeasureId String? // medida caseira escolhida (sobrepõe quantity/unit quando presente)
+  foodMeasure   FoodMeasure? @relation(fields: [foodMeasureId], references: [id])
+  recipeId      String?
+  recipe        Recipe?      @relation(fields: [recipeId], references: [id])
+  choiceGroupId String? // item referencia um grupo de escolha em vez de um alimento único
+  choiceGroup   ChoiceGroup? @relation(fields: [choiceGroupId], references: [id])
+  description   String? // fallback texto quando não há food/recipe/grupo estruturado
+  quantity      Float?
+  unit          String?
+  order         Int          @default(0)
 
   @@index([mealOptionId])
   @@index([foodId])
+  @@index([foodMeasureId])
   @@index([recipeId])
+  @@index([choiceGroupId])
 }
 
 // ---------------------------------------------------------------------------
@@ -551,7 +658,7 @@ enum GuidanceTextType {
 model GuidanceText {
   id        String           @id @default(cuid())
   title     String // rótulo curto para localizar
-  content   String // texto completo, aceita quebras de linha
+  content   String           @unique // texto completo, aceita quebras de linha — chave natural do seed
   type      GuidanceTextType @default(ORIENTACAO_GERAL)
   tags      String? // ex: "corrida curta,musculação"
   createdAt DateTime         @default(now())

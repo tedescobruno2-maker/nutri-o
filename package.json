@@ -12,6 +12,10 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-taco": "tsx prisma/seed-taco.ts",
+    "db:seed-medidas": "tsx prisma/seed-medidas.ts",
+    "db:seed-grupos": "tsx prisma/seed-grupos.ts",
+    "db:seed-textos": "tsx prisma/seed-textos.ts",
     "db:studio": "prisma studio",
     "db:import-postgres": "tsx prisma/import-to-postgres.ts",
     "db:export-backup": "tsx prisma/export-full-backup.ts"
@@ -36,6 +40,7 @@
     "recharts": "^3.10.1",
     "resend": "^6.19.0",
     "server-only": "^0.0.1",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
