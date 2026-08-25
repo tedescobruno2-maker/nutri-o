@@ -146,7 +146,8 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
           {settings.phone && <span>📞 {settings.phone}</span>}
           {settings.email && <span>✉️ {settings.email}</span>}
           {settings.address && <span>📍 {settings.address}</span>}
-          {settings.footerText && <span>{settings.footerText}</span>}
+          {settings.instagram && <span>📷 {settings.instagram}</span>}
+          {settings.footerText && <span style={{ whiteSpace: "pre-line" }}>{settings.footerText}</span>}
         </footer>
       </div>
     </div>

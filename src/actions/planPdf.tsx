@@ -42,6 +42,7 @@ export async function generateMealPlanPdf(mealPlanId: string, withPhotos: boolea
   }));
 
   const initialGuidanceText = plan.initialGuidanceOverride || plan.initialGuidance?.content || null;
+  const generatedAt = new Date();
 
   const buffer = await renderToBuffer(
     <MealPlanDocument
@@ -53,6 +54,8 @@ export async function generateMealPlanPdf(mealPlanId: string, withPhotos: boolea
         address: settings.address,
         phone: settings.phone,
         email: settings.email,
+        instagram: settings.instagram,
+        footerText: settings.footerText,
       }}
       client={{ name: plan.client.name, age }}
       weight={weight}
@@ -62,10 +65,11 @@ export async function generateMealPlanPdf(mealPlanId: string, withPhotos: boolea
       generalGuidelines={plan.generalGuidelines}
       meals={meals}
       withPhotos={withPhotos}
+      generatedAt={generatedAt}
     />
   );
 
-  const fileName = mealPlanPdfFileName(plan.client.name, new Date());
+  const fileName = mealPlanPdfFileName(plan.client.name, generatedAt);
   const objectPath = await saveGeneratedDocument(buffer, `planos/${mealPlanId}`, withPhotos ? "com-fotos.pdf" : "sem-fotos.pdf", "application/pdf");
 
   await prisma.mealPlan.update({

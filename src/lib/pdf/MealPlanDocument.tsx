@@ -27,12 +27,17 @@ const styles = StyleSheet.create({
   headerName: { fontSize: 12, fontWeight: "bold" },
   headerCrn: { fontSize: 9, color: "#555" },
   footer: { position: "absolute", bottom: 20, left: 36, right: 36, borderTop: "1pt solid #ccc", paddingTop: 6, flexDirection: "column" },
-  footerRow: { flexDirection: "row", justifyContent: "space-between", fontSize: 8, color: "#555" },
+  // Página X de Y fica na SUA PRÓPRIA linha, nunca ao lado do contato — o contato pode ser longo
+  // (endereço + telefone + e-mail + instagram) e colidiria com o número de página na mesma linha.
+  footerPageNumber: { fontSize: 8, color: "#555", textAlign: "right", marginBottom: 1 },
+  footerContact: { fontSize: 8, color: "#555" },
+  footerCustomLine: { fontSize: 8, color: "#555", textAlign: "center", marginTop: 1 },
   footerCitation: { fontSize: 7, color: "#888", marginTop: 2, textAlign: "center" },
   identBlock: { marginBottom: 14, flexDirection: "column" },
-  identRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 2 },
+  identRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 2 },
   identLabel: { fontSize: 10 },
-  planTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 10 },
+  planTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 6 },
+  identGenerated: { fontSize: 8, color: "#888" },
   block: { marginBottom: 12, flexDirection: "column" },
   blockTitle: { fontSize: 12, fontWeight: "bold", textTransform: "uppercase", marginBottom: 4, backgroundColor: "#f2f2f2", padding: 4 },
   option: { flexDirection: "column", marginBottom: 2 },
@@ -68,7 +73,17 @@ export type PdfMeal = {
 };
 
 export type MealPlanDocumentProps = {
-  professional: { nutritionistName: string; crn: string; crnRegion: string | null; logoUrl: string | null; address: string | null; phone: string | null; email: string | null };
+  professional: {
+    nutritionistName: string;
+    crn: string;
+    crnRegion: string | null;
+    logoUrl: string | null;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+    instagram: string | null;
+    footerText: string | null;
+  };
   client: { name: string; age: number | null };
   weight: number | null;
   consultationDate: Date | null;
@@ -77,6 +92,7 @@ export type MealPlanDocumentProps = {
   generalGuidelines: string | null;
   meals: PdfMeal[];
   withPhotos: boolean;
+  generatedAt: Date;
 };
 
 function formatDatePt(date: Date | null) {
@@ -84,9 +100,13 @@ function formatDatePt(date: Date | null) {
   return date.toLocaleDateString("pt-BR");
 }
 
-export function MealPlanDocument({ professional, client, weight, consultationDate, objective, initialGuidanceText, generalGuidelines, meals, withPhotos }: MealPlanDocumentProps) {
+export function MealPlanDocument({ professional, client, weight, consultationDate, objective, initialGuidanceText, generalGuidelines, meals, withPhotos, generatedAt }: MealPlanDocumentProps) {
   const crnLine = professional.crnRegion ? `CRN ${professional.crnRegion} ${professional.crn}` : `CRN ${professional.crn}`;
   const visibleMeals = meals.filter((m) => m.visible);
+  const footerContactLine = [professional.address, professional.phone, professional.email, professional.instagram].filter(Boolean).join(" · ");
+  const footerCustomLines = professional.footerText
+    ? professional.footerText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+    : [];
 
   return (
     <Document>
@@ -104,7 +124,10 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
         </View>
 
         <View style={styles.identBlock}>
-          <Text style={styles.planTitle}>Plano Alimentar</Text>
+          <View style={styles.identRow}>
+            <Text style={styles.planTitle}>Plano Alimentar</Text>
+            <Text style={styles.identGenerated}>Gerado em {formatDatePt(generatedAt)}</Text>
+          </View>
           <View style={styles.identRow}>
             <Text style={styles.identLabel}>Paciente: {client.name}</Text>
             {client.age != null && <Text style={styles.identLabel}>Idade: {client.age} anos</Text>}
@@ -192,12 +215,11 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
         )}
 
         <View style={styles.footer} fixed>
-          <View style={styles.footerRow}>
-            <Text>
-              {[professional.address, professional.phone, professional.email].filter(Boolean).join(" · ")}
-            </Text>
-            <Text render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
-          </View>
+          <Text style={styles.footerPageNumber} render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
+          <Text style={styles.footerContact}>{footerContactLine}</Text>
+          {footerCustomLines.map((line, i) => (
+            <Text key={i} style={styles.footerCustomLine}>{line}</Text>
+          ))}
           <Text style={styles.footerCitation}>Composição: NEPA/UNICAMP. TACO, 4ª ed. rev. e ampl. Campinas, 2011.</Text>
         </View>
       </Page>
