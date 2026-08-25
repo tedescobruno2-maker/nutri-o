@@ -32,7 +32,6 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
         <div style={{ display: "flex", gap: 8 }}>
           <PrintButton />
           <GeneratePdfButton mealPlanId={plan.id} withPhotos={true} label="📄 Gerar PDF" />
-          <GeneratePdfButton mealPlanId={plan.id} withPhotos={false} label="📄 Gerar PDF (sem fotos)" />
         </div>
       </div>
 
@@ -75,7 +74,16 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
 
         {visibleMeals.map((meal) => (
           <section key={meal.id} className="plan-doc-meal">
-            <h3>{(meal.displayTitle || MEAL_BLOCK_TYPE_LABELS[meal.blockType] || meal.name).toUpperCase()}</h3>
+            <h3>
+              {(
+                meal.displayTitle ||
+                // blockType=LIVRE é o default de migração para refeições antigas (pré-Fase 4) —
+                // nesse caso o nome original digitado (meal.name) é mais informativo que o
+                // rótulo genérico "Bloco livre" (mesmo ajuste feito no PDF real).
+                (meal.blockType !== "LIVRE" ? MEAL_BLOCK_TYPE_LABELS[meal.blockType] : null) ||
+                meal.name
+              ).toUpperCase()}
+            </h3>
 
             {meal.separator === "LISTA" ? (
               <ul style={{ paddingLeft: 18, listStyle: "disc", display: "flex", flexDirection: "column", gap: 4 }}>
@@ -121,7 +129,22 @@ export default async function ExportPlanPage({ params }: { params: Promise<{ id:
                           })}
                         </ul>
                       ) : (
-                        <p className="plan-doc-ingredients">{option.freeText}</p>
+                        <>
+                          {(() => {
+                            const linkedRecipe = option.items.find((i) => i.recipe)?.recipe;
+                            if (!linkedRecipe) return null;
+                            return (
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                                {linkedRecipe.imageUrl && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={linkedRecipe.imageUrl} alt={linkedRecipe.name} style={{ width: 40, height: 40, borderRadius: "var(--radius-sm)", objectFit: "cover" }} />
+                                )}
+                                <strong>{linkedRecipe.name}</strong>
+                              </div>
+                            );
+                          })()}
+                          <p className="plan-doc-ingredients">{option.freeText}</p>
+                        </>
                       )}
                     </div>
                   </div>

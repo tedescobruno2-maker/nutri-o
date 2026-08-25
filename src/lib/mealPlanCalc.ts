@@ -25,6 +25,7 @@ export type MealOptionItemLike = {
   recipe: {
     name: string;
     servings: number | null;
+    imageUrl?: string | null;
     ingredientItems: Array<{ food: FoodLike | null; description: string | null; quantity: number | null; unit: string | null }>;
   } | null;
   choiceGroup: {

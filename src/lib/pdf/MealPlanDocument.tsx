@@ -41,6 +41,8 @@ const styles = StyleSheet.create({
   blockTitle: { fontSize: 12, fontWeight: "bold", textTransform: "uppercase", marginBottom: 4, backgroundColor: "#f2f2f2", padding: 4 },
   option: { flexDirection: "column", marginBottom: 2 },
   optionSeparator: { textAlign: "center", fontSize: 9, color: "#888", marginVertical: 2 },
+  optionLabel: { fontSize: 10, fontWeight: "bold", marginBottom: 2 },
+  recipeTitle: { fontSize: 11, fontWeight: "bold" },
   optionItemRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 2, gap: 6 },
   itemPhoto: { width: 24, height: 24, borderRadius: 3, objectFit: "cover" },
   // itemText: só dentro de optionItemRow (flexDirection row) — o flex:1 faz o texto ocupar o
@@ -172,12 +174,15 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
               : meal.options.map((option, optionIndex) => (
                   <View key={option.id} style={styles.option}>
                     {optionIndex > 0 && <Text style={styles.optionSeparator}>— OU —</Text>}
+                    {meal.options.length > 1 && <Text style={styles.optionLabel}>{option.label}</Text>}
                     {option.isStructured ? (
-                      option.items.map((item, itemIndex) => (
+                      option.items.map((item, itemIndex) => {
+                        const photoUrl = item.food?.imageUrl || item.recipe?.imageUrl;
+                        return (
                         <View key={itemIndex} style={styles.optionItemRow}>
-                          {withPhotos && item.food?.imageUrl && (
+                          {withPhotos && photoUrl && (
                             // eslint-disable-next-line jsx-a11y/alt-text
-                            <Image src={item.food.imageUrl} style={styles.itemPhoto} />
+                            <Image src={photoUrl} style={styles.itemPhoto} />
                           )}
                           <Text style={styles.itemText}>
                             {itemQuantityLabel(item) ? `${itemQuantityLabel(item)} de ` : ""}
@@ -186,13 +191,32 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
                           </Text>
                           {itemKcalLabel(item) && <Text style={styles.itemKcal}>{itemKcalLabel(item)}</Text>}
                         </View>
-                      ))
+                        );
+                      })
                     ) : (
-                      // <Text> não quebra em \n sozinho — cada linha vira seu próprio <Text>,
-                      // senão o texto sobrepõe (bug real, pego testando com um plano real).
-                      option.freeText.split("\n").filter(Boolean).map((line, i) => (
-                        <Text key={i} style={styles.freeTextLine}>{line}</Text>
-                      ))
+                      <>
+                        {/* Opção legada (isStructured=false) com receita vinculada: mantém o
+                            freeText como o texto autoritativo (5.5.3), mas resgata nome + foto da
+                            receita — é exatamente o que sumiu ao migrar do card único antigo. */}
+                        {(() => {
+                          const linkedRecipe = option.items.find((i) => i.recipe)?.recipe;
+                          if (!linkedRecipe) return null;
+                          return (
+                            <View style={styles.optionItemRow}>
+                              {withPhotos && linkedRecipe.imageUrl && (
+                                // eslint-disable-next-line jsx-a11y/alt-text
+                                <Image src={linkedRecipe.imageUrl} style={styles.itemPhoto} />
+                              )}
+                              <Text style={styles.recipeTitle}>{linkedRecipe.name}</Text>
+                            </View>
+                          );
+                        })()}
+                        {/* <Text> não quebra em \n sozinho — cada linha vira seu próprio <Text>,
+                            senão o texto sobrepõe (bug real, pego testando com um plano real). */}
+                        {option.freeText.split("\n").filter(Boolean).map((line, i) => (
+                          <Text key={i} style={styles.freeTextLine}>{line}</Text>
+                        ))}
+                      </>
                     )}
                   </View>
                 ))}
