@@ -1,6 +1,12 @@
 "use client";
 
 import { ViewToggle, useViewMode } from "@/components/ui/ViewToggle";
+import { ConfirmActionButton } from "@/components/ui/ConfirmActionButton";
+import { SupplementModal } from "@/components/suplementos/SupplementModal";
+import { SupplementBrandModal } from "@/components/suplementos/SupplementBrandModal";
+import { SupplementProductModal } from "@/components/suplementos/SupplementProductModal";
+import { CompoundedFormulaModal } from "@/components/suplementos/CompoundedFormulaModal";
+import { deleteSupplement, deleteSupplementBrand, deleteSupplementProduct, deleteCompoundedFormula } from "@/actions/supplements";
 import type { getSupplementCatalog } from "@/lib/dal";
 
 type Catalog = Awaited<ReturnType<typeof getSupplementCatalog>>;
@@ -24,10 +30,11 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
         <div className="card card-pad">
           <div className="chart-card-header">
             <h3>Ativos</h3>
+            <SupplementModal trigger={<span className="btn btn-primary btn-sm">+ Novo ativo</span>} />
           </div>
           {archivedCount > 0 && (
             <p className="text-tertiary" style={{ fontSize: "0.78rem", marginBottom: 8 }}>
-              {archivedCount} suplemento(s) legado(s) (registros livres de pacientes antes da Fase 6) arquivado(s) — ainda ligados às prescrições antigas, sem aparecer aqui.
+              {archivedCount} suplemento(s) legado(s) ou arquivado(s) (registros livres de pacientes antes da Fase 6, ou removidos por aqui) — ainda ligados às prescrições antigas, sem aparecer aqui.
             </p>
           )}
 
@@ -42,6 +49,7 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                     <th>Horário padrão</th>
                     <th>Origem</th>
                     <th>Marcas cadastradas</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -53,6 +61,10 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                       <td className="text-muted">{a.defaultTiming ?? "—"}</td>
                       <td className="text-muted">{ORIGIN_LABELS[a.origin]}</td>
                       <td className="text-muted">{a._count.products}</td>
+                      <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <SupplementModal supplement={a} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                        <ConfirmActionButton label="Remover" confirmText={`Arquivar o ativo "${a.activeName}"?`} onConfirm={() => deleteSupplement(a.id)} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -70,6 +82,10 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                     <span className="badge badge-neutral" style={{ fontSize: "0.68rem" }}>{ORIGIN_LABELS[a.origin]}</span>
                     <span className="text-tertiary" style={{ fontSize: "0.74rem" }}>{a._count.products} marca(s)</span>
                   </div>
+                  <div style={{ display: "flex", gap: 4, marginTop: 8, borderTop: "1px solid var(--border-subtle)", paddingTop: 8 }}>
+                    <SupplementModal supplement={a} trigger={<span className="btn btn-ghost btn-sm">✎ Editar</span>} />
+                    <ConfirmActionButton label="Remover" confirmText={`Arquivar o ativo "${a.activeName}"?`} onConfirm={() => deleteSupplement(a.id)} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -81,11 +97,21 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
         <div className="card card-pad">
           <div className="chart-card-header">
             <h3>Marcas e produtos</h3>
+            <SupplementBrandModal trigger={<span className="btn btn-primary btn-sm">+ Nova marca</span>} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {brands.map((brand) => (
               <div key={brand.id}>
-                <strong style={{ fontSize: "0.9rem" }}>{brand.name}</strong>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: "0.9rem" }}>{brand.name}</strong>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    <SupplementProductModal actives={actives} brands={brands} defaultBrandId={brand.id} trigger={<span className="btn btn-ghost btn-sm">+ Produto</span>} />
+                    <SupplementBrandModal brand={brand} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                    {brand.products.length === 0 && (
+                      <ConfirmActionButton label="Remover" confirmText={`Remover a marca "${brand.name}"?`} onConfirm={() => deleteSupplementBrand(brand.id)} />
+                    )}
+                  </div>
+                </div>
                 {brand.products.length === 0 ? (
                   <p className="text-tertiary" style={{ fontSize: "0.8rem", marginTop: 4 }}>Nenhum produto cadastrado.</p>
                 ) : mode === "table" ? (
@@ -100,6 +126,7 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                           <th>Dose no rótulo</th>
                           <th>Tabela nutricional</th>
                           <th>Origem do dado</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -112,6 +139,10 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                             <td className="text-muted">{p.doseLabel ?? "—"}</td>
                             <td className="text-muted">{p.nutritionJson ? "Impressa no rótulo" : "Pendente (rótulo não traz)"}</td>
                             <td className="text-tertiary" style={{ fontSize: "0.76rem" }}>{p.sourceRef ?? "—"}</td>
+                            <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                              <SupplementProductModal product={p} actives={actives} brands={brands} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                              <ConfirmActionButton label="Remover" confirmText={`Arquivar o produto "${p.commercialName}"?`} onConfirm={() => deleteSupplementProduct(p.id)} />
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -129,6 +160,10 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                         <span className="badge badge-neutral" style={{ fontSize: "0.66rem", marginTop: 6, display: "inline-block" }}>
                           {p.nutritionJson ? "Tabela impressa no rótulo" : "Tabela pendente"}
                         </span>
+                        <div style={{ display: "flex", gap: 4, marginTop: 8, borderTop: "1px solid var(--border-subtle)", paddingTop: 8 }}>
+                          <SupplementProductModal product={p} actives={actives} brands={brands} trigger={<span className="btn btn-ghost btn-sm">✎ Editar</span>} />
+                          <ConfirmActionButton label="Remover" confirmText={`Arquivar o produto "${p.commercialName}"?`} onConfirm={() => deleteSupplementProduct(p.id)} />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -143,11 +178,18 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
         <div className="card card-pad">
           <div className="chart-card-header">
             <h3>Fórmulas manipuladas</h3>
+            <CompoundedFormulaModal actives={actives} trigger={<span className="btn btn-primary btn-sm">+ Nova fórmula</span>} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {formulas.map((f) => (
               <div key={f.id} style={{ padding: "10px 12px", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
-                <strong style={{ fontSize: "0.9rem" }}>{f.name}</strong>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: "0.9rem" }}>{f.name}</strong>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    <CompoundedFormulaModal formula={f} actives={actives} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                    <ConfirmActionButton label="Remover" confirmText={`Remover a fórmula "${f.name}"?`} onConfirm={() => deleteCompoundedFormula(f.id)} />
+                  </div>
+                </div>
                 <p className="text-muted" style={{ fontSize: "0.8rem", margin: "4px 0" }}>{f.presentation}</p>
                 <p className="text-muted" style={{ fontSize: "0.8rem", marginBottom: 6 }}>{f.posology}</p>
                 <ul style={{ paddingLeft: 18, listStyle: "disc", fontSize: "0.82rem" }}>
