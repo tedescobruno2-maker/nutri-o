@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { GuidanceTextCard } from "@/components/settings/GuidanceTextCard";
 import { GuidanceTextsTable } from "@/components/settings/GuidanceTextsTable";
 import { ViewToggle, useViewMode } from "@/components/ui/ViewToggle";
+import { SearchCategoryFilter } from "@/components/ui/SearchCategoryFilter";
 import { PLAN_SLOTS, PLAN_SLOT_SHORT } from "@/lib/planSlots";
 import { GUIDANCE_TEXT_TYPE_LABELS as TYPE_LABELS } from "@/lib/utils";
 
@@ -16,14 +17,23 @@ type GuidanceText = {
   mealSlots?: string | null;
 };
 
+const TYPE_VALUES = Object.keys(TYPE_LABELS);
+
 export function GuidanceTextsView({ texts }: { texts: GuidanceText[] }) {
   const [mode, setMode] = useViewMode("view-mode:textos");
   const [slotFilter, setSlotFilter] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
 
   const filteredTexts = useMemo(() => {
-    if (!slotFilter) return texts;
-    return texts.filter((t) => (t.mealSlots ?? "").split(",").map((s) => s.trim()).includes(slotFilter));
-  }, [texts, slotFilter]);
+    const q = query.trim().toLowerCase();
+    return texts.filter((t) => {
+      if (slotFilter && !(t.mealSlots ?? "").split(",").map((s) => s.trim()).includes(slotFilter)) return false;
+      if (category && t.type !== category) return false;
+      if (q && !t.title.toLowerCase().includes(q) && !t.content.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [texts, slotFilter, category, query]);
 
   const byType = new Map<string, GuidanceText[]>();
   for (const t of filteredTexts) {
@@ -34,6 +44,16 @@ export function GuidanceTextsView({ texts }: { texts: GuidanceText[] }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <SearchCategoryFilter
+        query={query}
+        onQueryChange={setQuery}
+        category={category}
+        onCategoryChange={setCategory}
+        categories={TYPE_VALUES}
+        categoryLabels={TYPE_LABELS}
+        searchPlaceholder="Buscar texto..."
+      />
+
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {PLAN_SLOTS.map((slot) => {
@@ -56,7 +76,7 @@ export function GuidanceTextsView({ texts }: { texts: GuidanceText[] }) {
       {filteredTexts.length === 0 && (
         <div className="card empty-state">
           <span style={{ fontSize: "2rem" }}>📚</span>
-          <p>Nenhum texto marcado para esse horário ainda.</p>
+          <p>Nenhum texto encontrado.</p>
         </div>
       )}
 

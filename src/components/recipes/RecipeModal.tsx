@@ -9,7 +9,7 @@ import { MealSlotPicker } from "@/components/ui/MealSlotPicker";
 import { parseMealSlots } from "@/lib/planSlots";
 import type { Food, Recipe, RecipeIngredient, ImageAsset } from "@/generated/prisma/client";
 
-const MEAL_CATEGORIES = [
+export const MEAL_CATEGORIES = [
   { value: "", label: "Sem categoria" },
   { value: "desjejum", label: "Desjejum" },
   { value: "almoco", label: "Almoço" },

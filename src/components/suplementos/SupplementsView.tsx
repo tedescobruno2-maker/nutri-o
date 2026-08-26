@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { ViewToggle, useViewMode } from "@/components/ui/ViewToggle";
+import { SearchCategoryFilter } from "@/components/ui/SearchCategoryFilter";
 import { ConfirmActionButton } from "@/components/ui/ConfirmActionButton";
 import { SupplementModal } from "@/components/suplementos/SupplementModal";
 import { SupplementBrandModal } from "@/components/suplementos/SupplementBrandModal";
@@ -19,9 +21,58 @@ const ORIGIN_LABELS: Record<string, string> = {
 
 export function SupplementsView({ actives, archivedCount, brands, formulas }: Catalog) {
   const [mode, setMode] = useViewMode("view-mode:suplementos");
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const hasFilter = query.trim() !== "" || category !== "";
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of actives) if (a.category) set.add(a.category);
+    return [...set].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [actives]);
+
+  const filteredActives = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return actives.filter((a) => {
+      if (category && a.category !== category) return false;
+      if (q && !a.activeName.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [actives, category, query]);
+
+  const filteredBrands = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return brands
+      .map((brand) => ({
+        ...brand,
+        products: brand.products.filter((p) => {
+          if (category && p.supplement.category !== category) return false;
+          if (q && !p.commercialName.toLowerCase().includes(q) && !brand.name.toLowerCase().includes(q) && !p.supplement.activeName.toLowerCase().includes(q)) return false;
+          return true;
+        }),
+      }))
+      .filter((brand) => !hasFilter || brand.products.length > 0);
+  }, [brands, category, query, hasFilter]);
+
+  const filteredFormulas = useMemo(() => {
+    // Fórmulas não têm categoria — só entram no filtro por categoria quando nenhuma está selecionada.
+    if (category) return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return formulas;
+    return formulas.filter((f) => f.name.toLowerCase().includes(q) || f.items.some((item) => item.activeName.toLowerCase().includes(q)));
+  }, [formulas, category, query]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <SearchCategoryFilter
+        query={query}
+        onQueryChange={setQuery}
+        category={category}
+        onCategoryChange={setCategory}
+        categories={categories}
+        searchPlaceholder="Buscar suplemento..."
+      />
+
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <ViewToggle mode={mode} onChange={setMode} />
       </div>
@@ -36,6 +87,9 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
             <p className="text-tertiary" style={{ fontSize: "0.78rem", marginBottom: 8 }}>
               {archivedCount} suplemento(s) legado(s) ou arquivado(s) (registros livres de pacientes antes da Fase 6, ou removidos por aqui) — ainda ligados às prescrições antigas, sem aparecer aqui.
             </p>
+          )}
+          {hasFilter && filteredActives.length === 0 && (
+            <p className="text-tertiary" style={{ fontSize: "0.82rem" }}>Nenhum ativo encontrado.</p>
           )}
 
           {mode === "table" ? (
@@ -53,7 +107,7 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
                   </tr>
                 </thead>
                 <tbody>
-                  {actives.map((a) => (
+                  {filteredActives.map((a) => (
                     <tr key={a.id}>
                       <td>{a.activeName}</td>
                       <td className="text-muted">{a.category ?? "—"}</td>
@@ -72,7 +126,7 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-              {actives.map((a) => (
+              {filteredActives.map((a) => (
                 <div key={a.id} style={{ padding: "10px 12px", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
                   <strong style={{ fontSize: "0.88rem" }}>{a.activeName}</strong>
                   <p className="text-tertiary" style={{ fontSize: "0.76rem", marginTop: 2 }}>{a.category ?? "Sem categoria"}</p>
@@ -99,8 +153,11 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
             <h3>Marcas e produtos</h3>
             <SupplementBrandModal trigger={<span className="btn btn-primary btn-sm">+ Nova marca</span>} />
           </div>
+          {hasFilter && filteredBrands.length === 0 && (
+            <p className="text-tertiary" style={{ fontSize: "0.82rem" }}>Nenhuma marca/produto encontrado.</p>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {brands.map((brand) => (
+            {filteredBrands.map((brand) => (
               <div key={brand.id}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                   <strong style={{ fontSize: "0.9rem" }}>{brand.name}</strong>
@@ -180,8 +237,11 @@ export function SupplementsView({ actives, archivedCount, brands, formulas }: Ca
             <h3>Fórmulas manipuladas</h3>
             <CompoundedFormulaModal actives={actives} trigger={<span className="btn btn-primary btn-sm">+ Nova fórmula</span>} />
           </div>
+          {hasFilter && filteredFormulas.length === 0 && (
+            <p className="text-tertiary" style={{ fontSize: "0.82rem" }}>Nenhuma fórmula encontrada.</p>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {formulas.map((f) => (
+            {filteredFormulas.map((f) => (
               <div key={f.id} style={{ padding: "10px 12px", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
                   <strong style={{ fontSize: "0.9rem" }}>{f.name}</strong>
