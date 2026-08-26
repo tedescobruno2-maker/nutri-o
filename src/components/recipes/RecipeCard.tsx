@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Recipe, ImageAsset } from "@/generated/prisma/client";
 import { pickRecipeEmoji } from "@/lib/utils";
+import { MealSlotBadges } from "@/components/ui/MealSlotPicker";
 
 export function RecipeCard({ recipe }: { recipe: Recipe & { imageAsset?: ImageAsset | null } }) {
   const hasMacros = recipe.protein != null && recipe.carbs != null && recipe.fat != null;
@@ -68,6 +69,8 @@ export function RecipeCard({ recipe }: { recipe: Recipe & { imageAsset?: ImageAs
             </div>
           </>
         )}
+
+        <MealSlotBadges mealSlots={recipe.mealSlots} />
 
         <span className="recipe-card-cta">Ver receita completa →</span>
       </div>

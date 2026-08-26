@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { deleteGuidanceText } from "@/actions/settings";
 import { GuidanceTextModal } from "./GuidanceTextModal";
+import { MealSlotBadges } from "@/components/ui/MealSlotPicker";
 
 type GuidanceText = {
   id: string;
@@ -10,6 +11,7 @@ type GuidanceText = {
   content: string;
   type: string;
   tags: string | null;
+  mealSlots?: string | null;
 };
 
 export function GuidanceTextCard({ text }: { text: GuidanceText }) {
@@ -33,6 +35,7 @@ export function GuidanceTextCard({ text }: { text: GuidanceText }) {
         </div>
       </div>
       <p className="text-muted" style={{ fontSize: "0.85rem", whiteSpace: "pre-wrap" }}>{text.content}</p>
+      <MealSlotBadges mealSlots={text.mealSlots ?? null} />
       {text.tags && (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {text.tags.split(",").map((t) => (

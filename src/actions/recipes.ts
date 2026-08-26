@@ -34,6 +34,7 @@ const createRecipeSchema = z.object({
   isExtra: z.coerce.boolean().optional(),
   imageAssetId: z.string().optional(),
   tags: z.string().optional(),
+  mealSlots: z.string().optional(),
 });
 
 /** Fase 10 (5.10.1): calories/protein/carbs/fat deixaram de ser campo digitado — são cache
@@ -50,6 +51,7 @@ export async function createRecipe(formData: FormData) {
     isExtra: formData.get("isExtra") === "on" || undefined,
     imageAssetId: formData.get("imageAssetId") || undefined,
     tags: formData.get("tags") || undefined,
+    mealSlots: formData.get("mealSlots") || undefined,
   });
 
   const itemsJson = formData.get("ingredientItemsJson") as string | null;
@@ -69,6 +71,7 @@ export async function createRecipe(formData: FormData) {
       imageAssetId: parsed.imageAssetId,
       ...(await legacyImageUrl(parsed.imageAssetId)),
       tags: parsed.tags,
+      mealSlots: parsed.mealSlots,
       ingredientItems: {
         create: validItems.map((item, index) => ({ ...item, order: index })),
       },

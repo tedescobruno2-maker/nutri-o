@@ -3,20 +3,11 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createMealPlanFromRecipes } from "@/actions/planBuilder";
-import { PLAN_SLOTS } from "@/lib/planSlots";
+import { PLAN_SLOTS, PLAN_SLOT_SHORT } from "@/lib/planSlots";
 import { pickRecipeEmoji } from "@/lib/utils";
 import type { Client, Recipe } from "@/generated/prisma/client";
 
 type ClientBasic = Pick<Client, "id" | "name" | "goal" | "status">;
-
-const SLOT_SHORT: Record<string, string> = {
-  Desjejum: "Café",
-  "Lanche da Manhã": "Manhã",
-  Almoço: "Almoço",
-  "Lanche da Tarde": "Tarde",
-  Jantar: "Jantar",
-  Ceia: "Ceia",
-};
 
 export function PlanBuilder({
   clients,
@@ -129,7 +120,7 @@ export function PlanBuilder({
                         title={`${active ? "Remover de" : "Adicionar a"} ${slot}`}
                       >
                         {active ? "✓ " : "+ "}
-                        {SLOT_SHORT[slot]}
+                        {PLAN_SLOT_SHORT[slot]}
                       </button>
                     );
                   })}

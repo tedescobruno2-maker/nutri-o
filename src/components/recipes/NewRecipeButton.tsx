@@ -5,6 +5,7 @@ import { createRecipe, attachRecipeImage } from "@/actions/recipes";
 import { RecipeIngredientBuilder } from "./RecipeIngredientBuilder";
 import { ImagePicker } from "@/components/images/ImagePicker";
 import { suggestImageSearchTerm } from "@/lib/images/searchTerm";
+import { MealSlotPicker } from "@/components/ui/MealSlotPicker";
 import type { Food } from "@/generated/prisma/client";
 
 const MEAL_CATEGORIES = [
@@ -24,6 +25,7 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
   const [name, setName] = useState("");
   const [imageAsset, setImageAsset] = useState<{ id: string; url: string; thumbUrl: string | null; altText: string | null } | null>(null);
   const [showPicker, setShowPicker] = useState(false);
+  const [mealSlots, setMealSlots] = useState<string[]>([]);
   // Depois de salvar sem foto, o ImagePicker abre automaticamente para essa receita (5.10.3).
   const [pendingImageFor, setPendingImageFor] = useState<{ id: string; name: string } | null>(null);
 
@@ -32,6 +34,7 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
     setName("");
     setImageAsset(null);
     setShowPicker(false);
+    setMealSlots([]);
     setPendingImageFor(null);
     setOpen(false);
   }
@@ -186,6 +189,11 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
                   <div className="field">
                     <label htmlFor="r-tags">Tags (separadas por vírgula)</label>
                     <input className="input" id="r-tags" name="tags" placeholder="almoço, low carb" />
+                  </div>
+
+                  <div className="field">
+                    <label>Horários (ajuda a montar o Plano Alimentar)</label>
+                    <MealSlotPicker selected={mealSlots} onChange={setMealSlots} name="mealSlots" />
                   </div>
 
                   <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 6 }}>

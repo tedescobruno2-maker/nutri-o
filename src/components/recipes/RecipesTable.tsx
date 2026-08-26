@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Recipe, ImageAsset } from "@/generated/prisma/client";
+import { MealSlotBadges } from "@/components/ui/MealSlotPicker";
 
 type RecipeWithImage = Recipe & { imageAsset?: ImageAsset | null };
 
@@ -16,6 +17,7 @@ export function RecipesTable({ recipes }: { recipes: RecipeWithImage[] }) {
               <th>Carb.</th>
               <th>Gord.</th>
               <th>Tags</th>
+              <th>Horários</th>
               <th></th>
             </tr>
           </thead>
@@ -39,6 +41,7 @@ export function RecipesTable({ recipes }: { recipes: RecipeWithImage[] }) {
                     </>
                   )}
                   <td className="text-muted" style={{ fontSize: "0.78rem" }}>{tags.slice(0, 3).join(", ") || "—"}</td>
+                  <td><MealSlotBadges mealSlots={recipe.mealSlots} /></td>
                   <td style={{ textAlign: "right" }}>
                     <Link href={`/recipes/${recipe.id}`} className="btn btn-ghost btn-sm">
                       Ver →

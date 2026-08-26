@@ -656,6 +656,10 @@ model Recipe {
   imageAssetId     String?
   imageAsset       ImageAsset? @relation(fields: [imageAssetId], references: [id])
   tags             String? // separadas por vírgula (ex: "café da manhã,low carb")
+  // Horários de refeição em que a receita costuma servir (valores de PLAN_SLOTS, separados por
+  // vírgula) — diferente de mealCategory (categoria única, mais antiga, 5.10.1): aqui uma receita
+  // pode valer pra mais de um horário, e serve pra filtrar/montar o Plano Alimentar.
+  mealSlots        String?
   createdAt        DateTime    @default(now())
 
   ingredientItems RecipeIngredient[]
@@ -1130,6 +1134,7 @@ model GuidanceText {
   content   String           @unique // texto completo, aceita quebras de linha — chave natural do seed
   type      GuidanceTextType @default(ORIENTACAO_GERAL)
   tags      String? // ex: "corrida curta,musculação"
+  mealSlots String? // horários de refeição (valores de PLAN_SLOTS, separados por vírgula) — ajuda a montar o Plano Alimentar
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 

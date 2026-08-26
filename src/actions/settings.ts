@@ -51,6 +51,7 @@ const guidanceTextSchema = z.object({
   content: z.string().min(1, "Conteúdo é obrigatório"),
   type: z.enum(guidanceTextTypes).default("ORIENTACAO_GERAL"),
   tags: z.string().optional(),
+  mealSlots: z.string().optional(),
 });
 
 export async function createGuidanceText(formData: FormData) {
@@ -59,6 +60,7 @@ export async function createGuidanceText(formData: FormData) {
     content: formData.get("content"),
     type: formData.get("type") || "ORIENTACAO_GERAL",
     tags: formData.get("tags") || undefined,
+    mealSlots: formData.get("mealSlots") || undefined,
   });
   await prisma.guidanceText.create({ data: parsed });
   revalidatePath("/textos");
@@ -71,6 +73,7 @@ export async function updateGuidanceText(formData: FormData) {
     content: formData.get("content"),
     type: formData.get("type") || "ORIENTACAO_GERAL",
     tags: formData.get("tags") || undefined,
+    mealSlots: formData.get("mealSlots") || undefined,
   });
   await prisma.guidanceText.update({ where: { id }, data: parsed });
   revalidatePath("/textos");

@@ -2,6 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { createGuidanceText, updateGuidanceText } from "@/actions/settings";
+import { MealSlotPicker } from "@/components/ui/MealSlotPicker";
+import { parseMealSlots } from "@/lib/planSlots";
 
 const TYPE_LABELS: Record<string, string> = {
   ORIENTACAO_GERAL: "Orientação geral",
@@ -17,12 +19,14 @@ type GuidanceText = {
   content: string;
   type: string;
   tags: string | null;
+  mealSlots?: string | null;
 };
 
 export function GuidanceTextModal({ text, trigger }: { text?: GuidanceText; trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const [mealSlots, setMealSlots] = useState<string[]>(() => parseMealSlots(text?.mealSlots));
   const isEdit = !!text;
 
   function handleSubmit(formData: FormData) {
@@ -33,6 +37,7 @@ export function GuidanceTextModal({ text, trigger }: { text?: GuidanceText; trig
       } else {
         await createGuidanceText(formData);
         formRef.current?.reset();
+        setMealSlots([]);
       }
       setOpen(false);
     });
@@ -80,6 +85,11 @@ export function GuidanceTextModal({ text, trigger }: { text?: GuidanceText; trig
               <div className="field">
                 <label htmlFor="gt-tags">Tags (separadas por vírgula)</label>
                 <input className="input" id="gt-tags" name="tags" defaultValue={text?.tags ?? ""} placeholder="corrida curta, musculação" />
+              </div>
+
+              <div className="field">
+                <label>Horários (ajuda a montar o Plano Alimentar)</label>
+                <MealSlotPicker selected={mealSlots} onChange={setMealSlots} name="mealSlots" />
               </div>
 
               <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 4 }}>
