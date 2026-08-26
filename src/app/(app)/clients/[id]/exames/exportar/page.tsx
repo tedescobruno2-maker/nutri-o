@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getClientForExamsExport, getProfessionalSettings } from "@/lib/dal";
 import { PrintButton } from "@/components/planbuilder/PrintButton";
+import { GenerateExamPdfButton } from "@/components/planbuilder/GenerateExamPdfButton";
 import { getCurrentUser } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 import { formatDateFull } from "@/lib/utils";
@@ -23,7 +24,10 @@ export default async function ExportExamsPage({ params }: { params: Promise<{ id
         <Link href={`/clients/${client.id}`} className="btn btn-ghost btn-sm">
           ← Voltar para o paciente
         </Link>
-        <PrintButton />
+        <div style={{ display: "flex", gap: 8 }}>
+          <PrintButton />
+          <GenerateExamPdfButton clientId={client.id} />
+        </div>
       </div>
 
       <div className="plan-document">

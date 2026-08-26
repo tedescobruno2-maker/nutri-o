@@ -29,10 +29,14 @@ export async function updateProfessionalSettings(formData: FormData) {
   const logoFile = formData.get("logo") as File | null;
   const logoUrl = await saveUploadedImage(logoFile, "settings");
 
+  // 9.12 — assinatura enviada pela própria nutricionista (nunca gerada/inventada aqui).
+  const signatureFile = formData.get("signature") as File | null;
+  const signatureUrl = await saveUploadedImage(signatureFile, "settings");
+
   await prisma.professionalSettings.upsert({
     where: { id: "default" },
-    update: { ...parsed, email: parsed.email || null, ...(logoUrl ? { logoUrl } : {}) },
-    create: { id: "default", ...parsed, email: parsed.email || null, logoUrl: logoUrl ?? undefined },
+    update: { ...parsed, email: parsed.email || null, ...(logoUrl ? { logoUrl } : {}), ...(signatureUrl ? { signatureUrl } : {}) },
+    create: { id: "default", ...parsed, email: parsed.email || null, logoUrl: logoUrl ?? undefined, signatureUrl: signatureUrl ?? undefined },
   });
 
   revalidatePath("/configuracoes");

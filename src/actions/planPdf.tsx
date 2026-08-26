@@ -46,6 +46,7 @@ async function renderAndSaveMealPlanPdf(params: RenderMealPlanPdfParams): Promis
         crn: settings.crn,
         crnRegion: nutritionist?.crnRegion ?? null,
         logoUrl: settings.logoUrl,
+        signatureUrl: settings.signatureUrl,
         address: settings.address,
         phone: settings.phone,
         email: settings.email,

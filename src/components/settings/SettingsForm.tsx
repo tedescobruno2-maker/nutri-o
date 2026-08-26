@@ -63,6 +63,21 @@ export function SettingsForm({ settings }: { settings: ProfessionalSettings }) {
         <input className="input" id="logo" name="logo" type="file" accept="image/*" />
       </div>
 
+      <div className="field">
+        <label htmlFor="signature">Assinatura (opcional)</label>
+        {settings.signatureUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={settings.signatureUrl} alt="Assinatura atual" style={{ height: 48, marginBottom: 8, objectFit: "contain" }} />
+        )}
+        <input className="input" id="signature" name="signature" type="file" accept="image/*" />
+        <p className="text-tertiary" style={{ fontSize: "0.76rem", marginTop: 4 }}>
+          Envie uma foto ou scan da sua assinatura, de preferência com fundo transparente ou branco — aparece no
+          rodapé do plano alimentar, da prescrição de suplementos e da solicitação de exames. Isto é uma assinatura
+          visual/simples, não a assinatura eletrônica avançada exigida por lei para valer como documento oficial
+          sozinha (Art. 14 da Lei 14.063/2020) — essa parte segue pendente de decisão sua sobre qual provedor usar.
+        </p>
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <button type="submit" className="btn btn-primary" disabled={isPending}>
           {isPending ? "Salvando..." : "Salvar configurações"}

@@ -514,6 +514,9 @@ enum NutrientSource {
   ROTULO // rótulo do produto
   MANUAL // digitado pela nutricionista
   IMPORTADO_PENDENTE // veio de uma migração anterior, sem valor nutricional
+  // <<DECISÃO BRUNO>> 9.3, respondida em 26/08/2026: IA sugere a gramatura de medida caseira, a
+  // nutricionista sempre revisa/edita antes de salvar — nunca gravado sem essa confirmação.
+  IA_ESTIMADA
 }
 
 enum NutrientStatus {
@@ -1096,6 +1099,11 @@ model ProfessionalSettings {
   nutritionistName String   @default("Luana Gois")
   crn              String   @default("09100683")
   logoUrl          String?
+  // <<DECISÃO BRUNO>> 9.12, respondida em 26/08/2026: imagem da assinatura da nutricionista,
+  // enviada por ela (upload — nunca gerada/inventada), impressa no rodapé dos PDFs clínicos.
+  // É assinatura VISUAL/simples, não a assinatura eletrônica avançada do Art. 14 da Lei
+  // 14.063/2020 (essa continua pendente — ver <<DECISÃO BRUNO>> 9.12 no relatório da Fase 6/11).
+  signatureUrl     String?
   address          String?
   phone            String?
   email            String?

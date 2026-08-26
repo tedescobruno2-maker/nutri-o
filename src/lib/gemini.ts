@@ -151,6 +151,32 @@ export type FoodSuggestData = {
 };
 
 // ---------------------------------------------------------------------------
+// Sugestão de gramatura de medida caseira (9.3 — <<DECISÃO BRUNO>>, Fase 11+)
+// ---------------------------------------------------------------------------
+
+export const FOOD_MEASURE_SUGGEST_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    grams: { type: Type.NUMBER, nullable: true, description: "gramatura estimada, ou null se não for possível estimar com confiança razoável" },
+    reasoning: { type: Type.STRING, description: "explicação curta da estimativa (ou do motivo de não estimar), para a nutricionista revisar" },
+  },
+  required: ["reasoning"],
+};
+
+export const FOOD_MEASURE_SUGGEST_PROMPT = (foodName: string, measureLabel: string) => `Estime quantos GRAMAS correspondem à medida caseira "${measureLabel}" do alimento "${foodName}", usando conhecimento culinário geral e referências nutricionais padrão (TACO, USDA, tabelas de medidas caseiras usuais no Brasil).
+
+Se você tiver confiança razoável na estimativa, preencha "grams" com um número plausível. Se a medida for ambígua demais para esse alimento específico
+(ex: "a gosto", "a vontade", ou uma combinação de ingredientes sem gramatura definida), ou se você não tiver informação suficiente para uma estimativa
+minimamente confiável, deixe "grams" como null — não force um número. Em "reasoning", explique brevemente de onde veio a estimativa (ou por que não deu
+para estimar), em uma frase curta, para a nutricionista revisar antes de confirmar. Esta é sempre uma ESTIMATIVA que precisa de revisão humana antes de
+entrar no sistema — nunca é usada automaticamente sem confirmação.`;
+
+export type FoodMeasureSuggestData = {
+  grams?: number | null;
+  reasoning: string;
+};
+
+// ---------------------------------------------------------------------------
 // Extração de resultados de exames laboratoriais (relatório em PDF)
 // ---------------------------------------------------------------------------
 

@@ -43,6 +43,11 @@ const styles = StyleSheet.create({
   itemPending: { fontSize: 8, color: "#b45309" },
   bullet: { fontSize: 11, marginRight: 4 },
   listItemRow: { flexDirection: "row", marginBottom: 3 },
+  signatureBlock: { marginTop: 20, flexDirection: "column", alignItems: "center" },
+  signatureImage: { height: 48, objectFit: "contain", marginBottom: 4 },
+  signatureLine: { borderTop: "1pt solid #999", width: 220, marginBottom: 4 },
+  signatureName: { fontSize: 9, fontWeight: "bold" },
+  signatureCrn: { fontSize: 8, color: "#555" },
   guidance: { fontSize: 10, marginBottom: 3, lineHeight: 1.3 },
 });
 
@@ -69,6 +74,7 @@ export type MealPlanDocumentProps = {
     crn: string;
     crnRegion: string | null;
     logoUrl: string | null;
+    signatureUrl: string | null;
     address: string | null;
     phone: string | null;
     email: string | null;
@@ -225,6 +231,16 @@ export function MealPlanDocument({ professional, client, weight, consultationDat
                 <Text style={styles.itemText}>{line}</Text>
               </View>
             ))}
+          </View>
+        )}
+
+        {professional.signatureUrl && (
+          <View style={styles.signatureBlock} wrap={false}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={professional.signatureUrl} style={styles.signatureImage} />
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureName}>{professional.nutritionistName}</Text>
+            <Text style={styles.signatureCrn}>{crnLine}</Text>
           </View>
         )}
 

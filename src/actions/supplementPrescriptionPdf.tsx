@@ -37,6 +37,7 @@ async function renderAndSaveSupplementPrescriptionPdf(params: RenderPrescription
         crn: settings.crn,
         crnRegion: nutritionist?.crnRegion ?? null,
         logoUrl: settings.logoUrl,
+        signatureUrl: settings.signatureUrl,
         address: settings.address,
         phone: settings.phone,
         email: settings.email,

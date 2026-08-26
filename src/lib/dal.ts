@@ -190,6 +190,7 @@ export async function getFoodsGrouped(search?: string, category?: string) {
       ...(category ? { category } : {}),
     },
     orderBy: [{ baseName: "asc" }, { preparation: "asc" }],
+    include: { measures: { orderBy: { label: "asc" } } },
   });
 
   const groups = new Map<string, typeof foods>();

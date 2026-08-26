@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DeleteFoodButton } from "@/components/foods/DeleteFoodButton";
+import { FoodMeasuresManager } from "@/components/foods/FoodMeasuresManager";
 import { FOOD_PREPARATION_LABELS, NUTRIENT_SOURCE_LABELS } from "@/lib/utils";
 import type { getFoodsGrouped } from "@/lib/dal";
 
@@ -80,6 +81,7 @@ export function FoodCard({ group }: { group: FoodGroup }) {
       {!hasVariants ? (
         <>
           <MacroLine food={representative} />
+          <FoodMeasuresManager foodId={representative.id} measures={representative.measures} />
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <DeleteFoodButton foodId={representative.id} />
           </div>
@@ -98,9 +100,10 @@ export function FoodCard({ group }: { group: FoodGroup }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 8, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
               {variants.map((v) => (
                 <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <p style={{ fontSize: "0.8rem", fontWeight: 600 }}>{FOOD_PREPARATION_LABELS[v.preparation] ?? v.preparation}</p>
                     <MacroLine food={v} />
+                    <FoodMeasuresManager foodId={v.id} measures={v.measures} />
                   </div>
                   <DeleteFoodButton foodId={v.id} />
                 </div>
