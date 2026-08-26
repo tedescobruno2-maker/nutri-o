@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { PatientTopbar } from "@/components/layout/PatientTopbar";
 import { PatientSidebar } from "@/components/layout/PatientSidebar";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Meu Portal — Nutri Luana Gois",
@@ -22,7 +23,10 @@ const THEME_INIT_SCRIPT = `
 })();
 `;
 
-export default function PatientLayout({ children }: { children: React.ReactNode }) {
+export default async function PatientLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
+  const restricted = user?.portalScope === "SOMENTE_PLANO";
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
@@ -30,7 +34,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
       </head>
       <body>
         <div className="app-shell">
-          <PatientSidebar />
+          <PatientSidebar restricted={restricted} />
           <div className="app-main">
             <PatientTopbar />
             <main className="app-content">{children}</main>

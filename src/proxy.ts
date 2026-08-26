@@ -66,30 +66,49 @@ export async function proxy(request: NextRequest) {
   const isAccountPage = pathname === "/configuracoes/conta" || pathname.startsWith("/configuracoes/conta/");
   if (!isPatientRole && !isAccountPage) {
     const needsPasswordChange = user.mustChangePassword;
-    const needsMfaSetup = user.role === "ADMIN_MASTER" && !user.mfaEnabledAt;
+    // Obrigatório só até configurar uma vez (mfaEverConfiguredAt) — depois disso pode desativar
+    // livremente (Configurações → Minha conta) sem cair de novo nesta exigência.
+    const needsMfaSetup = user.role === "ADMIN_MASTER" && !user.mfaEnabledAt && !user.mfaEverConfiguredAt;
     if (needsPasswordChange || needsMfaSetup) {
       return NextResponse.redirect(new URL("/configuracoes/conta", request.url));
     }
   }
 
-  const clientId = isPatientRole ? await getPatientClientId(user.id) : null;
+  const patient = isPatientRole ? await getPatientClientInfo(user.id) : null;
+
+  // Regra 2 (Configurações → Acesso de pacientes): paciente com escopo SOMENTE_PLANO só navega
+  // /portal (redireciona) e /portal/plano* — qualquer outra sub-rota do portal é bloqueada aqui,
+  // não só escondida do menu (PatientSidebar), pra não dar pra contornar digitando a URL.
+  if (isPatientRole && patient?.portalAccessScope === "SOMENTE_PLANO") {
+    // /portal (a home) fica de fora do permitido de propósito — mostra peso, próxima consulta,
+    // alerta de exame e links pra evolução/exames/suplementos, exatamente o que este escopo
+    // restringe. Redireciona direto pro plano em vez de deixar passar.
+    const isAllowed = pathname === "/portal/plano" || pathname.startsWith("/portal/plano/");
+    if (!isAllowed) {
+      return NextResponse.redirect(new URL("/portal/plano", request.url));
+    }
+  }
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(SESSION_HEADERS.userId, user.id);
   requestHeaders.set(SESSION_HEADERS.role, user.role);
   requestHeaders.set(SESSION_HEADERS.name, user.name);
-  if (clientId) requestHeaders.set(SESSION_HEADERS.clientId, clientId);
-  else requestHeaders.delete(SESSION_HEADERS.clientId);
+  if (patient) {
+    requestHeaders.set(SESSION_HEADERS.clientId, patient.id);
+    requestHeaders.set(SESSION_HEADERS.portalScope, patient.portalAccessScope);
+  } else {
+    requestHeaders.delete(SESSION_HEADERS.clientId);
+    requestHeaders.delete(SESSION_HEADERS.portalScope);
+  }
 
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 // Import local (não no topo) para manter este arquivo fácil de ler de cima a baixo — só
-// resolve o clientId do paciente logado quando o papel realmente é PACIENTE.
-async function getPatientClientId(userId: string): Promise<string | null> {
+// resolve os dados do paciente logado quando o papel realmente é PACIENTE.
+async function getPatientClientInfo(userId: string): Promise<{ id: string; portalAccessScope: string } | null> {
   const { prisma } = await import("@/lib/db");
-  const client = await prisma.client.findUnique({ where: { userId }, select: { id: true } });
-  return client?.id ?? null;
+  return prisma.client.findUnique({ where: { userId }, select: { id: true, portalAccessScope: true } });
 }
 
 export const config = {

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { logout } from "@/actions/auth";
 
-const NAV_ITEMS = [
+const FULL_NAV_ITEMS = [
   { href: "/portal", label: "Início", icon: "🏠" },
   { href: "/portal/plano", label: "Meu plano", icon: "📝" },
   { href: "/portal/evolucao", label: "Evolução", icon: "📈" },
@@ -15,8 +15,13 @@ const NAV_ITEMS = [
   { href: "/portal/meus-dados", label: "Meus dados", icon: "🔒" },
 ];
 
-export function PatientSidebar() {
+// Escopo SOMENTE_PLANO (Configurações → Acesso de pacientes) — só o item do plano fica visível.
+// O bloqueio de verdade é no proxy.ts (isto aqui só evita mostrar um link que ia dar redirecionado).
+const RESTRICTED_NAV_ITEMS = [{ href: "/portal/plano", label: "Meu plano", icon: "📝" }];
+
+export function PatientSidebar({ restricted }: { restricted?: boolean }) {
   const pathname = usePathname();
+  const NAV_ITEMS = restricted ? RESTRICTED_NAV_ITEMS : FULL_NAV_ITEMS;
 
   return (
     <aside className="sidebar">

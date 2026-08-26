@@ -12,9 +12,14 @@ export default async function SettingsPage() {
           <h1>Configurações</h1>
           <p className="text-muted">Dados da nutricionista usados no cabeçalho e rodapé dos PDFs gerados pelo sistema.</p>
         </div>
-        <Link href="/configuracoes/conta" className="btn btn-ghost btn-sm">
-          🔐 Minha conta e senha
-        </Link>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Link href="/configuracoes/pacientes" className="btn btn-ghost btn-sm">
+            👥 Acesso de pacientes
+          </Link>
+          <Link href="/configuracoes/conta" className="btn btn-ghost btn-sm">
+            🔐 Minha conta e senha
+          </Link>
+        </div>
       </div>
 
       <SettingsForm settings={settings} />

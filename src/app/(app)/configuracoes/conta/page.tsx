@@ -13,7 +13,7 @@ export default async function AccountPage() {
   if (!user) redirect("/login");
 
   const needsPasswordChange = user.mustChangePassword;
-  const needsMfaSetup = user.role === "ADMIN_MASTER" && !user.mfaEnabledAt;
+  const needsMfaSetup = user.role === "ADMIN_MASTER" && !user.mfaEnabledAt && !user.mfaEverConfiguredAt;
 
   return (
     <div className="animate-in">

@@ -64,6 +64,11 @@ enum UserRole {
   PACIENTE // vê apenas os próprios dados, via dbForPatient
 }
 
+enum PortalAccessScope {
+  COMPLETO // navega todo o portal (plano, evolução, exames, suplementos, agenda, meus dados)
+  SOMENTE_PLANO // só acessa a visualização do próprio plano alimentar
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -80,8 +85,12 @@ model User {
   signatureRef String? // referência do certificado/provedor de assinatura eletrônica (Fase 5)
 
   mustChangePassword Boolean   @default(true)
-  mfaSecret          String? // TOTP — obrigatório para a conta profissional (ADMIN_MASTER)
+  mfaSecret          String? // TOTP — obrigatório configurar uma vez pra conta ADMIN_MASTER, mas pode desativar depois
   mfaEnabledAt       DateTime?
+  // Marca que o MFA já foi configurado alguma vez — nunca é limpo (mesmo ao desativar). É o que
+  // faz a exigência inicial (proxy.ts) valer só uma vez: depois de configurado, dá pra desativar
+  // livremente sem cair de volta na obrigatoriedade.
+  mfaEverConfiguredAt DateTime?
   lastLoginAt        DateTime?
   failedLoginCount   Int       @default(0)
   lockedUntil        DateTime?
@@ -256,6 +265,9 @@ model Client {
 
   userId String? @unique // conta do próprio paciente no portal (Fase 1/8)
   user   User?   @relation("PatientUser", fields: [userId], references: [id])
+  // Controle por paciente (Configurações → Acesso de pacientes): COMPLETO navega todo o portal,
+  // SOMENTE_PLANO só acessa /portal/plano (proxy.ts redireciona qualquer outra rota do portal).
+  portalAccessScope PortalAccessScope @default(COMPLETO)
 
   // Menor de idade → acesso pelo responsável legal (Res. CFN 594/2017, Art. 3º, IV)
   guardianName     String?

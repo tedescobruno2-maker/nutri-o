@@ -272,6 +272,23 @@ export async function getClientsBasic() {
   });
 }
 
+/** Lista pra Configurações → Acesso de pacientes: quem já tem conta no portal, com que escopo
+ * de navegação, e se tem e-mail cadastrado (precisa pra reiniciar senha por link). */
+export async function getClientsForPortalAccess() {
+  return prisma.client.findMany({
+    where: { deletedAt: null },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      userId: true,
+      portalAccessScope: true,
+      user: { select: { active: true, mustChangePassword: true, lastLoginAt: true } },
+    },
+    orderBy: { name: "asc" },
+  });
+}
+
 /** Agendamentos de um mês (year: ano cheio, month: 0-11), para a view de calendário. */
 export async function getAppointmentsForMonth(year: number, month: number) {
   const start = new Date(year, month, 1);

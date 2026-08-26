@@ -15,6 +15,7 @@ export const SESSION_HEADERS = {
   role: "x-nlg-user-role",
   name: "x-nlg-user-name",
   clientId: "x-nlg-client-id", // preenchido só quando role === PACIENTE
+  portalScope: "x-nlg-portal-scope", // idem — escopo de navegação do paciente (Client.portalAccessScope)
 } as const;
 
 export type SessionUser = {
@@ -22,6 +23,7 @@ export type SessionUser = {
   role: UserRole;
   name: string;
   clientId: string | null; // id do Client, quando o usuário logado é um PACIENTE
+  portalScope: string | null; // idem — "COMPLETO" | "SOMENTE_PLANO"
 };
 
 export async function createSession(
@@ -96,7 +98,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const role = h.get(SESSION_HEADERS.role) as UserRole | null;
   const name = h.get(SESSION_HEADERS.name);
   if (!id || !role || !name) return null;
-  return { id, role, name, clientId: h.get(SESSION_HEADERS.clientId) };
+  return { id, role, name, clientId: h.get(SESSION_HEADERS.clientId), portalScope: h.get(SESSION_HEADERS.portalScope) };
 });
 
 /** Garante que o usuário atual tem um dos papéis informados; lança se não tiver (ou não estiver logado). */
