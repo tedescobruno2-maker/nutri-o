@@ -1,5 +1,5 @@
 import { getFoodsGrouped, getFoodCategories } from "@/lib/dal";
-import { NewFoodButton } from "@/components/foods/NewFoodButton";
+import { FoodModal } from "@/components/foods/FoodModal";
 import { FoodsView } from "@/components/foods/FoodsView";
 
 export default async function FoodsPage({
@@ -20,7 +20,7 @@ export default async function FoodsPage({
             {groups.length} alimento(s)-base · {totalFoods} variante(s) de preparo · valores por 100g.
           </p>
         </div>
-        <NewFoodButton />
+        <FoodModal trigger={<span className="btn btn-primary">+ Novo alimento</span>} />
       </div>
 
       <form method="GET" style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>

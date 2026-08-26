@@ -5,8 +5,8 @@ import type { Food } from "@/generated/prisma/client";
 
 type Row = { foodId: string; quantity: string; unit: string };
 
-export function RecipeIngredientBuilder({ foods }: { foods: Food[] }) {
-  const [rows, setRows] = useState<Row[]>([]);
+export function RecipeIngredientBuilder({ foods, initialRows }: { foods: Food[]; initialRows?: Row[] }) {
+  const [rows, setRows] = useState<Row[]>(initialRows ?? []);
 
   function addRow() {
     setRows((prev) => [...prev, { foodId: "", quantity: "", unit: "g" }]);

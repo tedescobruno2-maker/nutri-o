@@ -1,4 +1,5 @@
 import { DeleteFoodButton } from "@/components/foods/DeleteFoodButton";
+import { FoodModal } from "@/components/foods/FoodModal";
 import { FOOD_PREPARATION_LABELS, NUTRIENT_SOURCE_LABELS } from "@/lib/utils";
 import type { getFoodsGrouped } from "@/lib/dal";
 
@@ -49,7 +50,8 @@ export function FoodsTable({ groups }: { groups: FoodGroup[] }) {
                 )}
                 <td className="text-muted">{NUTRIENT_SOURCE_LABELS[food.source] ?? food.source}</td>
                 <td className="text-muted">{food.measures.length}</td>
-                <td style={{ textAlign: "right" }}>
+                <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                  <FoodModal food={food} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
                   <DeleteFoodButton foodId={food.id} />
                 </td>
               </tr>

@@ -1,9 +1,11 @@
 import Link from "next/link";
-import type { Recipe, ImageAsset } from "@/generated/prisma/client";
 import { pickRecipeEmoji } from "@/lib/utils";
 import { MealSlotBadges } from "@/components/ui/MealSlotPicker";
+import { RecipeModal, type RecipeForEdit } from "@/components/recipes/RecipeModal";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
+import type { Food } from "@/generated/prisma/client";
 
-export function RecipeCard({ recipe }: { recipe: Recipe & { imageAsset?: ImageAsset | null } }) {
+export function RecipeCard({ recipe, foods }: { recipe: RecipeForEdit; foods: Food[] }) {
   const hasMacros = recipe.protein != null && recipe.carbs != null && recipe.fat != null;
   const total = hasMacros ? (recipe.protein! + recipe.carbs! + recipe.fat!) || 1 : 1;
   const proteinPct = hasMacros ? Math.round((recipe.protein! / total) * 100) : 0;
@@ -73,6 +75,17 @@ export function RecipeCard({ recipe }: { recipe: Recipe & { imageAsset?: ImageAs
         <MealSlotBadges mealSlots={recipe.mealSlots} />
 
         <span className="recipe-card-cta">Ver receita completa →</span>
+
+        <div
+          style={{ display: "flex", gap: 4, borderTop: "1px solid var(--border-subtle)", paddingTop: 8, marginTop: -2 }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <RecipeModal recipe={recipe} foods={foods} trigger={<span className="btn btn-ghost btn-sm">✎ Editar</span>} />
+          <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} />
+        </div>
       </div>
     </Link>
   );

@@ -5,11 +5,10 @@ import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { RecipesTable } from "@/components/recipes/RecipesTable";
 import { ViewToggle, useViewMode } from "@/components/ui/ViewToggle";
 import { PLAN_SLOTS, PLAN_SLOT_SHORT } from "@/lib/planSlots";
-import type { Recipe, ImageAsset } from "@/generated/prisma/client";
+import type { RecipeForEdit } from "@/components/recipes/RecipeModal";
+import type { Food } from "@/generated/prisma/client";
 
-type RecipeWithImage = Recipe & { imageAsset?: ImageAsset | null };
-
-export function RecipesView({ recipes }: { recipes: RecipeWithImage[] }) {
+export function RecipesView({ recipes, foods }: { recipes: RecipeForEdit[]; foods: Food[] }) {
   const [mode, setMode] = useViewMode("view-mode:receitas");
   const [slotFilter, setSlotFilter] = useState<string | null>(null);
 
@@ -45,11 +44,11 @@ export function RecipesView({ recipes }: { recipes: RecipeWithImage[] }) {
           <p>Nenhuma receita marcada para esse horário ainda.</p>
         </div>
       ) : mode === "table" ? (
-        <RecipesTable recipes={filtered} />
+        <RecipesTable recipes={filtered} foods={foods} />
       ) : (
         <div className="recipe-grid">
           {filtered.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} foods={foods} />
           ))}
         </div>
       )}

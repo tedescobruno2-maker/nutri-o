@@ -1,9 +1,9 @@
-import { getRecipes, getFoods } from "@/lib/dal";
+import { getRecipesWithIngredients, getFoods } from "@/lib/dal";
 import { RecipesView } from "@/components/recipes/RecipesView";
-import { NewRecipeButton } from "@/components/recipes/NewRecipeButton";
+import { RecipeModal } from "@/components/recipes/RecipeModal";
 
 export default async function RecipesPage() {
-  const [recipes, foods] = await Promise.all([getRecipes(), getFoods()]);
+  const [recipes, foods] = await Promise.all([getRecipesWithIngredients(), getFoods()]);
 
   return (
     <div className="animate-in">
@@ -12,7 +12,7 @@ export default async function RecipesPage() {
           <h1>Receitas</h1>
           <p className="text-muted">{recipes.length} receita(s) no acervo.</p>
         </div>
-        <NewRecipeButton foods={foods} />
+        <RecipeModal foods={foods} trigger={<span className="btn btn-primary">+ Nova receita</span>} />
       </div>
 
       {recipes.length === 0 ? (
@@ -21,7 +21,7 @@ export default async function RecipesPage() {
           <p>Nenhuma receita cadastrada ainda.</p>
         </div>
       ) : (
-        <RecipesView recipes={recipes} />
+        <RecipesView recipes={recipes} foods={foods} />
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DeleteFoodButton } from "@/components/foods/DeleteFoodButton";
+import { FoodModal } from "@/components/foods/FoodModal";
 import { FoodMeasuresManager } from "@/components/foods/FoodMeasuresManager";
 import { FOOD_PREPARATION_LABELS, NUTRIENT_SOURCE_LABELS } from "@/lib/utils";
 import type { getFoodsGrouped } from "@/lib/dal";
@@ -82,7 +83,8 @@ export function FoodCard({ group }: { group: FoodGroup }) {
         <>
           <MacroLine food={representative} />
           <FoodMeasuresManager foodId={representative.id} measures={representative.measures} />
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
+            <FoodModal food={representative} trigger={<span className="btn btn-ghost btn-sm">✎ Editar</span>} />
             <DeleteFoodButton foodId={representative.id} />
           </div>
         </>
@@ -105,7 +107,10 @@ export function FoodCard({ group }: { group: FoodGroup }) {
                     <MacroLine food={v} />
                     <FoodMeasuresManager foodId={v.id} measures={v.measures} />
                   </div>
-                  <DeleteFoodButton foodId={v.id} />
+                  <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                    <FoodModal food={v} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                    <DeleteFoodButton foodId={v.id} />
+                  </div>
                 </div>
               ))}
             </div>

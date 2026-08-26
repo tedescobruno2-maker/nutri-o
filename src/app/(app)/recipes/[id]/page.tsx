@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getRecipeById } from "@/lib/dal";
+import { getRecipeById, getFoods } from "@/lib/dal";
 import { pickRecipeEmoji } from "@/lib/utils";
+import { RecipeModal } from "@/components/recipes/RecipeModal";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const recipe = await getRecipeById(id);
+  const [recipe, foods] = await Promise.all([getRecipeById(id), getFoods()]);
   if (!recipe) notFound();
 
   const tags = recipe.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
@@ -14,9 +16,15 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="animate-in">
-      <Link href="/recipes" className="btn btn-ghost btn-sm" style={{ marginBottom: 16 }}>
-        ← Voltar para receitas
-      </Link>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        <Link href="/recipes" className="btn btn-ghost btn-sm">
+          ← Voltar para receitas
+        </Link>
+        <div style={{ display: "flex", gap: 6 }}>
+          <RecipeModal recipe={recipe} foods={foods} trigger={<span className="btn btn-ghost btn-sm">✎ Editar</span>} />
+          <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} />
+        </div>
+      </div>
 
       <div className="recipe-hero">
         {imageSrc ? (

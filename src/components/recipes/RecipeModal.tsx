@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { createRecipe, attachRecipeImage } from "@/actions/recipes";
+import { createRecipe, updateRecipe, attachRecipeImage } from "@/actions/recipes";
 import { RecipeIngredientBuilder } from "./RecipeIngredientBuilder";
 import { ImagePicker } from "@/components/images/ImagePicker";
 import { suggestImageSearchTerm } from "@/lib/images/searchTerm";
 import { MealSlotPicker } from "@/components/ui/MealSlotPicker";
-import type { Food } from "@/generated/prisma/client";
+import { parseMealSlots } from "@/lib/planSlots";
+import type { Food, Recipe, RecipeIngredient, ImageAsset } from "@/generated/prisma/client";
 
 const MEAL_CATEGORIES = [
   { value: "", label: "Sem categoria" },
@@ -18,43 +19,59 @@ const MEAL_CATEGORIES = [
   { value: "extra", label: "Extra" },
 ];
 
-export function NewRecipeButton({ foods }: { foods: Food[] }) {
+export type RecipeForEdit = Recipe & {
+  imageAsset?: Pick<ImageAsset, "id" | "url" | "thumbUrl" | "altText"> | null;
+  ingredientItems: RecipeIngredient[];
+};
+
+export function RecipeModal({ recipe, foods, trigger }: { recipe?: RecipeForEdit; foods: Food[]; trigger: React.ReactNode }) {
+  const isEdit = !!recipe;
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  const [name, setName] = useState("");
-  const [imageAsset, setImageAsset] = useState<{ id: string; url: string; thumbUrl: string | null; altText: string | null } | null>(null);
+  const [name, setName] = useState(recipe?.name ?? "");
+  const [imageAsset, setImageAsset] = useState<{ id: string; url: string; thumbUrl: string | null; altText: string | null } | null>(
+    recipe?.imageAsset ? { id: recipe.imageAsset.id, url: recipe.imageAsset.url, thumbUrl: recipe.imageAsset.thumbUrl, altText: recipe.imageAsset.altText } : null
+  );
   const [showPicker, setShowPicker] = useState(false);
-  const [mealSlots, setMealSlots] = useState<string[]>([]);
-  // Depois de salvar sem foto, o ImagePicker abre automaticamente para essa receita (5.10.3).
+  const [mealSlots, setMealSlots] = useState<string[]>(() => parseMealSlots(recipe?.mealSlots));
+  // Depois de CRIAR sem foto, o ImagePicker abre automaticamente (5.10.3) — não se aplica a edição.
   const [pendingImageFor, setPendingImageFor] = useState<{ id: string; name: string } | null>(null);
 
   function resetAndClose() {
     formRef.current?.reset();
-    setName("");
-    setImageAsset(null);
+    if (!isEdit) setName("");
     setShowPicker(false);
-    setMealSlots([]);
     setPendingImageFor(null);
     setOpen(false);
   }
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      const result = await createRecipe(formData);
-      if (result.hasImage) {
+      if (isEdit) {
+        formData.set("id", recipe.id);
+        await updateRecipe(formData);
         resetAndClose();
       } else {
-        setPendingImageFor({ id: result.id, name: result.name });
+        const result = await createRecipe(formData);
+        if (result.hasImage) {
+          resetAndClose();
+        } else {
+          setPendingImageFor({ id: result.id, name: result.name });
+        }
       }
     });
   }
 
+  const initialRows = recipe?.ingredientItems
+    .filter((item) => item.foodId)
+    .map((item) => ({ foodId: item.foodId as string, quantity: item.quantity != null ? String(item.quantity) : "", unit: item.unit ?? "g" }));
+
   return (
     <>
-      <button type="button" className="btn btn-primary" onClick={() => setOpen(true)}>
-        + Nova receita
-      </button>
+      <span onClick={() => setOpen(true)} style={{ cursor: "pointer", display: "inline-flex" }}>
+        {trigger}
+      </span>
 
       {open && (
         <div
@@ -98,7 +115,7 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
             ) : (
               <>
                 <div className="page-header" style={{ marginBottom: 16 }}>
-                  <h2>Nova receita</h2>
+                  <h2>{isEdit ? "Editar receita" : "Nova receita"}</h2>
                   <button type="button" className="btn btn-ghost btn-icon" onClick={() => setOpen(false)}>
                     ✕
                   </button>
@@ -111,7 +128,7 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
                   </div>
                   <div className="field">
                     <label htmlFor="r-description">Descrição curta</label>
-                    <input className="input" id="r-description" name="description" placeholder="Ex: Almoço rico em proteína" />
+                    <input className="input" id="r-description" name="description" defaultValue={recipe?.description ?? ""} placeholder="Ex: Almoço rico em proteína" />
                   </div>
 
                   <div className="field">
@@ -147,14 +164,14 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
 
                   <div className="field">
                     <label htmlFor="r-ingredients">Ingredientes (um por linha)</label>
-                    <textarea className="input" id="r-ingredients" name="ingredients" rows={4} required placeholder={"150g de frango\n1 batata doce\n..."} />
+                    <textarea className="input" id="r-ingredients" name="ingredients" rows={4} required defaultValue={recipe?.ingredients ?? ""} placeholder={"150g de frango\n1 batata doce\n..."} />
                   </div>
                   <div className="field">
                     <label htmlFor="r-instructions">Modo de preparo</label>
-                    <textarea className="input" id="r-instructions" name="instructions" rows={3} placeholder="Passo a passo do preparo" />
+                    <textarea className="input" id="r-instructions" name="instructions" rows={3} defaultValue={recipe?.instructions ?? ""} placeholder="Passo a passo do preparo" />
                   </div>
 
-                  <RecipeIngredientBuilder foods={foods} />
+                  <RecipeIngredientBuilder foods={foods} initialRows={initialRows} />
 
                   <p className="text-tertiary" style={{ fontSize: "0.76rem" }}>
                     Calorias e macros são calculados automaticamente a partir dos alimentos vinculados acima — não dá para digitar um valor.
@@ -163,32 +180,32 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                     <div className="field">
                       <label htmlFor="r-servings">Porções</label>
-                      <input className="input" id="r-servings" name="servings" type="number" min={1} />
+                      <input className="input" id="r-servings" name="servings" type="number" min={1} defaultValue={recipe?.servings ?? ""} />
                     </div>
                     <div className="field">
                       <label htmlFor="r-prepTime">Tempo de preparo (min)</label>
-                      <input className="input" id="r-prepTime" name="prepTimeMin" type="number" min={1} />
+                      <input className="input" id="r-prepTime" name="prepTimeMin" type="number" min={1} defaultValue={recipe?.prepTimeMin ?? ""} />
                     </div>
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, alignItems: "end" }}>
                     <div className="field">
                       <label htmlFor="r-category">Categoria</label>
-                      <select className="input" id="r-category" name="mealCategory" defaultValue="">
+                      <select className="input" id="r-category" name="mealCategory" defaultValue={recipe?.mealCategory ?? ""}>
                         {MEAL_CATEGORIES.map((c) => (
                           <option key={c.value} value={c.value}>{c.label}</option>
                         ))}
                       </select>
                     </div>
                     <label style={{ display: "flex", alignItems: "center", gap: 6, paddingBottom: 10 }}>
-                      <input type="checkbox" name="isExtra" />
+                      <input type="checkbox" name="isExtra" defaultChecked={recipe?.isExtra ?? false} />
                       Receita extra
                     </label>
                   </div>
 
                   <div className="field">
                     <label htmlFor="r-tags">Tags (separadas por vírgula)</label>
-                    <input className="input" id="r-tags" name="tags" placeholder="almoço, low carb" />
+                    <input className="input" id="r-tags" name="tags" defaultValue={recipe?.tags ?? ""} placeholder="almoço, low carb" />
                   </div>
 
                   <div className="field">
@@ -197,7 +214,7 @@ export function NewRecipeButton({ foods }: { foods: Food[] }) {
                   </div>
 
                   <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 6 }}>
-                    {isPending ? "Salvando..." : "Adicionar receita"}
+                    {isPending ? "Salvando..." : isEdit ? "Salvar alterações" : "Adicionar receita"}
                   </button>
                 </form>
               </>

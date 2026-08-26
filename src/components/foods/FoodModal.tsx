@@ -1,38 +1,42 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { createFood } from "@/actions/foods";
+import { createFood, updateFood } from "@/actions/foods";
 import { suggestFoodData } from "@/actions/foodAI";
+import type { Food } from "@/generated/prisma/client";
 
 function round1(n: number) {
   return Math.round(n * 10) / 10;
 }
 
-export function NewFoodButton() {
+export function FoodModal({ food, trigger }: { food?: Food; trigger: React.ReactNode }) {
+  const isEdit = !!food;
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isSuggesting, startSuggesting] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [kcal, setKcal] = useState("");
-  const [protein, setProtein] = useState("");
-  const [carbs, setCarbs] = useState("");
-  const [fat, setFat] = useState("");
-  const [fiber, setFiber] = useState("");
+  const [name, setName] = useState(food?.name ?? "");
+  const [category, setCategory] = useState(food?.category ?? "");
+  const [kcal, setKcal] = useState(food?.kcal100 != null ? String(food.kcal100) : "");
+  const [protein, setProtein] = useState(food?.protein100 != null ? String(food.protein100) : "");
+  const [carbs, setCarbs] = useState(food?.carbs100 != null ? String(food.carbs100) : "");
+  const [fat, setFat] = useState(food?.fat100 != null ? String(food.fat100) : "");
+  const [fiber, setFiber] = useState(food?.fiber100 != null ? String(food.fiber100) : "");
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [suggestError, setSuggestError] = useState<string | null>(null);
   const [suggested, setSuggested] = useState(false);
 
   function resetAll() {
-    setName("");
-    setCategory("");
-    setKcal("");
-    setProtein("");
-    setCarbs("");
-    setFat("");
-    setFiber("");
+    if (!isEdit) {
+      setName("");
+      setCategory("");
+      setKcal("");
+      setProtein("");
+      setCarbs("");
+      setFat("");
+      setFiber("");
+    }
     setAiImageUrl(null);
     setSuggestError(null);
     setSuggested(false);
@@ -41,7 +45,12 @@ export function NewFoodButton() {
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      await createFood(formData);
+      if (isEdit) {
+        formData.set("id", food.id);
+        await updateFood(formData);
+      } else {
+        await createFood(formData);
+      }
       resetAll();
       setOpen(false);
     });
@@ -71,9 +80,9 @@ export function NewFoodButton() {
 
   return (
     <>
-      <button type="button" className="btn btn-primary" onClick={() => setOpen(true)}>
-        + Novo alimento
-      </button>
+      <span onClick={() => setOpen(true)} style={{ cursor: "pointer", display: "inline-flex" }}>
+        {trigger}
+      </span>
 
       {open && (
         <div
@@ -82,7 +91,7 @@ export function NewFoodButton() {
         >
           <div className="card glass card-pad animate-in" style={{ width: "min(480px, 100%)", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
             <div className="page-header" style={{ marginBottom: 16 }}>
-              <h2>Novo alimento</h2>
+              <h2>{isEdit ? "Editar alimento" : "Novo alimento"}</h2>
               <button type="button" className="btn btn-ghost btn-icon" onClick={() => { setOpen(false); resetAll(); }}>✕</button>
             </div>
 
@@ -116,11 +125,14 @@ export function NewFoodButton() {
               </div>
 
               <div className="field">
-                <label htmlFor="f-photo">Foto {aiImageUrl ? "(sugerida pela IA — envie um arquivo para trocar)" : "(opcional)"}</label>
-                {aiImageUrl && (
+                <label htmlFor="f-photo">Foto {aiImageUrl ? "(sugerida pela IA — envie um arquivo para trocar)" : isEdit && food?.imageUrl ? "(envie um arquivo para trocar a atual)" : "(opcional)"}</label>
+                {aiImageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={aiImageUrl} alt={name} style={{ width: 64, height: 64, borderRadius: "var(--radius-sm)", objectFit: "cover", marginBottom: 8 }} />
-                )}
+                ) : isEdit && food?.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={food.imageUrl} alt={name} style={{ width: 64, height: 64, borderRadius: "var(--radius-sm)", objectFit: "cover", marginBottom: 8 }} />
+                ) : null}
                 <input className="input" id="f-photo" name="photo" type="file" accept="image/*" />
               </div>
 
@@ -131,17 +143,17 @@ export function NewFoodButton() {
                 </div>
                 <div className="field">
                   <label htmlFor="f-unit">Unidade padrão</label>
-                  <input className="input" id="f-unit" name="defaultUnit" defaultValue="g" placeholder="g, ml, unidade..." />
+                  <input className="input" id="f-unit" name="defaultUnit" defaultValue={food?.defaultUnit ?? "g"} placeholder="g, ml, unidade..." />
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div className="field">
                   <label htmlFor="f-brand">Marca (opcional)</label>
-                  <input className="input" id="f-brand" name="brand" placeholder="Ex: Danone, Yopro..." />
+                  <input className="input" id="f-brand" name="brand" defaultValue={food?.brand ?? ""} placeholder="Ex: Danone, Yopro..." />
                 </div>
                 <div className="field">
                   <label htmlFor="f-source">Fonte do dado nutricional</label>
-                  <select className="input" id="f-source" name="source" defaultValue="MANUAL">
+                  <select className="input" id="f-source" name="source" defaultValue={food?.source === "ROTULO" ? "ROTULO" : "MANUAL"}>
                     <option value="MANUAL">Digitado agora (manual)</option>
                     <option value="ROTULO">Rótulo do produto</option>
                   </select>
@@ -170,10 +182,13 @@ export function NewFoodButton() {
                   <input className="input" id="f-fat" name="fat100" type="number" step="0.1" min={0} value={fat} onChange={(e) => setFat(e.target.value)} />
                 </div>
               </div>
-              {fiber && <input type="hidden" name="fiber100" value={fiber} />}
+              <div className="field">
+                <label htmlFor="f-fiber">Fibra (g, opcional)</label>
+                <input className="input" id="f-fiber" name="fiber100" type="number" step="0.1" min={0} value={fiber} onChange={(e) => setFiber(e.target.value)} style={{ maxWidth: 140 }} />
+              </div>
 
               <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 6 }}>
-                {isPending ? "Salvando..." : "Adicionar alimento"}
+                {isPending ? "Salvando..." : isEdit ? "Salvar alterações" : "Adicionar alimento"}
               </button>
             </form>
           </div>

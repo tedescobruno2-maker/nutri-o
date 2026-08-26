@@ -88,6 +88,65 @@ export async function createRecipe(formData: FormData) {
   return { id: recipe.id, name: recipe.name, hasImage: !!recipe.imageAssetId };
 }
 
+const updateRecipeSchema = createRecipeSchema.extend({ id: z.string().min(1) });
+
+/** Edição (Fase 2 da reorganização do Plano Alimentar — antes não existia edição de receita
+ * nenhuma). Ao contrário de createRecipe, aqui um campo deixado em branco precisa LIMPAR o valor
+ * anterior (?? null), não deixar como estava — por isso não reaproveita undefined-on-empty do
+ * schema de criação direto no data do update. Ingredientes são substituídos por inteiro
+ * (deleteMany + create) e as macros recalculadas de novo, mesmo padrão de createRecipe. */
+export async function updateRecipe(formData: FormData) {
+  const parsed = updateRecipeSchema.parse({
+    id: formData.get("id"),
+    name: formData.get("name"),
+    description: formData.get("description") || undefined,
+    ingredients: formData.get("ingredients"),
+    instructions: formData.get("instructions") || undefined,
+    servings: formData.get("servings") || undefined,
+    prepTimeMin: formData.get("prepTimeMin") || undefined,
+    mealCategory: formData.get("mealCategory") || undefined,
+    isExtra: formData.get("isExtra") === "on" || undefined,
+    imageAssetId: formData.get("imageAssetId") || undefined,
+    tags: formData.get("tags") || undefined,
+    mealSlots: formData.get("mealSlots") || undefined,
+  });
+
+  const itemsJson = formData.get("ingredientItemsJson") as string | null;
+  const items = itemsJson ? ingredientItemSchema.array().parse(JSON.parse(itemsJson)) : [];
+  const validItems = items.filter((item) => item.foodId || item.description);
+
+  const recipe = await prisma.recipe.update({
+    where: { id: parsed.id },
+    data: {
+      name: parsed.name,
+      description: parsed.description ?? null,
+      ingredients: parsed.ingredients,
+      instructions: parsed.instructions ?? null,
+      servings: parsed.servings ?? null,
+      prepTimeMin: parsed.prepTimeMin ?? null,
+      mealCategory: parsed.mealCategory ?? null,
+      isExtra: parsed.isExtra ?? false,
+      ...(parsed.imageAssetId ? { imageAssetId: parsed.imageAssetId, ...(await legacyImageUrl(parsed.imageAssetId)) } : {}),
+      tags: parsed.tags ?? null,
+      mealSlots: parsed.mealSlots ?? null,
+      ingredientItems: {
+        deleteMany: {},
+        create: validItems.map((item, index) => ({ ...item, order: index })),
+      },
+    },
+    include: { ingredientItems: { include: { food: true } } },
+  });
+
+  const macros = computeRecipeMacros(recipe.name, recipe.servings, recipe.ingredientItems);
+  await prisma.recipe.update({ where: { id: recipe.id }, data: macros });
+
+  revalidatePath("/recipes");
+  revalidatePath(`/recipes/${recipe.id}`);
+  revalidatePath("/");
+
+  return { id: recipe.id, name: recipe.name };
+}
+
 /** 5.10.3 — quando a receita é salva sem foto, o <ImagePicker /> abre em seguida com o termo
  * sugerido; esta ação liga a imagem escolhida à receita já criada. */
 export async function attachRecipeImage(recipeId: string, imageAssetId: string) {

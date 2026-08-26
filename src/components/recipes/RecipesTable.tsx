@@ -1,10 +1,10 @@
 import Link from "next/link";
-import type { Recipe, ImageAsset } from "@/generated/prisma/client";
 import { MealSlotBadges } from "@/components/ui/MealSlotPicker";
+import { RecipeModal, type RecipeForEdit } from "@/components/recipes/RecipeModal";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
+import type { Food } from "@/generated/prisma/client";
 
-type RecipeWithImage = Recipe & { imageAsset?: ImageAsset | null };
-
-export function RecipesTable({ recipes }: { recipes: RecipeWithImage[] }) {
+export function RecipesTable({ recipes, foods }: { recipes: RecipeForEdit[]; foods: Food[] }) {
   return (
     <div className="card card-pad">
       <div style={{ overflowX: "auto" }}>
@@ -42,10 +42,12 @@ export function RecipesTable({ recipes }: { recipes: RecipeWithImage[] }) {
                   )}
                   <td className="text-muted" style={{ fontSize: "0.78rem" }}>{tags.slice(0, 3).join(", ") || "—"}</td>
                   <td><MealSlotBadges mealSlots={recipe.mealSlots} /></td>
-                  <td style={{ textAlign: "right" }}>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     <Link href={`/recipes/${recipe.id}`} className="btn btn-ghost btn-sm">
                       Ver →
                     </Link>
+                    <RecipeModal recipe={recipe} foods={foods} trigger={<span className="btn btn-ghost btn-sm">✎</span>} />
+                    <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} />
                   </td>
                 </tr>
               );
