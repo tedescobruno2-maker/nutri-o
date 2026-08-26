@@ -16,6 +16,7 @@ type MealPlanData = {
   objective: string | null;
   generalGuidelines: string | null;
   status: string;
+  sentAt: Date | null;
   consultationId: string | null;
   initialGuidanceId: string | null;
   meals: MealView[];
@@ -111,7 +112,7 @@ export function MealPlanSection({
                     <span className="text-tertiary">{CALC_STATUS_LABELS[dayTotal.status] ?? dayTotal.status}</span>
                   </p>
                 </div>
-                <PlanActionsBar mealPlanId={mealPlan.id} clientId={clientId} status={mealPlan.status} templates={templates} />
+                <PlanActionsBar mealPlanId={mealPlan.id} clientId={clientId} status={mealPlan.status} sentAt={mealPlan.sentAt} templates={templates} />
               </div>
               {dayTotal.warnings.length > 0 && (
                 <details>

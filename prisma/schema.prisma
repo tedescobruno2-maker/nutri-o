@@ -737,6 +737,12 @@ model MealPlan {
   objective         String?
   generalGuidelines String? // itens separados por \n
   active            Boolean  @default(true)
+  // Fase 5 da reorganização do Plano Alimentar: null = rascunho, o paciente ainda não vê este
+  // plano no portal — só depois que a nutricionista clicar em "Enviar para o paciente". Antes
+  // disto, "active" por si só já liberava a visualização (sem gate nenhum); dbPatient.ts::
+  // getActivePlan passa a exigir os dois. Planos que já eram ativos antes desta fase recebem um
+  // backfill (sentAt = createdAt) pra ninguém perder acesso ao que já via.
+  sentAt            DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

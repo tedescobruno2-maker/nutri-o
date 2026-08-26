@@ -7,6 +7,7 @@ type PlanHistoryItem = {
   objective: string | null;
   active: boolean;
   status: string;
+  sentAt: Date | null;
   createdAt: Date;
   _count: { meals: number };
 };
@@ -36,6 +37,7 @@ export function PlanHistoryTable({ plans }: { plans: PlanHistoryItem[] }) {
               <td>
                 {plan.title}
                 {plan.active && <span className="badge badge-neutral" style={{ marginLeft: 8 }}>Atual</span>}
+                {!plan.sentAt && <span className="badge badge-warm" style={{ marginLeft: 8 }}>🔒 Rascunho — paciente não vê</span>}
               </td>
               <td className="text-muted">{formatDateFull(plan.createdAt)}</td>
               <td className="text-muted">{plan._count.meals}</td>

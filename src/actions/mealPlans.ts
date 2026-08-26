@@ -661,3 +661,19 @@ export async function finalizeMealPlan(mealPlanId: string, clientId: string) {
   await logAudit({ actorUserId: actor.id, action: "ATUALIZAR", entity: "MealPlan", entityId: mealPlanId, clientId, metadata: { finalizado: true } });
   revalidateClient(clientId);
 }
+
+/** Fase 5: libera o plano pro paciente ver no portal (sentAt não-nulo é o que
+ * dbPatient.ts::getActivePlan/getPlanHistory/getPlanById exigem) — até aqui, mesmo um plano
+ * "ativo" fica invisível pro paciente. Ação deliberada da nutricionista, separada de Finalizar
+ * (pode enviar um rascunho ainda em construção, ou finalizar sem enviar ainda). */
+export async function sendMealPlanToPatient(mealPlanId: string, clientId: string) {
+  const actor = await requireRole("ADMIN_MASTER", "NUTRICIONISTA");
+  const plan = await prisma.mealPlan.findUnique({ where: { id: mealPlanId }, select: { clientId: true } });
+  if (!plan) throw new Error("Plano não encontrado.");
+  if (plan.clientId !== clientId) throw new Error("Este plano não pertence a este paciente.");
+
+  await prisma.mealPlan.update({ where: { id: mealPlanId }, data: { sentAt: new Date() } });
+
+  await logAudit({ actorUserId: actor.id, action: "ATUALIZAR", entity: "MealPlan", entityId: mealPlanId, clientId, metadata: { enviadoParaPaciente: true } });
+  revalidateClient(clientId);
+}

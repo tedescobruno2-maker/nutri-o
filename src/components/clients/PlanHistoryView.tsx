@@ -11,6 +11,7 @@ type PlanHistoryItem = {
   objective: string | null;
   active: boolean;
   status: string;
+  sentAt: Date | null;
   createdAt: Date;
   _count: { meals: number };
 };
@@ -39,6 +40,7 @@ export function PlanHistoryView({ plans }: { plans: PlanHistoryItem[] }) {
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 <strong style={{ fontSize: "0.88rem" }}>{plan.title}</strong>
                 {plan.active && <span className="badge badge-neutral" style={{ fontSize: "0.66rem" }}>Atual</span>}
+                {!plan.sentAt && <span className="badge badge-warm" style={{ fontSize: "0.66rem" }}>🔒 Rascunho</span>}
               </div>
               <p className="text-tertiary" style={{ fontSize: "0.76rem", marginTop: 2 }}>
                 {formatDateFull(plan.createdAt)} · {plan._count.meals} refeição(ões)

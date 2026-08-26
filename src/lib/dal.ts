@@ -57,6 +57,7 @@ export async function getClientProfile(id: string) {
         objective: true,
         active: true,
         status: true,
+        sentAt: true,
         createdAt: true,
         _count: { select: { meals: true } },
       },

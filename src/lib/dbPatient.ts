@@ -62,22 +62,24 @@ export function dbForPatient(clientId: string) {
         },
       }),
 
+    // Fase 5: sentAt não-nulo é o que libera a visualização pro paciente — um plano ativo mas
+    // ainda em rascunho (sentAt null) não aparece em NENHUMA leitura daqui, nem no histórico.
     getActivePlan: () =>
       prisma.mealPlan.findFirst({
-        where: { clientId, active: true },
+        where: { clientId, active: true, sentAt: { not: null } },
         include: { consultation: true, initialGuidance: true, ...PLAN_INCLUDE },
       }),
 
     getPlanHistory: () =>
       prisma.mealPlan.findMany({
-        where: { clientId },
+        where: { clientId, sentAt: { not: null } },
         orderBy: { createdAt: "desc" },
         select: { id: true, title: true, objective: true, active: true, createdAt: true },
       }),
 
     getPlanById: (id: string) =>
       prisma.mealPlan.findFirst({
-        where: { id, clientId },
+        where: { id, clientId, sentAt: { not: null } },
         include: { consultation: true, initialGuidance: true, ...PLAN_INCLUDE },
       }),
 

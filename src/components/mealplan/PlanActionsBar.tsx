@@ -2,18 +2,20 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { duplicateMealPlan, saveMealPlanAsTemplate, applyTemplateToClient, finalizeMealPlan } from "@/actions/mealPlans";
+import { duplicateMealPlan, saveMealPlanAsTemplate, applyTemplateToClient, finalizeMealPlan, sendMealPlanToPatient } from "@/actions/mealPlans";
 import type { MealPlanTemplate } from "@/generated/prisma/client";
 
 export function PlanActionsBar({
   mealPlanId,
   clientId,
   status,
+  sentAt,
   templates,
 }: {
   mealPlanId: string;
   clientId: string;
   status: string;
+  sentAt: Date | null;
   templates: MealPlanTemplate[];
 }) {
   const router = useRouter();
@@ -59,8 +61,21 @@ export function PlanActionsBar({
     });
   }
 
+  function handleSend() {
+    startTransition(async () => {
+      await sendMealPlanToPatient(mealPlanId, clientId);
+      setMessage("Plano enviado — o paciente já pode ver no portal.");
+      router.refresh();
+    });
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {!sentAt && (
+        <span className="badge badge-warm" style={{ alignSelf: "flex-start" }}>
+          🔒 Rascunho — o paciente ainda não vê este plano
+        </span>
+      )}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button type="button" className="btn btn-ghost btn-sm" disabled={isPending} onClick={handleDuplicate}>
           🗂️ Duplicar
@@ -74,11 +89,18 @@ export function PlanActionsBar({
           </button>
         )}
         {status !== "FINALIZADO" ? (
-          <button type="button" className="btn btn-primary btn-sm" disabled={isPending} onClick={handleFinalize}>
+          <button type="button" className="btn btn-ghost btn-sm" disabled={isPending} onClick={handleFinalize}>
             ✓ Finalizar
           </button>
         ) : (
           <span className="badge badge-success">Finalizado</span>
+        )}
+        {!sentAt ? (
+          <button type="button" className="btn btn-primary btn-sm" disabled={isPending} onClick={handleSend}>
+            📤 Enviar para o paciente
+          </button>
+        ) : (
+          <span className="badge badge-success">📤 Enviado ao paciente</span>
         )}
       </div>
 
