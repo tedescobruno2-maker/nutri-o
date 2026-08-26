@@ -62,9 +62,6 @@ export function MealPlanSection({
               🖨️ Exportar PDF
             </Link>
           )}
-          <Link href={`/planos?clientId=${clientId}`} className="btn btn-ghost btn-sm">
-            🍽️ Montar com receitas
-          </Link>
           <NewMealPlanButton clientId={clientId} hasPlan={!!mealPlan} />
         </div>
       </div>

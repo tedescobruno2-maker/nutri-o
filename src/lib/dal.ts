@@ -28,6 +28,9 @@ export async function getClients() {
   });
 }
 
+/** Fase 4 da reorganização do Plano Alimentar: a montagem/edição do plano saiu daqui — a página
+ * do paciente só mostra o HISTÓRICO (leve, sem a árvore inteira de refeições). Editar acontece em
+ * /planos/[id], via getMealPlanForEditor. */
 export async function getClientProfile(id: string) {
   const [client, mealPlanHistory] = await Promise.all([
     prisma.client.findUnique({
@@ -43,44 +46,17 @@ export async function getClientProfile(id: string) {
         consultationForms: { orderBy: { createdAt: "desc" }, take: 1 },
         consultations: { orderBy: { date: "desc" } },
         exams: { orderBy: { requestedDate: "desc" } },
-        mealPlans: {
-          where: { active: true },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-          include: {
-            consultation: true,
-            initialGuidance: true,
-            meals: {
-              orderBy: { order: "asc" },
-              include: {
-                options: {
-                  orderBy: { order: "asc" },
-                  include: {
-                    imageAsset: true,
-                    items: {
-                      orderBy: { order: "asc" },
-                      include: {
-                        food: true,
-                        foodMeasure: true,
-                        recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
-                        choiceGroup: { include: { items: { orderBy: { order: "asc" }, include: { food: true } } } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
       },
     }),
     prisma.mealPlan.findMany({
-      where: { clientId: id, active: false },
+      where: { clientId: id },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
         title: true,
         objective: true,
+        active: true,
+        status: true,
         createdAt: true,
         _count: { select: { meals: true } },
       },
@@ -117,6 +93,56 @@ export async function getMealPlanFullTree(mealPlanId: string) {
       },
     },
   });
+}
+
+/** Plano + paciente completos, para a tela de edição em /planos/[id] (Fase 4) — substitui o que
+ * antes era montado a partir de getClientProfile quando o editor vivia dentro da página do
+ * paciente. Opera sobre um mealPlanId arbitrário (não precisa ser o "ativo" do paciente). */
+export async function getMealPlanForEditor(mealPlanId: string) {
+  return prisma.mealPlan.findUnique({
+    where: { id: mealPlanId },
+    include: {
+      client: {
+        select: {
+          id: true,
+          name: true,
+          allergies: true,
+          intolerances: true,
+          dietaryRestrictions: true,
+          foodAversions: true,
+          consultations: { orderBy: { date: "desc" } },
+          measurements: { orderBy: { date: "asc" } },
+        },
+      },
+      meals: {
+        orderBy: { order: "asc" },
+        include: {
+          options: {
+            orderBy: { order: "asc" },
+            include: {
+              imageAsset: true,
+              items: {
+                orderBy: { order: "asc" },
+                include: {
+                  food: true,
+                  foodMeasure: true,
+                  recipe: { include: { ingredientItems: { orderBy: { order: "asc" }, include: { food: true } } } },
+                  choiceGroup: { include: { items: { orderBy: { order: "asc" }, include: { food: true } } } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+/** Id do plano ativo (rascunho em andamento) de um paciente, ou null — usado por /planos pra
+ * decidir se abre o editor existente ou oferece começar um novo. */
+export async function getClientActivePlanId(clientId: string) {
+  const plan = await prisma.mealPlan.findFirst({ where: { clientId, active: true }, select: { id: true } });
+  return plan?.id ?? null;
 }
 
 export async function getMealPlanTemplates() {

@@ -60,6 +60,7 @@ export async function createMealPlanFromRecipes(input: PlanBuilderInput) {
 
   revalidatePath(`/clients/${clientId}`);
   revalidatePath("/planos");
+  revalidatePath("/planos/[id]", "page");
 
   return { mealPlanId: mealPlan.id };
 }

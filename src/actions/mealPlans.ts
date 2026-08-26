@@ -9,8 +9,12 @@ import { findRestrictionConflict, type ClientRestrictions } from "@/lib/allergyM
 import { calcMealOptionItem, calcMealOptionFromItems, calcMealFromOptions, calcDayTotal, type MealOptionItemLike } from "@/lib/mealPlanCalc";
 import { getMealPlanFullTree } from "@/lib/dal";
 
+/** Fase 4: o editor do plano saiu da página do paciente e virou uma rota própria por
+ * mealPlanId (/planos/[id]) — revalidamos o padrão da rota inteira (sem saber qual id
+ * específico está aberto agora) junto com a página do paciente, que só mostra o histórico. */
 function revalidateClient(clientId: string) {
   revalidatePath(`/clients/${clientId}`);
+  revalidatePath("/planos/[id]", "page");
 }
 
 const createMealPlanSchema = z.object({
@@ -30,13 +34,14 @@ export async function createMealPlan(formData: FormData) {
 
   const actor = await requireRole("ADMIN_MASTER", "NUTRICIONISTA");
 
-  await prisma.$transaction([
+  const [, newPlan] = await prisma.$transaction([
     prisma.mealPlan.updateMany({ where: { clientId: parsed.clientId, active: true }, data: { active: false, status: "SUBSTITUIDO" } }),
     prisma.mealPlan.create({ data: parsed }),
   ]);
 
-  await logAudit({ actorUserId: actor.id, action: "CRIAR", entity: "MealPlan", clientId: parsed.clientId });
+  await logAudit({ actorUserId: actor.id, action: "CRIAR", entity: "MealPlan", entityId: newPlan.id, clientId: parsed.clientId });
   revalidateClient(parsed.clientId);
+  return { mealPlanId: newPlan.id };
 }
 
 export async function updateMealPlanGuidelines(mealPlanId: string, clientId: string, formData: FormData) {
@@ -303,6 +308,7 @@ export async function duplicateMealPlan(mealPlanId: string, clientId: string) {
   const actor = await requireRole("ADMIN_MASTER", "NUTRICIONISTA");
   const original = await getMealPlanFullTree(mealPlanId);
   if (!original) throw new Error("Plano não encontrado.");
+  if (original.clientId !== clientId) throw new Error("Este plano não pertence a este paciente.");
 
   const result = await prisma.$transaction(async (tx) => {
     await tx.mealPlan.updateMany({ where: { clientId, active: true }, data: { active: false, status: "SUBSTITUIDO" } });
@@ -558,6 +564,7 @@ export async function finalizeMealPlan(mealPlanId: string, clientId: string) {
   const actor = await requireRole("ADMIN_MASTER", "NUTRICIONISTA");
   const plan = await getMealPlanFullTree(mealPlanId);
   if (!plan) throw new Error("Plano não encontrado.");
+  if (plan.clientId !== clientId) throw new Error("Este plano não pertence a este paciente.");
 
   const allWarnings: Array<{ message: string; foodName?: string }> = [];
 

@@ -27,9 +27,8 @@ export function PlanActionsBar({
 
   function handleDuplicate() {
     startTransition(async () => {
-      await duplicateMealPlan(mealPlanId, clientId);
-      setMessage("Plano duplicado — o anterior foi marcado como substituído.");
-      router.refresh();
+      const result = await duplicateMealPlan(mealPlanId, clientId);
+      router.push(`/planos/${result.mealPlanId}`);
     });
   }
 
@@ -46,10 +45,9 @@ export function PlanActionsBar({
   function handleApplyTemplate() {
     if (!applyTemplateId) return;
     startTransition(async () => {
-      await applyTemplateToClient(applyTemplateId, clientId);
-      setMessage("Modelo aplicado como novo rascunho.");
+      const result = await applyTemplateToClient(applyTemplateId, clientId);
       setShowApplyForm(false);
-      router.refresh();
+      router.push(`/planos/${result.mealPlanId}`);
     });
   }
 

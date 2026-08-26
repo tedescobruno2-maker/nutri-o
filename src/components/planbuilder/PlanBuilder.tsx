@@ -69,7 +69,7 @@ export function PlanBuilder({
     startTransition(async () => {
       try {
         const result = await createMealPlanFromRecipes({ clientId, title, objective: objective || undefined, slots: activeSlots });
-        router.push(`/planos/${result.mealPlanId}/exportar`);
+        router.push(`/planos/${result.mealPlanId}`);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erro ao salvar o plano.");
       }
@@ -135,17 +135,19 @@ export function PlanBuilder({
         <div className="card card-pad" style={{ display: "flex", flexDirection: "column", gap: 14, position: "sticky", top: 90 }}>
           <h3>Plano em construção</h3>
 
-          <div className="field">
-            <label htmlFor="pb-client">Paciente</label>
-            <select id="pb-client" className="input" value={clientId} onChange={(e) => setClientId(e.target.value)}>
-              <option value="">Selecione...</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {clients.length > 1 && (
+            <div className="field">
+              <label htmlFor="pb-client">Paciente</label>
+              <select id="pb-client" className="input" value={clientId} onChange={(e) => setClientId(e.target.value)}>
+                <option value="">Selecione...</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="field">
             <label htmlFor="pb-title">Título do plano</label>

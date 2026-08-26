@@ -1,18 +1,21 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { createMealPlan } from "@/actions/mealPlans";
 
 export function NewMealPlanButton({ clientId, hasPlan }: { clientId: string; hasPlan: boolean }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      await createMealPlan(formData);
+      const result = await createMealPlan(formData);
       formRef.current?.reset();
       setOpen(false);
+      router.push(`/planos/${result.mealPlanId}`);
     });
   }
 

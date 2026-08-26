@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getClientProfile, getFoodsForBuilder, getRecipesWithIngredients, getChoiceGroupsForBuilder, getGuidanceTexts, getMealPlanTemplates, getActiveSupplementsForPrescription } from "@/lib/dal";
+import { getClientProfile, getActiveSupplementsForPrescription } from "@/lib/dal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { AdherenceChart } from "@/components/charts/AdherenceChart";
 import { MacroChart } from "@/components/charts/MacroChart";
 import { AddMeasurementForm } from "@/components/clients/AddMeasurementForm";
 import { AddDietLogForm } from "@/components/clients/AddDietLogForm";
-import { MealPlanSection } from "@/components/mealplan/MealPlanSection";
+import { PlanHistoryView } from "@/components/clients/PlanHistoryView";
 import { SupplementPrescriptionSection } from "@/components/supplements/SupplementPrescriptionSection";
 import { ConsultationFormSection } from "@/components/consultation/ConsultationFormSection";
 import { ConsultationHistorySection } from "@/components/clients/ConsultationHistorySection";
@@ -22,13 +22,8 @@ import { KANBAN_LABELS, initials, formatDate, formatDateFull, calculateAge, type
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [client, foodsForBuilder, recipesWithIngredients, choiceGroups, guidanceTexts, mealPlanTemplates, activeSupplements] = await Promise.all([
+  const [client, activeSupplements] = await Promise.all([
     getClientProfile(id),
-    getFoodsForBuilder(),
-    getRecipesWithIngredients(),
-    getChoiceGroupsForBuilder(),
-    getGuidanceTexts(),
-    getMealPlanTemplates(),
     getActiveSupplementsForPrescription(),
   ]);
   if (!client) notFound();
@@ -50,7 +45,6 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
   const first = client.measurements[0];
   const delta = latest && first ? Math.round((latest.weight - first.weight) * 10) / 10 : null;
   const latestAdherence = client.dietLogs.at(-1)?.adherence ?? null;
-  const activePlan = client.mealPlans[0] ?? null;
   const lastConsultation = client.consultations[0]?.date ?? null;
   const measurementHistory = [...client.measurements].reverse(); // mais recente primeiro
   const dietLogHistory = [...client.dietLogs].reverse();
@@ -243,61 +237,19 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
         </div>
       </section>
 
-      <section className="section">
-        <MealPlanSection
-          clientId={client.id}
-          client={{
-            allergies: client.allergies,
-            intolerances: client.intolerances,
-            dietaryRestrictions: client.dietaryRestrictions,
-            foodAversions: client.foodAversions,
-            consultations: client.consultations,
-            measurements: client.measurements,
-          }}
-          mealPlan={activePlan}
-          foods={foodsForBuilder}
-          recipes={recipesWithIngredients}
-          choiceGroups={choiceGroups}
-          guidanceTexts={guidanceTexts}
-          templates={mealPlanTemplates}
-        />
-      </section>
-
-      {/* Histórico de planos alimentares anteriores */}
+      {/* Fase 4: montar/editar o plano alimentar acontece em /planos — aqui só o histórico. */}
       <section className="section">
         <div className="card card-pad">
           <div className="chart-card-header">
-            <h3>Histórico de planos alimentares</h3>
+            <h3>Plano Alimentar</h3>
+            <Link href={`/planos?clientId=${client.id}`} className="btn btn-primary btn-sm">
+              🍽️ Montar / continuar plano
+            </Link>
           </div>
           {client.mealPlanHistory.length === 0 ? (
-            <p className="text-tertiary" style={{ fontSize: "0.85rem" }}>Nenhum plano anterior registrado.</p>
+            <p className="text-tertiary" style={{ fontSize: "0.85rem" }}>Nenhum plano alimentar registrado ainda.</p>
           ) : (
-            <div>
-              {client.mealPlanHistory.map((plan) => (
-                <div
-                  key={plan.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px 0",
-                    borderBottom: "1px solid var(--border-subtle)",
-                  }}
-                >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{plan.title}</div>
-                    <div className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      {formatDateFull(plan.createdAt)} · {plan._count.meals} refeição(ões)
-                      {plan.objective ? ` · ${plan.objective}` : ""}
-                    </div>
-                  </div>
-                  <Link href={`/planos/${plan.id}/exportar`} className="btn btn-ghost btn-sm">
-                    Ver plano →
-                  </Link>
-                </div>
-              ))}
-            </div>
+            <PlanHistoryView plans={client.mealPlanHistory} />
           )}
         </div>
       </section>
