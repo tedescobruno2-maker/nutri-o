@@ -1,5 +1,5 @@
 import { getRecipes, getFoods } from "@/lib/dal";
-import { RecipeCard } from "@/components/recipes/RecipeCard";
+import { RecipesView } from "@/components/recipes/RecipesView";
 import { NewRecipeButton } from "@/components/recipes/NewRecipeButton";
 
 export default async function RecipesPage() {
@@ -21,11 +21,7 @@ export default async function RecipesPage() {
           <p>Nenhuma receita cadastrada ainda.</p>
         </div>
       ) : (
-        <div className="recipe-grid">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
+        <RecipesView recipes={recipes} />
       )}
     </div>
   );

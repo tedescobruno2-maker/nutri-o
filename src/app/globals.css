@@ -806,6 +806,39 @@ select.input:focus {
   background: color-mix(in oklch, var(--accent-primary) 15%, transparent);
 }
 
+/* -------------------------------- View toggle (Tabela / Cards) -------------------------------- */
+
+.view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.view-toggle-btn:hover {
+  color: var(--text-primary);
+}
+
+.view-toggle-btn.active {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
+  color: white;
+}
+
 /* -------------------------------- Tables / lists -------------------------------- */
 
 .data-table {

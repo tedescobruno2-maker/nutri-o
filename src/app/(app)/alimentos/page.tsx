@@ -1,6 +1,6 @@
 import { getFoodsGrouped, getFoodCategories } from "@/lib/dal";
 import { NewFoodButton } from "@/components/foods/NewFoodButton";
-import { FoodCard } from "@/components/foods/FoodCard";
+import { FoodsView } from "@/components/foods/FoodsView";
 
 export default async function FoodsPage({
   searchParams,
@@ -44,11 +44,7 @@ export default async function FoodsPage({
           <p>Nenhum alimento encontrado.</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
-          {groups.map((group) => (
-            <FoodCard key={group.baseName} group={group} />
-          ))}
-        </div>
+        <FoodsView groups={groups} />
       )}
     </div>
   );
