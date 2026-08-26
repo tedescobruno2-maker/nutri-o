@@ -113,6 +113,12 @@ export async function getMealPlanForEditor(mealPlanId: string) {
           foodAversions: true,
           consultations: { orderBy: { date: "desc" } },
           measurements: { orderBy: { date: "asc" } },
+          consultationForms: {
+            where: { status: "COMPLETED" },
+            orderBy: { completedAt: "desc" },
+            take: 1,
+            select: { mainGoal: true },
+          },
         },
       },
       meals: {
@@ -144,6 +150,18 @@ export async function getMealPlanForEditor(mealPlanId: string) {
 export async function getClientActivePlanId(clientId: string) {
   const plan = await prisma.mealPlan.findFirst({ where: { clientId, active: true }, select: { id: true } });
   return plan?.id ?? null;
+}
+
+/** Objetivo que o PRÓPRIO paciente descreveu ao responder o formulário pré-consulta mais
+ * recente (ConsultationForm.mainGoal) — usado só para pré-preencher o campo "Objetivo" ao criar
+ * um plano; nunca escreve de volta no formulário (esse permanece intocado). */
+export async function getClientLatestFormGoal(clientId: string) {
+  const form = await prisma.consultationForm.findFirst({
+    where: { clientId, status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    select: { mainGoal: true },
+  });
+  return form?.mainGoal ?? null;
 }
 
 export async function getMealPlanTemplates() {

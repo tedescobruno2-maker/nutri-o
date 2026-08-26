@@ -12,7 +12,7 @@ import {
 } from "@/lib/dal";
 import { MealPlanSection } from "@/components/mealplan/MealPlanSection";
 import { PlanCatalogPanel } from "@/components/planbuilder/PlanCatalogPanel";
-import { initials } from "@/lib/utils";
+import { initials, MAIN_GOAL_LABELS, type MainGoalValue } from "@/lib/utils";
 
 export default async function PlanEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,6 +29,8 @@ export default async function PlanEditorPage({ params }: { params: Promise<{ id:
   if (!mealPlan) notFound();
 
   const { client, ...planData } = mealPlan;
+  const formMainGoal = client.consultationForms[0]?.mainGoal as MainGoalValue | undefined;
+  const patientStatedGoal = formMainGoal ? MAIN_GOAL_LABELS[formMainGoal] : null;
 
   return (
     <div className="animate-in">
@@ -53,6 +55,7 @@ export default async function PlanEditorPage({ params }: { params: Promise<{ id:
             consultations: client.consultations,
             measurements: client.measurements,
           }}
+          patientStatedGoal={patientStatedGoal}
           mealPlan={planData}
           foods={foodsForBuilder}
           recipes={recipesWithIngredients}

@@ -4,14 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { createGuidanceText, updateGuidanceText } from "@/actions/settings";
 import { MealSlotPicker } from "@/components/ui/MealSlotPicker";
 import { parseMealSlots } from "@/lib/planSlots";
-
-const TYPE_LABELS: Record<string, string> = {
-  ORIENTACAO_GERAL: "Orientação geral",
-  HIDRATACAO: "Hidratação",
-  SUPLEMENTACAO: "Suplementação",
-  PRE_TREINO: "Pré-treino",
-  TAREFA_INICIAL: "Tarefa inicial",
-};
+import { GUIDANCE_TEXT_TYPE_LABELS as TYPE_LABELS } from "@/lib/utils";
 
 type GuidanceText = {
   id: string;

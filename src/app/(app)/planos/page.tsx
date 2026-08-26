@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
-import { getClientsBasic, getRecipes, getClientActivePlanId } from "@/lib/dal";
+import { getClientsBasic, getRecipes, getClientActivePlanId, getClientLatestFormGoal, getGuidanceTexts } from "@/lib/dal";
 import { ClientPicker } from "@/components/planbuilder/ClientPicker";
 import { PlanBuilder } from "@/components/planbuilder/PlanBuilder";
 import { NewMealPlanButton } from "@/components/mealplan/NewMealPlanButton";
+import { MAIN_GOAL_LABELS, type MainGoalValue } from "@/lib/utils";
 
 export default async function PlanosPage({ searchParams }: { searchParams: Promise<{ clientId?: string }> }) {
   const { clientId } = await searchParams;
@@ -15,7 +16,10 @@ export default async function PlanosPage({ searchParams }: { searchParams: Promi
   }
 
   const selected = clientId ? clients.find((c) => c.id === clientId) ?? null : null;
-  const recipes = selected ? await getRecipes() : [];
+  const [recipes, guidanceTexts, formGoal] = selected
+    ? await Promise.all([getRecipes(), getGuidanceTexts(), getClientLatestFormGoal(selected.id)])
+    : [[], [], null];
+  const patientStatedGoal = formGoal ? MAIN_GOAL_LABELS[formGoal as MainGoalValue] : null;
 
   return (
     <div className="animate-in">
@@ -35,7 +39,7 @@ export default async function PlanosPage({ searchParams }: { searchParams: Promi
               <strong>{selected.name}</strong>
               <p className="text-tertiary" style={{ fontSize: "0.8rem" }}>Sem plano em andamento — comece do zero ou monte a partir de receitas abaixo.</p>
             </div>
-            <NewMealPlanButton clientId={selected.id} hasPlan={false} />
+            <NewMealPlanButton clientId={selected.id} hasPlan={false} patientStatedGoal={patientStatedGoal} guidanceTexts={guidanceTexts} />
           </div>
 
           <div>

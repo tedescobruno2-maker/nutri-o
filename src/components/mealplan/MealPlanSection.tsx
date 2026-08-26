@@ -25,6 +25,7 @@ type MealPlanData = {
 export function MealPlanSection({
   clientId,
   client,
+  patientStatedGoal,
   mealPlan,
   foods,
   recipes,
@@ -34,6 +35,7 @@ export function MealPlanSection({
 }: {
   clientId: string;
   client: ClientRestrictions & { consultations: Consultation[]; measurements: Measurement[] };
+  patientStatedGoal?: string | null;
   mealPlan: MealPlanData;
   foods: Array<Food & { measures: FoodMeasure[] }>;
   recipes: RecipeView[];
@@ -63,7 +65,7 @@ export function MealPlanSection({
               🖨️ Exportar PDF
             </Link>
           )}
-          <NewMealPlanButton clientId={clientId} hasPlan={!!mealPlan} />
+          <NewMealPlanButton clientId={clientId} hasPlan={!!mealPlan} patientStatedGoal={patientStatedGoal} guidanceTexts={guidanceTexts} />
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { GuidanceTextCard } from "@/components/settings/GuidanceTextCard";
 import { GuidanceTextsTable } from "@/components/settings/GuidanceTextsTable";
 import { ViewToggle, useViewMode } from "@/components/ui/ViewToggle";
 import { PLAN_SLOTS, PLAN_SLOT_SHORT } from "@/lib/planSlots";
+import { GUIDANCE_TEXT_TYPE_LABELS as TYPE_LABELS } from "@/lib/utils";
 
 type GuidanceText = {
   id: string;
@@ -13,14 +14,6 @@ type GuidanceText = {
   type: string;
   tags: string | null;
   mealSlots?: string | null;
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  ORIENTACAO_GERAL: "Orientação geral",
-  HIDRATACAO: "Hidratação",
-  SUPLEMENTACAO: "Suplementação",
-  PRE_TREINO: "Pré-treino",
-  TAREFA_INICIAL: "Tarefa inicial",
 };
 
 export function GuidanceTextsView({ texts }: { texts: GuidanceText[] }) {

@@ -2,6 +2,14 @@ export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+export const GUIDANCE_TEXT_TYPE_LABELS: Record<string, string> = {
+  ORIENTACAO_GERAL: "Orientação geral",
+  HIDRATACAO: "Hidratação",
+  SUPLEMENTACAO: "Suplementação",
+  PRE_TREINO: "Pré-treino",
+  TAREFA_INICIAL: "Tarefa inicial",
+};
+
 export const FOOD_PREPARATION_LABELS: Record<string, string> = {
   NAO_APLICA: "Padrão",
   CRU: "Cru",
