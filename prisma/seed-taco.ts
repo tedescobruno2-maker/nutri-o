@@ -96,9 +96,15 @@ function parseTacoName(fullName: string): ParsedName {
   return { baseName: fullName, preparation: "NAO_APLICA", suspicious };
 }
 
-/** "NA", "Tr", "*", "" e vazio viram null — nunca 0. Números passam direto. */
+/** "NA", "Tr", "*", "" e vazio viram null — nunca 0. Números são arredondados: a planilha oficial
+ * carrega ruído de ponto flutuante em células calculadas (ex.: 209.376254458904 em vez de 209), e
+ * a própria TACO publica os valores com no máximo 1 casa decimal (kcal sempre inteiro). */
 function cleanNumber(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return Math.round(value * 10) / 10;
+  return null;
+}
+function cleanKcal(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.round(value);
   return null;
 }
 
@@ -146,7 +152,7 @@ async function main() {
         baseName,
         preparation,
         suspicious,
-        kcal: cleanNumber(r[COL.kcal]),
+        kcal: cleanKcal(r[COL.kcal]),
         protein: cleanNumber(r[COL.protein]),
         fat: cleanNumber(r[COL.fat]),
         carbs: cleanNumber(r[COL.carbs]),

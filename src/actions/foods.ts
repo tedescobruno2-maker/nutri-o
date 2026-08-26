@@ -12,11 +12,13 @@ const createFoodSchema = z.object({
   defaultUnit: z.string().min(1).default("g"),
   source: z.enum(["MANUAL", "ROTULO"]).default("MANUAL"),
   sourceRef: z.string().optional(),
-  kcal100: z.coerce.number().min(0).optional(),
-  protein100: z.coerce.number().min(0).optional(),
-  carbs100: z.coerce.number().min(0).optional(),
-  fat100: z.coerce.number().min(0).optional(),
-  fiber100: z.coerce.number().min(0).optional(),
+  // Arredondado na entrada — kcal inteiro, demais campos com 1 casa (mesma convenção de recipeCalc.ts),
+  // pra não deixar um valor colado do rótulo/planilha entrar com ruído de várias casas decimais.
+  kcal100: z.coerce.number().min(0).optional().transform((n) => (n == null ? n : Math.round(n))),
+  protein100: z.coerce.number().min(0).optional().transform((n) => (n == null ? n : Math.round(n * 10) / 10)),
+  carbs100: z.coerce.number().min(0).optional().transform((n) => (n == null ? n : Math.round(n * 10) / 10)),
+  fat100: z.coerce.number().min(0).optional().transform((n) => (n == null ? n : Math.round(n * 10) / 10)),
+  fiber100: z.coerce.number().min(0).optional().transform((n) => (n == null ? n : Math.round(n * 10) / 10)),
 });
 
 export async function createFood(formData: FormData) {
