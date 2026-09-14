@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { extractScaleReport, saveScaleMeasurement } from "@/actions/scaleImport";
+import { checkUploadSize } from "@/lib/uploadLimits";
 import { cn } from "@/lib/utils";
 import type { ScaleReportData } from "@/lib/gemini";
 
@@ -42,6 +43,11 @@ export function ImportScaleButton({ clientId, clientName }: { clientId: string; 
 
   function handleExtract(formData: FormData) {
     setError(null);
+    const sizeError = checkUploadSize(formData.get("file") as File | null);
+    if (sizeError) {
+      setError(sizeError);
+      return;
+    }
     startTransition(async () => {
       const result = await extractScaleReport(formData);
       if (!result.ok) {

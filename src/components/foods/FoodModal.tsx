@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { createFood, updateFood } from "@/actions/foods";
 import { suggestFoodData } from "@/actions/foodAI";
+import { checkUploadSize } from "@/lib/uploadLimits";
 import type { Food } from "@/generated/prisma/client";
 
 function round1(n: number) {
@@ -25,6 +26,7 @@ export function FoodModal({ food, trigger }: { food?: Food; trigger: React.React
   const [fiber, setFiber] = useState(food?.fiber100 != null ? String(food.fiber100) : "");
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [suggestError, setSuggestError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [suggested, setSuggested] = useState(false);
 
   function resetAll() {
@@ -44,6 +46,12 @@ export function FoodModal({ food, trigger }: { food?: Food; trigger: React.React
   }
 
   function handleSubmit(formData: FormData) {
+    setFileError(null);
+    const sizeError = checkUploadSize(formData.get("photo") as File | null);
+    if (sizeError) {
+      setFileError(sizeError);
+      return;
+    }
     startTransition(async () => {
       if (isEdit) {
         formData.set("id", food.id);
@@ -186,6 +194,8 @@ export function FoodModal({ food, trigger }: { food?: Food; trigger: React.React
                 <label htmlFor="f-fiber">Fibra (g, opcional)</label>
                 <input className="input" id="f-fiber" name="fiber100" type="number" step="0.1" min={0} value={fiber} onChange={(e) => setFiber(e.target.value)} style={{ maxWidth: 140 }} />
               </div>
+
+              {fileError && <p style={{ color: "var(--danger)", fontSize: "0.82rem" }}>{fileError}</p>}
 
               <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 6 }}>
                 {isPending ? "Salvando..." : isEdit ? "Salvar alterações" : "Adicionar alimento"}

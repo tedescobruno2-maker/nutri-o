@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { importExamResultsPdf, type ImportExamResultsSummary } from "@/actions/examResults";
+import { checkUploadSize, formatMb, MAX_UPLOAD_BYTES } from "@/lib/uploadLimits";
 
 export function ImportExamResultsButton({ clientId }: { clientId: string }) {
   const [open, setOpen] = useState(false);
@@ -19,6 +20,13 @@ export function ImportExamResultsButton({ clientId }: { clientId: string }) {
 
   function handleSubmit(formData: FormData) {
     setError(null);
+    // Precisa ser aqui: acima do limite o Next rejeita a requisição antes da action rodar, e aí
+    // não existe erro tratado pra mostrar — cai na tela genérica "This page couldn't load".
+    const sizeError = checkUploadSize(formData.get("file") as File | null);
+    if (sizeError) {
+      setError(sizeError);
+      return;
+    }
     startTransition(async () => {
       const result = await importExamResultsPdf(formData);
       if (!result.ok) {
@@ -59,7 +67,7 @@ export function ImportExamResultsButton({ clientId }: { clientId: string }) {
                   fora da faixa de referência.
                 </p>
                 <div className="field">
-                  <label htmlFor="exam-pdf-file">Arquivo PDF</label>
+                  <label htmlFor="exam-pdf-file">Arquivo PDF (até {formatMb(MAX_UPLOAD_BYTES)} MB)</label>
                   <input className="input" id="exam-pdf-file" name="file" type="file" accept="application/pdf" required />
                 </div>
                 {error && <p style={{ color: "var(--danger)", fontSize: "0.85rem" }}>{error}</p>}
